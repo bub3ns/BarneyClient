@@ -453,7 +453,7 @@ extends Module {
         if (!this.rayTrace.isEnabled() || !bl) {
             return true;
         }
-        if (this.predictionState.getSavedPlayerState() != null && this.predictionState.getAttackCount() > 1 || this.privilegedMode) {
+        if (this.privilegedMode) {
             return true;
         }
         ClientPlayerEntity player = Aura.minecraftClient.player;
@@ -809,7 +809,7 @@ extends Module {
     }
 
     public boolean isWithinAttackRange(LivingEntity class_13092) {
-        return this.predictionState.getAttackCount() <= 1 ? Aura.minecraftClient.player.getEyePos().distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) <= (double)this.getAttackProgress() : this.predictionState.getSavedPlayerState().getPosition().distanceTo(class_13092.getPos()) < 6.0;
+        return Aura.minecraftClient.player.getEyePos().distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) <= (double)this.getAttackProgress();
     }
 
     @Override
@@ -819,7 +819,6 @@ extends Module {
             AuraRotationMode auraRotationMode = (AuraRotationMode)option;
             auraRotationMode.enabled();
         }
-        this.predictionState.registerEventListeners();
         this.alwaysEnabled = false;
         this.resetAttackState();
         super.onEnable();
@@ -835,7 +834,6 @@ extends Module {
         if (this.rotationController != null) {
             this.rotationController.onTargetLost();
         }
-        this.predictionState.restoreStateAndUnregister();
         super.onDisable();
     }
 
