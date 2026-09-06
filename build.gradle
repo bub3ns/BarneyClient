@@ -1,0 +1,106 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+    id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+}
+
+loom {
+    // fabric.mod.json already declares this widener, but that only affects runtime.
+    // Loom needs the path too, otherwise the widened members stay private at compile
+    // time and every call site that the original client makes into them fails to build.
+    accessWidenerPath = file("src/main/resources/rockstar.accesswidener")
+
+    mods {
+        "rockstar" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // MixinExtras is a normal Fabric dependency resolved from Maven Central.
+    modImplementation "io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}"
+
+    // Libraries used directly by the decompiled source tree.
+    implementation "com.google.zxing:core:${project.zxing_version}"
+    implementation "com.google.zxing:javase:${project.zxing_version}"
+    implementation "com.squareup.okhttp3:okhttp:${project.okhttp_version}"
+    implementation "org.jsoup:jsoup:${project.jsoup_version}"
+    implementation "io.projectreactor.netty:reactor-netty-http:${project.reactor_netty_version}"
+    implementation "org.reactivestreams:reactive-streams:${project.reactive_streams_version}"
+    implementation "net.java.dev.jna:jna:${project.jna_version}"
+    implementation "net.java.dev.jna:jna-platform:${project.jna_version}"
+    implementation "black.ninia:jep:${project.jep_version}"
+
+    // The source uses JavaFX WebView/Swing classes; these are platform-specific on desktop.
+    implementation "org.openjfx:javafx-base:${project.javafx_version}:win"
+    implementation "org.openjfx:javafx-graphics:${project.javafx_version}:win"
+    implementation "org.openjfx:javafx-controls:${project.javafx_version}:win"
+    implementation "org.openjfx:javafx-swing:${project.javafx_version}:win"
+    implementation "org.openjfx:javafx-web:${project.javafx_version}:win"
+
+    compileOnly "org.projectlombok:lombok:${project.lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+    compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
+    compileOnly "com.google.code.findbugs:jsr305:${project.jsr305_version}"
+    compileOnly "javax.validation:validation-api:${project.validation_api_version}"
+}
+
+processResources {
+    def version = project.version
+    inputs.property "version", version
+    filesMatching("fabric.mod.json") {
+        expand "version": version
+    }
+}
+
+// The original client reads its optional image pack from the Minecraft run
+// directory (run/Barney/assets).  Keep that behavior and stage the supplied
+// original archive there for development runs; do not put the external pack
+// into the mod jar or replace missing images with generated files.
+def rockstarAssetArchive = file("../assets.zip")
+
+tasks.register("prepareRockstarAssets", Copy) {
+    onlyIf { rockstarAssetArchive.isFile() }
+    from { zipTree(rockstarAssetArchive) }
+    into file("run/Barney")
+}
+
+tasks.named("runClient") {
+    dependsOn(tasks.named("prepareRockstarAssets"))
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+    it.options.compilerArgs.addAll('-Xmaxerrs', '5000')
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    def projectName = project.name
+    inputs.property "projectName", projectName
+    from("LICENSE") {
+        rename { "${it}_$projectName" }
+    }
+}
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            from components.java
+        }
+    }
+}

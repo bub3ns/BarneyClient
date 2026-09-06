@@ -1,0 +1,18 @@
+accessWidener	v2	named
+accessible	method	net/minecraft/client/network/ClientPlayerInteractionManager	sendSequencedPacket	(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V
+accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
+accessible	field	net/minecraft/entity/projectile/FishingBobberEntity	CAUGHT_FISH	Lnet/minecraft/entity/data/TrackedData;
+accessible	method	net/minecraft/client/render/entity/EntityRenderDispatcher	render	(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V
+accessible	field	net/minecraft/client/sound/AbstractSoundInstance	volume	F
+accessible	field	net/minecraft/client/sound/AbstractSoundInstance	pitch	F
+accessible	method	net/minecraft/client/render/GameRenderer	getFov	(Lnet/minecraft/client/render/Camera;FZ)F
+accessible	method	net/minecraft/client/render/GameRenderer	tiltViewWhenHurt	(Lnet/minecraft/client/util/math/MatrixStack;F)V
+accessible	class	net/minecraft/client/network/ClientCommonNetworkHandler$ConfirmServerResourcePackScreen
+accessible	method	net/minecraft/client/texture/NativeImage	getColor	(II)I
+accessible	method	net/minecraft/client/texture/NativeImage	setColor	(III)V
+accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	lastSelectedSlot	I
+accessible	method	net/minecraft/client/render/WorldRenderer	renderEntities	(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/RenderTickCounter;Ljava/util/List;)V
+accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
+accessible	field	net/minecraft/client/gui/screen/ingame/HandledScreen	focusedSlot	Lnet/minecraft/screen/slot/Slot;
+accessible	method	net/minecraft/client/MinecraftClient	doAttack	()Z
+accessible	method	net/minecraft/client/MinecraftClient	handleBlockBreaking	(Z)V

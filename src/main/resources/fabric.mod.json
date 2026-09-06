@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "rockstar",
+  "version": "1.0.0",
+  "name": "Barney",
+  "description": "Вспомогательный мод для комфортной игры. Огромные благодарности за помощь в разработке клиента: Sampay, sheluvparis, Delyfss, qmaa, senya, watanowa, whistlekey и др.",
+  "authors": [
+    "ConeTin",
+    "Malecharik",
+    "Jabkov",
+    "saint",
+    "Gyusik",
+    "Damage",
+    "Claude",
+    "ChatGPT Codex"
+  ],
+  "license": "CC0-1.0",
+  "icon": "assets/rockstar/icon.png",
+  "environment": "client",
+  "entrypoints": {},
+  "mixins": [
+    "rockstar.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": "\u003e\u003d0.16.14",
+    "minecraft": "~1.21.4",
+    "java": "\u003e\u003d21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  },
+  "accessWidener": "rockstar.accesswidener"
+}
