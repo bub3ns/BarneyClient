@@ -45,7 +45,9 @@ import lombok.Generated;
 import moscow.rockstar.combat.RotationController;
 import moscow.rockstar.combat.RotationManager;
 import moscow.rockstar.combat.WallMode;
+import moscow.rockstar.combat.critical.AttackCriticalHandler;
 import moscow.rockstar.combat.critical.CriticalHitTiming;
+import moscow.rockstar.combat.critical.MeleeDamage;
 import moscow.rockstar.combat.critical.SprintResetPolicy;
 import moscow.rockstar.combat.rotation.AimRotationMath;
 import moscow.rockstar.combat.rotation.RotationCorrectionMode;
@@ -423,25 +425,16 @@ extends Module {
         if (!this.isRaycastPassing(class_13092, bl)) {
             return this.isProtectedName("\u0440\u0435\u0439\u0442\u0440\u0435\u0439\u0441 \u043d\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u0442");
         }
-        if (this.isSmartCriticalReady() && this.isWithinRangePrimary(class_13092) && !this.isAirCriticalReady()) {
-            return this.isProtectedName("\u0436\u0434\u0451\u043c \u043a\u0440\u0438\u0442");
+        if (!AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), class_13092)) {
+            return this.isProtectedName("ждём крит");
         }
-        this.attackStatistics.merge("\u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438 \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u044b", 1, Integer::sum);
+        this.attackStatistics.merge("проверки пройдены", 1, Integer::sum);
         return true;
     }
 
     public boolean isAirCriticalReady() {
-        ClientPlayerEntity player = Aura.minecraftClient.player;
-        if (player == null) {
-            return false;
-        }
-        if (player.isClimbing() || player.isTouchingWater() || player.isInLava() || player.hasVehicle() || player.getAbilities().flying) {
-            return true;
-        }
-        if (player.isOnGround()) {
-            return false;
-        }
-        return player.getVelocity().y <= -0.01;
+        LivingEntity target = RockstarClient.create().getFriendManager().getTargetLivingEntity();
+        return AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), target);
     }
 
     private boolean isRaycastPassing(LivingEntity class_13092, boolean bl) {
@@ -499,7 +492,7 @@ extends Module {
         if (bl ? Aura.minecraftClient.player.getEyePos().add(0.0, -1.0, 0.0).distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) > (double)this.getAttackProgress() : !this.isWithinAttackRange(class_13092)) {
             return false;
         }
-        return !this.isSmartCriticalReady() || !this.isWithinRangePrimary(class_13092) || this.isAirCriticalReady();
+        return AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), class_13092);
     }
 
     private boolean isWithinRangePrimary(LivingEntity class_13092) {
@@ -514,11 +507,11 @@ extends Module {
         if (Aura.minecraftClient.player.isSubmergedInWater() && ServerDetector.isInventoryServer()) {
             return this.isAttackDelayReady();
         }
-        return Aura.minecraftClient.player.getAttackCooldownProgress(0.0f) >= 0.9f;
+        return MeleeDamage.isFullStrength(Aura.minecraftClient.player);
     }
 
     private boolean isAttackDelayReady() {
-        if (Aura.minecraftClient.player.getAttackCooldownProgress(0.0f) < 1.0f) {
+        if (Aura.minecraftClient.player.getAttackCooldownProgress(0.5f) < 1.0f) {
             this.nextAttackTime = 0L;
             return false;
         }
@@ -714,14 +707,18 @@ extends Module {
         return RotationReturnMode.SMOOTH;
     }
 
-    private boolean isSmartCriticalReady() {
-        if (this.onlyCrits.isEnabled()) {
-            return true;
+    public AttackCriticalHandler.Mode getCriticalMode() {
+        if (this.onlyCrits != null && this.onlyCrits.isEnabled()) {
+            return AttackCriticalHandler.Mode.ONLY;
         }
         if (this.smartCriticals != null && this.smartCriticals.isEnabled()) {
-            return Aura.minecraftClient.options != null && Aura.minecraftClient.options.jumpKey.isPressed() || !Aura.minecraftClient.player.isOnGround();
+            return AttackCriticalHandler.Mode.PRIORITIZE;
         }
-        return false;
+        return AttackCriticalHandler.Mode.NONE;
+    }
+
+    private boolean isSmartCriticalReady() {
+        return this.getCriticalMode() != AttackCriticalHandler.Mode.NONE;
     }
 
     private boolean prepareAttackTarget() {

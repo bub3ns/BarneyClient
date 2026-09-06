@@ -106,6 +106,10 @@ extends AbstractSetting {
         this.selectedOption = option;
     }
 
+    public int getSelectedIndex() {
+        return this.options.indexOf(this.selectedOption);
+    }
+
     @Override
     public JsonElement serialize() {
         return new JsonPrimitive(this.selectedOption == null ? "" : this.selectedOption.getName());
