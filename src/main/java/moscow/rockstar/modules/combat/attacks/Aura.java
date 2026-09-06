@@ -271,11 +271,10 @@ extends Module {
         this.cpsLimiter = new RangeSetting((SettingOwner)this, "modules.settings.aura.cps_limiter", () -> true).setMinimum(1.0f).setMaximum(20.0f).setStep(1.0f).setFirstValue(8.0f).setSecondValue(12.0f);
         this.critCalc = new ModeSetting((SettingOwner)this, "modules.settings.aura.crit_calc", () -> true);
         this.airCriticalsOption = new ModeSetting.Option(this.critCalc, "modules.settings.aura.crit_calc.air").select();
-        this.sprintReset = new ModeSetting(this, "modules.settings.aura.sprint_reset");
+        this.sprintReset = new ModeSetting((SettingOwner)this, "modules.settings.aura.sprint_reset", () -> false);
         this.smartSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.smart");
-        this.normalSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.normal");
+        this.normalSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.normal").select();
         this.packetSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.packet");
-        this.smartSprintResetOption.select();
         this.utilities = new MultiBooleanSetting(this, "modules.settings.aura.utilities");
         this.resolver = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.resolver");
         this.useHit = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.useHit");
@@ -353,10 +352,6 @@ extends Module {
                 this.targetVisible = true;
             }
             this.performCriticalAttack(class_13092);
-            if (this.prepareAttackTarget()) {
-                this.attackStatistics.merge("\u0441\u043f\u0440\u0438\u043d\u0442-\u0440\u0435\u0441\u0435\u0442 (\u0434\u043e \u0443\u0434\u0430\u0440\u0430)", 1, Integer::sum);
-                return;
-            }
             if (this.isEntityValid(class_13092, true)) {
                 if (this.isEntityValid(class_13092)) {
                     this.attackStatistics.merge("\u0441\u043f\u0440\u0438\u043d\u0442-\u0440\u0435\u0441\u0435\u0442 (\u0432\u043c\u0435\u0441\u0442\u043e \u0443\u0434\u0430\u0440\u0430)", 1, Integer::sum);
@@ -446,7 +441,7 @@ extends Module {
         if (player.isOnGround()) {
             return false;
         }
-        return player.getVelocity().y < this.lastVelocityY && (player.getVelocity().y < 0.0 || player.fallDistance > 0.0f);
+        return player.getVelocity().y < this.lastVelocityY && player.getVelocity().y < 0.0 && player.fallDistance > 0.15f;
     }
 
     private boolean isRaycastPassing(LivingEntity class_13092, boolean bl) {
@@ -734,26 +729,14 @@ extends Module {
     }
 
     private boolean prepareAttackTarget() {
-        if (Aura.minecraftClient.player == null) {
-            return false;
-        }
-        if (TargetActionQueue.hasDeferredAction()) {
-            return true;
-        }
-        if (!this.isSmartCriticalReady() || !SprintResetPolicy.shouldDeferAttack((PlayerEntity)Aura.minecraftClient.player)) {
-            return false;
-        }
-        TargetActionQueue.setCurrentTarget((PlayerEntity)Aura.minecraftClient.player);
-        return true;
+        return false;
     }
 
     private boolean isEntityValid(LivingEntity class_13092) {
-        boolean bl = this.sprintReset.isSelected(this.normalSprintResetOption);
-        boolean bl2 = this.sprintReset.isSelected(this.packetSprintResetOption);
         if (RockstarClient.create().getModuleRegistry().getModule(KnockbackTweaks.class).isEnabled()) {
             return false;
         }
-        if (!bl && !bl2 || Aura.minecraftClient.player == null) {
+        if (Aura.minecraftClient.player == null) {
             return false;
         }
         if (TargetActionQueue.hasDeferredAction() || TargetActionQueue.isCurrentTarget((Entity)Aura.minecraftClient.player)) {
@@ -763,7 +746,7 @@ extends Module {
             TargetActionQueue.clearTarget((Entity)Aura.minecraftClient.player);
             return false;
         }
-        TargetActionQueue.queueTargetAction((PlayerEntity)Aura.minecraftClient.player, () -> this.tryAttackTarget(class_13092), bl2);
+        TargetActionQueue.queueTargetAction((PlayerEntity)Aura.minecraftClient.player, () -> this.tryAttackTarget(class_13092), false);
         return true;
     }
 
@@ -777,30 +760,7 @@ extends Module {
     }
 
     public boolean shouldResetSprint() {
-        boolean bl;
-        LivingEntity class_13092;
-        if (!this.sprintReset.isSelected(this.smartSprintResetOption)) {
-            return false;
-        }
-        if (RockstarClient.create().getModuleRegistry().getModule(KnockbackTweaks.class).isEnabled()) {
-            return false;
-        }
-        Entity class_12972 = RockstarClient.create().getFriendManager().getTargetEntity();
-        if (class_12972 instanceof LivingEntity) {
-            class_13092 = (LivingEntity)class_12972;
-        } else {
-            class_13092 = null;
-        }
-        if (class_13092 == null || Aura.minecraftClient.player == null) {
-            return false;
-        }
-        if (Aura.minecraftClient.player.isSubmergedInWater()) {
-            return false;
-        }
-        return this.isSmartCriticalReady() && this.isWithinRangePrimary(class_13092)
-            && (this.isAirCriticalReady()
-            || !this.cooldownTimer.hasElapsed(ServerDetector.isServerProfileSupported(ServerProfile.SPOOKY)
-            || ServerDetector.isInventoryServer() ? (long)MathUtils.interpolateRandomStrategy(50.0f, 150.0f) : 50L));
+        return false;
     }
 
     public float getAttackProgress() {
