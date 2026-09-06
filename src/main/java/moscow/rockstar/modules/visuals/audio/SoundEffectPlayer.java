@@ -36,9 +36,11 @@ public final class SoundEffectPlayer {
         play("totem.totem-totem", volume, 1.0f);
     }
 
+    /*
     public static void playKill(float volume) {
         play("kill.easy", volume, 1.0f);
     }
+    */
 
     public static void playDeath(float volume) {
         play("death.blin", volume, 1.0f);

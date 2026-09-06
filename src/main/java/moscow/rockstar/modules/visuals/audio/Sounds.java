@@ -69,7 +69,7 @@ extends Module {
     private void initializeSettings() {
         this.volumeSetting = new NumberSetting(this, "modules.settings.sounds.volume").setStep(5.0f).setMinValue(10.0f).setMaxValue(100.0f).setValue(80.0f).setUnit("%");
         this.soundOptions = new MultiBooleanSetting(this, "modules.settings.sounds.voice");
-        this.killSoundOption = new MultiBooleanSetting.Option(this.soundOptions, "modules.settings.sounds.voice.kill");
+        // this.killSoundOption = new MultiBooleanSetting.Option(this.soundOptions, "modules.settings.sounds.voice.kill");
         this.totemSoundOption = new MultiBooleanSetting.Option(this.soundOptions, "modules.settings.sounds.voice.totem");
         this.startSoundOption = new MultiBooleanSetting.Option(this.soundOptions, "modules.settings.sounds.voice.start");
         this.leaveSoundOption = new MultiBooleanSetting.Option(this.soundOptions, "modules.settings.sounds.voice.leave");
@@ -82,6 +82,7 @@ extends Module {
 
     @Override
     public void onTick() {
+        /*
         LivingEntity class_13092;
         Entity class_12972;
         LivingEntity class_13093;
@@ -103,6 +104,7 @@ extends Module {
         if (class_13093 != null) {
             this.trackedTarget = class_13093;
         }
+        */
     }
 
     @Generated

@@ -5,6 +5,9 @@ plugins {
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 loom {
@@ -28,6 +31,12 @@ dependencies {
 
     // MixinExtras is a normal Fabric dependency resolved from Maven Central.
     modImplementation "io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}"
+
+    // In-Game Account Switcher (IAS)
+    modImplementation name: 'IAS'
+    include name: 'IAS'
+
+
 
     // Libraries used directly by the decompiled source tree.
     implementation "com.google.zxing:core:${project.zxing_version}"
