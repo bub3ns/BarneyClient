@@ -71,7 +71,6 @@ import moscow.rockstar.modules.ModuleCategory;
 import moscow.rockstar.modules.ModuleInfo;
 import moscow.rockstar.modules.combat.attacks.Criticals;
 import moscow.rockstar.modules.combat.aura.rotation.AuraRotationMode;
-import moscow.rockstar.modules.combat.aura.rotation.ReallyWorldRotationMode;
 import moscow.rockstar.modules.combat.aura.rotation.SimpleRotationMode;
 import moscow.rockstar.modules.combat.defense.KnockbackTweaks;
 import moscow.rockstar.modules.combat.targeting.AntiBot;
@@ -200,12 +199,13 @@ extends Module {
     private static final long ATTACK_RETRY_DELAY = 200L;
     private float attackRange = MathUtils.interpolateRandomStrategy(0.0f, 1.0f);
     private long nextAttackTime;
+    private double lastVelocityY = 0.0;
     private final Map<String, Integer> attackStatistics = new LinkedHashMap<String, Integer>();
     private final EventListener<EntityJumpEvent> onEntityJumpEvent = entityJumpEvent -> {
         if (Aura.minecraftClient.player != entityJumpEvent.getEntity()) {
             return;
         }
-        if (this.critCalc.isSelected(this.newCriticalsOption) && Aura.minecraftClient.player.isOnGround() && Aura.minecraftClient.player.getMainHandStack().getItem() instanceof SwordItem) {
+        if (this.newCriticalsOption != null && this.critCalc.isSelected(this.newCriticalsOption) && Aura.minecraftClient.player.isOnGround() && Aura.minecraftClient.player.getMainHandStack().getItem() instanceof SwordItem) {
             LivingEntity class_13092 = RockstarClient.create().getFriendManager().getTargetLivingEntity();
             if (CriticalHitTiming.shouldCancelJump(Aura.minecraftClient.player, EntityOverlayGeometry.getEntityHeight(class_13092))) {
                 entityJumpEvent.cancel();
@@ -222,8 +222,6 @@ extends Module {
         this.rotationMode = new ModeSetting(this, "modules.settings.aura.rotationMode");
         this.noRotation = new ModeSetting.Option(this.rotationMode, "modules.settings.aura.noRotation");
         this.smoothRotation = new SimpleRotationMode(this.rotationMode).select();
-        new ReallyWorldRotationMode(this.rotationMode);
-        this.rotationController = new RotationController(this.rotationMode);
         this.returnMode = new ModeSetting((SettingOwner)this, "modules.settings.aura.returnMode", () -> this.rotationMode.isSelected(this.noRotation));
         this.noReturnOption = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.none");
         this.smooth = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.smooth").select();
@@ -243,7 +241,7 @@ extends Module {
         this.doorsAndTrapdoorsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.doors");
         this.reachableWallsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.rw");
         this.nonSolidBlocksOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.ft");
-        this.rayTrace = new BooleanSetting(this, "modules.settings.aura.rayTrace").enable();
+        this.rayTrace = new BooleanSetting((SettingOwner)this, "modules.settings.aura.rayTrace", () -> true).enable();
         this.targeting = new BooleanSetting(this, "modules.settings.aura.targeting").enable();
         this.onlyWeapon = new BooleanSetting(this, "modules.settings.aura.onlyWeapon");
         this.autoMace = new BooleanSetting((SettingOwner)this, "modules.settings.aura.auto_mace", "modules.settings.aura.auto_mace.description");
@@ -267,14 +265,12 @@ extends Module {
         this.targetedMoveCorrection = new ModeSetting.Option(this.moveCorrectionMode, "modules.settings.aura.targeted_move_correction");
         this.forceTargetedRanged = new BooleanSetting((SettingOwner)this, "modules.settings.aura.force_targeted_ranged", () -> this.moveCorrectionMode.isSelected(this.targetedMoveCorrection));
         this.forceBehindTargeted = new BooleanSetting((SettingOwner)this, "modules.settings.aura.force_behind_targeted", () -> !this.forceTargetedRanged.isEnabled() || this.moveCorrectionMode.isSelected(this.targetedMoveCorrection));
-        this.styleAttack = new ModeSetting(this, "modules.settings.aura.styleAttack");
-        this.legacyAttackStyle = new ModeSetting.Option(this.styleAttack, "1.8");
+        this.styleAttack = new ModeSetting((SettingOwner)this, "modules.settings.aura.styleAttack", () -> true);
         this.modernAttackStyle = new ModeSetting.Option(this.styleAttack, "1.9").select();
-        this.cpsLimiter = new RangeSetting(this, "modules.settings.aura.cps_limiter", this.modernAttackStyle::isSelected).setMinimum(1.0f).setMaximum(20.0f).setStep(1.0f).setFirstValue(8.0f).setSecondValue(12.0f);
-        this.critCalc = new ModeSetting(this, "modules.settings.aura.crit_calc");
-        this.oldCriticalsOption = new ModeSetting.Option(this.critCalc, "modules.settings.aura.crit_calc.old").select();
-        this.newCriticalsOption = new ModeSetting.Option(this.critCalc, "modules.settings.aura.crit_calc.new");
-        this.airCriticalsOption = new ModeSetting.Option(this.critCalc, "modules.settings.aura.crit_calc.air");
+        this.legacyAttackStyle = new ModeSetting.Option(new ModeSetting((SettingOwner)this, "unused_legacy", () -> true), "1.8");
+        this.cpsLimiter = new RangeSetting((SettingOwner)this, "modules.settings.aura.cps_limiter", () -> true).setMinimum(1.0f).setMaximum(20.0f).setStep(1.0f).setFirstValue(8.0f).setSecondValue(12.0f);
+        this.critCalc = new ModeSetting((SettingOwner)this, "modules.settings.aura.crit_calc", () -> true);
+        this.airCriticalsOption = new ModeSetting.Option(this.critCalc, "modules.settings.aura.crit_calc.air").select();
         this.sprintReset = new ModeSetting(this, "modules.settings.aura.sprint_reset");
         this.smartSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.smart");
         this.normalSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.normal");
@@ -283,7 +279,7 @@ extends Module {
         this.utilities = new MultiBooleanSetting(this, "modules.settings.aura.utilities");
         this.resolver = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.resolver");
         this.useHit = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.useHit");
-        this.excludeTeammatesOption = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.no_teammates_1_8", () -> !this.legacyAttackStyle.isSelected());
+        this.excludeTeammatesOption = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.no_teammates_1_8", () -> true);
         this.sync = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.sync");
         this.syncTps = new MultiBooleanSetting.Option(this.utilities, "modules.settings.aura.sync_tps");
         this.cooldownTimer = new Timer();
@@ -325,7 +321,7 @@ extends Module {
             ((AuraRotationMode)clientAccess).tick();
         }
         float f = (bl = ((Module)(clientAccess = RockstarClient.create().getModuleRegistry().getModule(ElytraTarget.class))).isEnabled()) ? ((ElytraTarget)clientAccess).getEngageRange().getValue() : Math.max(this.aimDistance.getValue(), this.getAttackProgress());
-        TargetFilter.Builder builder = new TargetFilter.Builder().players(this.players.isSelected()).animals(!bl && this.animals.isSelected()).mobs(!bl && this.mobs.isSelected()).invisibles(this.invisibles.isSelected()).nakedPlayers(this.nakedPlayers.isSelected()).friends(this.friends.isSelected()).rockstarUsers(this.rockUsers.isSelected()).excludeTeammates(this.excludeTeammatesOption.isSelected() && this.legacyAttackStyle.isSelected()).range(f);
+        TargetFilter.Builder builder = new TargetFilter.Builder().players(this.players.isSelected()).animals(!bl && this.animals.isSelected()).mobs(!bl && this.mobs.isSelected()).invisibles(this.invisibles.isSelected()).nakedPlayers(this.nakedPlayers.isSelected()).friends(this.friends.isSelected()).rockstarUsers(this.rockUsers.isSelected()).excludeTeammates(this.excludeTeammatesOption.isSelected()).range(f);
         if (bl || this.sorting.isSelected(this.distanceSorting)) {
             builder.sortComparator(EntityProcessor.DISTANCE_COMPARATOR);
         } else if (this.sorting.isSelected(this.healthSorting)) {
@@ -377,11 +373,12 @@ extends Module {
                 auraRotationMode.onTargetLost();
             }
         }
+        if (Aura.minecraftClient.player != null) {
+            this.lastVelocityY = Aura.minecraftClient.player.getVelocity().y;
+        }
     }
 
     public boolean isEntityValid(LivingEntity class_13092, boolean bl) {
-        ReallyWorldRotationMode reallyWorldRotationMode;
-        boolean bl2;
         ClientAccess clientAccess;
         Criticals criticals;
         if (!this.isAttackCooldownReady()) {
@@ -390,7 +387,7 @@ extends Module {
         if (AntiBot.isEntityValid(class_13092)) {
             return this.isProtectedName("antibot");
         }
-        if (this.styleAttack.isSelected(this.legacyAttackStyle) && this.excludeTeammatesOption.isSelected() && class_13092 instanceof PlayerEntity && TargetFilter.areTeammates((PlayerEntity)Aura.minecraftClient.player, (PlayerEntity)class_13092)) {
+        if (this.excludeTeammatesOption.isSelected() && class_13092 instanceof PlayerEntity && TargetFilter.areTeammates((PlayerEntity)Aura.minecraftClient.player, (PlayerEntity)class_13092)) {
             return this.isProtectedName("\u0441\u043e\u044e\u0437\u043d\u0438\u043a");
         }
         criticals = RockstarClient.create().getModuleRegistry().getModule(Criticals.class);
@@ -424,19 +421,53 @@ extends Module {
                 return this.isProtectedName("\u043e\u0436\u0438\u0434\u0430\u0435\u043c \u0441\u0432\u0430\u043f \u043d\u0430 \u0431\u0443\u043b\u0430\u0432\u0443");
             }
         }
-        boolean bl3 = bl2 = ((Module)(clientAccess = RockstarClient.create().getModuleRegistry().getModule(ElytraTarget.class))).isEnabled() && Aura.minecraftClient.player.isGliding() && Aura.minecraftClient.player.getVelocity().length() < 6.0;
+        boolean bl2 = ((Module)(clientAccess = RockstarClient.create().getModuleRegistry().getModule(ElytraTarget.class))).isEnabled() && Aura.minecraftClient.player.isGliding() && Aura.minecraftClient.player.getVelocity().length() < 6.0;
         if (bl2) {
             return true;
         }
-        ModeSetting.Option option2 = this.rotationMode.getSelectedOption();
-        if (!(option2 instanceof ReallyWorldRotationMode && (reallyWorldRotationMode = (ReallyWorldRotationMode)option2).isSpecialRotationActive() || MathUtils.isRotationPathClear(this.getAttackProgress(), RockstarClient.create().getRotationManager().getCurrentRotation().getYaw(), RockstarClient.create().getRotationManager().getCurrentRotation().getPitch(), (Entity)Aura.minecraftClient.player, (Entity)class_13092, this.getWallMode()) || !this.rayTrace.isEnabled() || !bl || this.predictionState.getSavedPlayerState() != null && this.predictionState.getAttackCount() > 1 || this.privilegedMode)) {
+        if (!this.isRaycastPassing(class_13092, bl)) {
             return this.isProtectedName("\u0440\u0435\u0439\u0442\u0440\u0435\u0439\u0441 \u043d\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u0442");
         }
-        if (this.isSmartCriticalReady() && this.isWithinRangePrimary(class_13092) && !EntityOverlayGeometry.isValidTarget(class_13092, true)) {
+        if (this.isSmartCriticalReady() && this.isWithinRangePrimary(class_13092) && !this.isAirCriticalReady()) {
             return this.isProtectedName("\u0436\u0434\u0451\u043c \u043a\u0440\u0438\u0442");
         }
         this.attackStatistics.merge("\u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438 \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u044b", 1, Integer::sum);
         return true;
+    }
+
+    public boolean isAirCriticalReady() {
+        ClientPlayerEntity player = Aura.minecraftClient.player;
+        if (player == null) {
+            return false;
+        }
+        if (player.isClimbing() || player.isTouchingWater() || player.isInLava() || player.hasVehicle() || player.getAbilities().flying) {
+            return true;
+        }
+        if (player.isOnGround()) {
+            return false;
+        }
+        return player.getVelocity().y < this.lastVelocityY && (player.getVelocity().y < 0.0 || player.fallDistance > 0.0f);
+    }
+
+    private boolean isRaycastPassing(LivingEntity class_13092, boolean bl) {
+        if (!this.rayTrace.isEnabled() || !bl) {
+            return true;
+        }
+        if (this.predictionState.getSavedPlayerState() != null && this.predictionState.getAttackCount() > 1 || this.privilegedMode) {
+            return true;
+        }
+        ClientPlayerEntity player = Aura.minecraftClient.player;
+        if (player == null || class_13092 == null) {
+            return false;
+        }
+        if (Aura.minecraftClient.targetedEntity == class_13092) {
+            return true;
+        }
+        if (MathUtils.isRotationPathClear(this.getAttackProgress(), player.getYaw(), player.getPitch(), (Entity)player, (Entity)class_13092, this.getWallMode())) {
+            return true;
+        }
+        Rotation rotation = RockstarClient.create().getRotationManager().getCurrentRotation();
+        return MathUtils.isRotationPathClear(this.getAttackProgress(), rotation.getYaw(), rotation.getPitch(), (Entity)player, (Entity)class_13092, this.getWallMode());
     }
 
     private boolean isProtectedName(String string) {
@@ -473,7 +504,7 @@ extends Module {
         if (bl ? Aura.minecraftClient.player.getEyePos().add(0.0, -1.0, 0.0).distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) > (double)this.getAttackProgress() : !this.isWithinAttackRange(class_13092)) {
             return false;
         }
-        return !this.isSmartCriticalReady() || !this.isWithinRangePrimary(class_13092) || EntityOverlayGeometry.isValidLivingEntity(class_13092);
+        return !this.isSmartCriticalReady() || !this.isWithinRangePrimary(class_13092) || this.isAirCriticalReady();
     }
 
     private boolean isWithinRangePrimary(LivingEntity class_13092) {
@@ -482,20 +513,17 @@ extends Module {
     }
 
     public boolean isAttackCooldownReady() {
-        boolean bl;
         if (Aura.minecraftClient.player == null) {
             return false;
         }
         if (Aura.minecraftClient.player.isSubmergedInWater() && ServerDetector.isInventoryServer()) {
             return this.isAttackDelayReady();
         }
-        float f = this.getCooldownProgress();
-        float f2 = this.syncTps.isSelected() ? Math.min(1.0f, 0.8f * f) : 0.8f;
-        boolean bl2 = bl = Aura.minecraftClient.player.getAttackCooldownProgress(0.0f) >= f2;
-        if (this.styleAttack.isSelected(this.legacyAttackStyle)) {
-            return this.cooldownTimer.hasElapsed(this.getAttackCooldown());
+        if (Aura.minecraftClient.player.getAttackCooldownProgress(0.0f) <= 0.9f) {
+            return false;
         }
-        return bl && this.cooldownTimer.hasElapsed(Math.round(500.0f * f));
+        float f = this.getCooldownProgress();
+        return this.cooldownTimer.hasElapsed(Math.round(500.0f * f));
     }
 
     private boolean isAttackDelayReady() {
@@ -519,8 +547,7 @@ extends Module {
         if (this.getWallMode() != WallMode.REACHABLE_WALLS || Aura.minecraftClient.player == null || Aura.minecraftClient.world == null || class_13092 == null) {
             return;
         }
-        ModeSetting.Option option = this.rotationMode.getSelectedOption();
-        Rotation rotation = option instanceof ReallyWorldRotationMode reallyWorldMode && reallyWorldMode.isSpecialRotationActive() ? reallyWorldMode.getRotation() : AimRotationMath.calculateAttackRotation(class_13092, this);
+        Rotation rotation = AimRotationMath.calculateAttackRotation(class_13092, this);
         list = this.collectAttackHitPoints(class_13092, rotation);
         if (list.isEmpty()) {
             return;
@@ -680,15 +707,8 @@ extends Module {
             auraRotationMode.rotate(rotationManager, this.getAttackProgress(), this.getWallMode().usesDirectRaycast(), this.rayTrace.isEnabled(), rotationCorrectionMode, class_13092);
             RotationRequest rotationRequest = rotationManager.getRotationResolver();
             if (rotationRequest != null && rotationRequest != object) {
-                RotationStepAccess rotationStepAccess;
                 rotationRequest.setReturnMode(this.getRotationReturnMode());
-                if (auraRotationMode instanceof RotationController) {
-                    RotationController rotationController = (RotationController)auraRotationMode;
-                    rotationStepAccess = rotationController::calculateCorrectionRotation;
-                } else {
-                    rotationStepAccess = null;
-                }
-                rotationRequest.setRotationStep(rotationStepAccess);
+                rotationRequest.setRotationStep(null);
             }
         }
     }
@@ -704,10 +724,13 @@ extends Module {
     }
 
     private boolean isSmartCriticalReady() {
-        if (this.smartCriticals != null && this.smartCriticals.isEnabled() && !this.airCriticalsOption.isSelected()) {
+        if (this.onlyCrits.isEnabled()) {
+            return true;
+        }
+        if (this.smartCriticals != null && this.smartCriticals.isEnabled()) {
             return Aura.minecraftClient.options != null && Aura.minecraftClient.options.jumpKey.isPressed() || !Aura.minecraftClient.player.isOnGround();
         }
-        return this.onlyCrits.isEnabled();
+        return false;
     }
 
     private boolean prepareAttackTarget() {
@@ -771,22 +794,11 @@ extends Module {
         if (class_13092 == null || Aura.minecraftClient.player == null) {
             return false;
         }
-        if (this.styleAttack.isSelected(this.legacyAttackStyle) || Aura.minecraftClient.player.isSubmergedInWater()) {
+        if (Aura.minecraftClient.player.isSubmergedInWater()) {
             return false;
         }
-        Criticals criticals = RockstarClient.create().getModuleRegistry().getModule(Criticals.class);
-        boolean criticalWindowReady = criticals.isCriticalsEnvironmentReady()
-            && (criticals.isCriticalsStateReady() && this.cooldownTimer.hasElapsed(500L)
-            || Aura.minecraftClient.player.isOnGround())
-            || !Aura.minecraftClient.player.isOnGround()
-            && CriticalHitTiming.isCriticalWindowReady(
-                Aura.minecraftClient.player,
-                EntityOverlayGeometry.getEntityHeight(class_13092),
-                ServerDetector.isServerProfileSupported(ServerProfile.FUNTIME)
-                    || ServerDetector.isServerProfileSupported(ServerProfile.FUNSKY)
-                    || ServerDetector.isInventoryServer() ? MathUtils.RANDOM.nextInt(3) : 1);
         return this.isSmartCriticalReady() && this.isWithinRangePrimary(class_13092)
-            && (criticalWindowReady || EntityOverlayGeometry.isValidTarget(class_13092, true)
+            && (this.isAirCriticalReady()
             || !this.cooldownTimer.hasElapsed(ServerDetector.isServerProfileSupported(ServerProfile.SPOOKY)
             || ServerDetector.isInventoryServer() ? (long)MathUtils.interpolateRandomStrategy(50.0f, 150.0f) : 50L));
     }
@@ -797,7 +809,7 @@ extends Module {
     }
 
     public boolean isWithinAttackRange(LivingEntity class_13092) {
-        return this.predictionState.getAttackCount() <= 1 || !this.airCriticalsOption.isSelected() ? Aura.minecraftClient.player.getEyePos().distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) <= (double)this.getAttackProgress() : this.predictionState.getSavedPlayerState().getPosition().distanceTo(class_13092.getPos()) < 6.0;
+        return this.predictionState.getAttackCount() <= 1 ? Aura.minecraftClient.player.getEyePos().distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) <= (double)this.getAttackProgress() : this.predictionState.getSavedPlayerState().getPosition().distanceTo(class_13092.getPos()) < 6.0;
     }
 
     @Override
@@ -807,9 +819,7 @@ extends Module {
             AuraRotationMode auraRotationMode = (AuraRotationMode)option;
             auraRotationMode.enabled();
         }
-        if (this.airCriticalsOption.isSelected()) {
-            this.predictionState.registerEventListeners();
-        }
+        this.predictionState.registerEventListeners();
         this.alwaysEnabled = false;
         this.resetAttackState();
         super.onEnable();
@@ -979,10 +989,6 @@ extends Module {
     }
 
     private long getNextAttackTime() {
-        if (this.styleAttack.isSelected(this.legacyAttackStyle)) {
-            int n = (int)Math.max(this.cpsLimiter.getFirstValue(), this.cpsLimiter.getSecondValue());
-            return Math.max(1L, 1000L / (long)Math.max(1, n));
-        }
         return Math.round(500.0f * this.getCooldownProgress());
     }
 
