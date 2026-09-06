@@ -233,8 +233,8 @@ extends Module {
             return f;
         });
         this.aimDistance = new NumberSetting(this, "modules.settings.aura.aimDistance").setMinValue(0.1f).setMaxValue(9.0f).setStep(0.1f).setValue(3.0f).setFormatter(f -> " %s".formatted(Localization.translate("block")) + moscow.rockstar.util.NumberFormatting.formatOneDecimal((float)f)).setChangeListener(f -> Float.valueOf(this.attackDistance == null ? f.floatValue() : Math.max(this.attackDistance.getValue(), f.floatValue())));
-        this.onlyCrits = new BooleanSetting(this, "modules.settings.aura.onlyCrits").enable();
-        this.smartCriticals = new BooleanSetting((SettingOwner)this, "modules.settings.aura.smart_criticals", () -> !this.onlyCrits.isEnabled());
+        this.onlyCrits = new BooleanSetting((SettingOwner)this, "modules.settings.aura.onlyCrits", () -> true);
+        this.smartCriticals = new BooleanSetting((SettingOwner)this, "modules.settings.aura.smart_criticals", () -> true).enable();
         this.walls = new ModeSetting(this, "modules.settings.aura.walls");
         this.noWallsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.none").select();
         this.allWallsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.all");
@@ -271,7 +271,7 @@ extends Module {
         this.cpsLimiter = new RangeSetting((SettingOwner)this, "modules.settings.aura.cps_limiter", () -> true).setMinimum(1.0f).setMaximum(20.0f).setStep(1.0f).setFirstValue(8.0f).setSecondValue(12.0f);
         this.critCalc = new ModeSetting((SettingOwner)this, "modules.settings.aura.crit_calc", () -> true);
         this.airCriticalsOption = new ModeSetting.Option(this.critCalc, "modules.settings.aura.crit_calc.air").select();
-        this.sprintReset = new ModeSetting((SettingOwner)this, "modules.settings.aura.sprint_reset", () -> false);
+        this.sprintReset = new ModeSetting((SettingOwner)this, "modules.settings.aura.sprint_reset", () -> true);
         this.smartSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.smart");
         this.normalSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.normal").select();
         this.packetSprintResetOption = new ModeSetting.Option(this.sprintReset, "modules.settings.aura.sprint_reset.packet");
