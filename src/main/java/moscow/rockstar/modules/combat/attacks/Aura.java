@@ -441,7 +441,7 @@ extends Module {
         if (player.isOnGround()) {
             return false;
         }
-        return player.getVelocity().y < this.lastVelocityY && player.getVelocity().y < 0.0 && player.fallDistance > 0.15f;
+        return player.getVelocity().y <= -0.01;
     }
 
     private boolean isRaycastPassing(LivingEntity class_13092, boolean bl) {
@@ -514,11 +514,7 @@ extends Module {
         if (Aura.minecraftClient.player.isSubmergedInWater() && ServerDetector.isInventoryServer()) {
             return this.isAttackDelayReady();
         }
-        if (Aura.minecraftClient.player.getAttackCooldownProgress(0.0f) <= 0.9f) {
-            return false;
-        }
-        float f = this.getCooldownProgress();
-        return this.cooldownTimer.hasElapsed(Math.round(500.0f * f));
+        return Aura.minecraftClient.player.getAttackCooldownProgress(0.0f) >= 0.9f;
     }
 
     private boolean isAttackDelayReady() {
@@ -754,7 +750,7 @@ extends Module {
         if (!this.isEnabled() || Aura.minecraftClient.player == null || Aura.minecraftClient.interactionManager == null || class_13092 == null || class_13092.isRemoved() || !class_13092.isAlive()) {
             return;
         }
-        if (this.isEntityValid(class_13092, true)) {
+        if (this.isWithinAttackRange(class_13092) && this.isRaycastPassing(class_13092, true)) {
             this.performPrimaryAttack(class_13092);
         }
     }
