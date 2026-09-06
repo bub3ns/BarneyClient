@@ -226,13 +226,13 @@ extends Module {
         this.noReturnOption = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.none");
         this.smooth = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.smooth").select();
         this.camera = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.camera");
-        this.attackDistance = new NumberSetting(this, "modules.settings.aura.attackDistance").setMinValue(0.1f).setMaxValue(6.0f).setStep(0.1f).setValue(3.0f).setFormatter(f -> " %s".formatted(Localization.translate("block")) + moscow.rockstar.util.NumberFormatting.formatOneDecimal((float)f)).setChangeListener(f -> {
+        this.attackDistance = new NumberSetting(this, "modules.settings.aura.attackDistance").setMinValue(0.1f).setMaxValue(6.0f).setStep(0.1f).setValue(3.0f).setUnit(" block").setChangeListener(f -> {
             if (this.aimDistance != null && this.aimDistance.getValue() < f.floatValue()) {
                 this.aimDistance.setValue(f.floatValue());
             }
             return f;
         });
-        this.aimDistance = new NumberSetting(this, "modules.settings.aura.aimDistance").setMinValue(0.1f).setMaxValue(9.0f).setStep(0.1f).setValue(3.0f).setFormatter(f -> " %s".formatted(Localization.translate("block")) + moscow.rockstar.util.NumberFormatting.formatOneDecimal((float)f)).setChangeListener(f -> Float.valueOf(this.attackDistance == null ? f.floatValue() : Math.max(this.attackDistance.getValue(), f.floatValue())));
+        this.aimDistance = new NumberSetting(this, "modules.settings.aura.aimDistance").setMinValue(0.1f).setMaxValue(9.0f).setStep(0.1f).setValue(3.0f).setUnit(" block").setChangeListener(f -> Float.valueOf(this.attackDistance == null ? f.floatValue() : Math.max(this.attackDistance.getValue(), f.floatValue())));
         this.onlyCrits = new BooleanSetting((SettingOwner)this, "modules.settings.aura.onlyCrits", () -> true);
         this.smartCriticals = new BooleanSetting((SettingOwner)this, "modules.settings.aura.smart_criticals", () -> true).enable();
         this.walls = new ModeSetting(this, "modules.settings.aura.walls");

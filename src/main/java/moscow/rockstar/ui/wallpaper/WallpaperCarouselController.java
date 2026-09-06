@@ -43,7 +43,7 @@ implements ClientAccess {
     private int preloadIndex;
 
     public static int getDefaultWallpaperIndex() {
-        return 1;
+        return 0;
     }
 
     public static int getWallpaperCount() {

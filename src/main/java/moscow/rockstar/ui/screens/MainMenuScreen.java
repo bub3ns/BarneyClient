@@ -86,9 +86,7 @@ public final class MainMenuScreen extends MinecraftScreenBase implements ClientA
 
     private static WallpaperCarouselController getWallpaperController() {
         if (wallpaperController == null) {
-            int wallpaperCount = WallpaperCarouselController.getWallpaperCount();
-            int selectedIndex = ThreadLocalRandom.current().nextInt(Math.max(1, wallpaperCount));
-            wallpaperController = new WallpaperCarouselController(selectedIndex);
+            wallpaperController = new WallpaperCarouselController(WallpaperCarouselController.getDefaultWallpaperIndex());
         }
         return wallpaperController;
     }
