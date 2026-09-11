@@ -75,28 +75,43 @@ implements ClientAccess {
     @NotNull
     @Compile(obfuscation=1)
     public static Rotation snapRotationToMouseStep(@NotNull Rotation rotation, @NotNull Rotation rotation2) {
-        float f = AimRotationMath.getMouseRotationStep();
-        float f2 = MathHelper.wrapDegrees((float)(rotation2.getYaw() - rotation.getYaw()));
-        float f3 = rotation2.getPitch() - rotation.getPitch();
-        f2 = (float)Math.round(f2 / f) * f;
-        f3 = (float)Math.round(f3 / f) * f;
-        return new Rotation(rotation.getYaw() + f2, MathHelper.clamp((float)(rotation.getPitch() + f3), (float)-90.0f, (float)90.0f));
+        float step = AimRotationMath.getMouseRotationStep();
+        if (step <= 0.0001f) {
+            return rotation2;
+        }
+        float deltaYaw = MathHelper.wrapDegrees(rotation2.getYaw() - rotation.getYaw());
+        float deltaPitch = rotation2.getPitch() - rotation.getPitch();
+        float snappedDeltaYaw = (float)Math.round(deltaYaw / step) * step;
+        float snappedDeltaPitch = (float)Math.round(deltaPitch / step) * step;
+        return new Rotation(rotation.getYaw() + snappedDeltaYaw, MathHelper.clamp(rotation.getPitch() + snappedDeltaPitch, -90.0f, 90.0f));
     }
 
     @Compile(obfuscation=1)
-    public static float snapYawToMouseStep(float f, float f2) {
-        return AimRotationMath.snapRotationToMouseStep(new Rotation(f, 0.0f), new Rotation(f2, 0.0f)).getYaw();
+    public static float snapYawToMouseStep(float current, float target) {
+        float step = AimRotationMath.getMouseRotationStep();
+        if (step <= 0.0001f) {
+            return target;
+        }
+        float deltaYaw = MathHelper.wrapDegrees(target - current);
+        float snappedDeltaYaw = (float)Math.round(deltaYaw / step) * step;
+        return current + snappedDeltaYaw;
     }
 
     @Compile(obfuscation=1)
-    public static float snapPitchToMouseStep(float f, float f2) {
-        return AimRotationMath.snapRotationToMouseStep(new Rotation(0.0f, f), new Rotation(0.0f, f2)).getPitch();
+    public static float snapPitchToMouseStep(float current, float target) {
+        float step = AimRotationMath.getMouseRotationStep();
+        if (step <= 0.0001f) {
+            return MathHelper.clamp(target, -90.0f, 90.0f);
+        }
+        float deltaPitch = target - current;
+        float snappedDeltaPitch = (float)Math.round(deltaPitch / step) * step;
+        return MathHelper.clamp(current + snappedDeltaPitch, -90.0f, 90.0f);
     }
 
     @Compile(obfuscation=1)
     public static int getWrappedYawStepCount(float f, float f2) {
         float f3 = AimRotationMath.getMouseRotationStep();
-        return Math.round(MathHelper.wrapDegrees((float)(f2 - f)) / f3);
+        return Math.round(MathHelper.wrapDegrees(f2 - f) / f3);
     }
 
     @Compile(obfuscation=1)
@@ -107,68 +122,21 @@ implements ClientAccess {
 
     @Compile(obfuscation=1)
     public static float getWrappedAngleDifference(float f, float f2) {
-        float f3;
-        for (f3 = f2 - f; f3 > 180.0f; f3 -= 360.0f) {
-        }
-        while (f3 < -180.0f) {
-            f3 += 360.0f;
-        }
-        return f3;
+        return MathHelper.wrapDegrees(f2 - f);
     }
 
     @Compile(obfuscation=1)
-    public static float getClosestWrappedYaw(float f, float f2, float f3) {
-        float f4;
-        float f5 = f % 360.0f;
-        if (f5 < 0.0f) {
-            f5 += 360.0f;
+    public static float getClosestWrappedYaw(float current, float target, float maxStep) {
+        float delta = MathHelper.wrapDegrees(target - current);
+        if (Math.abs(delta) <= maxStep) {
+            return current + delta;
         }
-        if ((f4 = f2 % 360.0f) < 0.0f) {
-            f4 += 360.0f;
-        }
-        int n = (int)(f / 360.0f);
-        if (f < 0.0f && f % 360.0f != 0.0f) {
-            --n;
-        }
-        float f6 = f4 + (float)(n * 360);
-        float f7 = f4 - f5;
-        if (f7 < 0.0f) {
-            f7 += 360.0f;
-        }
-        if (f7 <= f3) {
-            return f + f7;
-        }
-        float f8 = f6 - f;
-        if (f8 > 180.0f) {
-            f6 -= 360.0f;
-        } else if (f8 < -180.0f) {
-            f6 += 360.0f;
-        }
-        return f6;
+        return current + Math.signum(delta) * maxStep;
     }
 
     @Compile(obfuscation=1)
     public static float getNearestWrappedYaw(float f, float f2) {
-        float f3;
-        float f4;
-        float f5;
-        float f6 = f % 360.0f;
-        if (f6 < 0.0f) {
-            f6 += 360.0f;
-        }
-        if ((f5 = f2 % 360.0f) < 0.0f) {
-            f5 += 360.0f;
-        }
-        int n = (int)(f / 360.0f);
-        if (f < 0.0f && f % 360.0f != 0.0f) {
-            --n;
-        }
-        if ((f4 = (f3 = f5 + (float)(n * 360)) - f) > 180.0f) {
-            f3 -= 360.0f;
-        } else if (f4 < -180.0f) {
-            f3 += 360.0f;
-        }
-        return f3;
+        return f + MathHelper.wrapDegrees(f2 - f);
     }
 
     @Compile(obfuscation=1)

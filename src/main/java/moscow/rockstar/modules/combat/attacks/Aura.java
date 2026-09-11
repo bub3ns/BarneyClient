@@ -142,23 +142,20 @@ extends Module {
     private ModeSetting returnMode;
     private ModeSetting.Option noReturnOption;
     private ModeSetting.Option smooth;
-    private ModeSetting.Option camera;
     private ModeSetting moveCorrectionMode;
     private ModeSetting.Option noMoveCorrection;
     private ModeSetting.Option directMoveCorrection;
     private ModeSetting.Option silentMoveCorrection;
-    private ModeSetting.Option targetedMoveCorrection;
-    private BooleanSetting forceTargetedRanged;
-    private BooleanSetting forceBehindTargeted;
+    private ModeSetting critsMode;
+    private ModeSetting.Option smartCrits;
+    private ModeSetting.Option onlyCrits;
     private ModeSetting styleAttack;
     private ModeSetting.Option legacyAttackStyle;
     private ModeSetting.Option modernAttackStyle;
     private RangeSetting cpsLimiter;
-    private BooleanSetting onlyCrits;
     private BooleanSetting smartCriticals;
     private BooleanSetting rayTrace;
     private BooleanSetting onlyWeapon;
-    private BooleanSetting autoMace;
     private BooleanSetting targeting;
     private BooleanSetting noHitInv;
     private ModeSetting walls;
@@ -227,16 +224,17 @@ extends Module {
         this.returnMode = new ModeSetting((SettingOwner)this, "modules.settings.aura.returnMode", () -> this.rotationMode.isSelected(this.noRotation));
         this.noReturnOption = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.none");
         this.smooth = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.smooth").select();
-        this.camera = new ModeSetting.Option(this.returnMode, "modules.settings.aura.returnMode.camera");
         this.attackDistance = new NumberSetting(this, "modules.settings.aura.attackDistance").setMinValue(0.1f).setMaxValue(6.0f).setStep(0.1f).setValue(3.0f).setUnit(" block").setChangeListener(f -> {
             if (this.aimDistance != null && this.aimDistance.getValue() < f.floatValue()) {
                 this.aimDistance.setValue(f.floatValue());
             }
             return f;
         });
-        this.aimDistance = new NumberSetting(this, "modules.settings.aura.aimDistance").setMinValue(0.1f).setMaxValue(9.0f).setStep(0.1f).setValue(3.0f).setUnit(" block").setChangeListener(f -> Float.valueOf(this.attackDistance == null ? f.floatValue() : Math.max(this.attackDistance.getValue(), f.floatValue())));
-        this.onlyCrits = new BooleanSetting((SettingOwner)this, "modules.settings.aura.onlyCrits", () -> true);
-        this.smartCriticals = new BooleanSetting((SettingOwner)this, "modules.settings.aura.smart_criticals", () -> true).enable();
+        this.aimDistance = new NumberSetting(this, "modules.settings.aura.aimDistance").setMinValue(0.1f).setMaxValue(16.0f).setStep(0.1f).setValue(3.0f).setUnit(" block").setChangeListener(f -> Float.valueOf(this.attackDistance == null ? f.floatValue() : Math.max(this.attackDistance.getValue(), f.floatValue())));
+        this.critsMode = new ModeSetting(this, "modules.settings.aura.crits_mode");
+        this.smartCrits = new ModeSetting.Option(this.critsMode, "modules.settings.aura.crits_mode.smart").select();
+        this.onlyCrits = new ModeSetting.Option(this.critsMode, "modules.settings.aura.crits_mode.only");
+        this.smartCriticals = new BooleanSetting((SettingOwner)this, "modules.settings.aura.smart_criticals", () -> true);
         this.walls = new ModeSetting(this, "modules.settings.aura.walls");
         this.noWallsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.none").select();
         this.allWallsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.all");
@@ -246,7 +244,6 @@ extends Module {
         this.rayTrace = new BooleanSetting((SettingOwner)this, "modules.settings.aura.rayTrace", () -> true).enable();
         this.targeting = new BooleanSetting(this, "modules.settings.aura.targeting").enable();
         this.onlyWeapon = new BooleanSetting(this, "modules.settings.aura.onlyWeapon");
-        this.autoMace = new BooleanSetting((SettingOwner)this, "modules.settings.aura.auto_mace", "modules.settings.aura.auto_mace.description");
         this.noHitInv = new BooleanSetting(this, "modules.settings.aura.no_hit_inv");
         this.targets = new MultiBooleanSetting(this, "modules.settings.aura.targets");
         this.players = new MultiBooleanSetting.Option(this.targets, "modules.settings.aura.targets.players").select();
@@ -264,9 +261,6 @@ extends Module {
         this.noMoveCorrection = new ModeSetting.Option(this.moveCorrectionMode, "modules.settings.aura.noMoveCorrection");
         this.directMoveCorrection = new ModeSetting.Option(this.moveCorrectionMode, "modules.settings.aura.directMoveCorrection");
         this.silentMoveCorrection = new ModeSetting.Option(this.moveCorrectionMode, "modules.settings.aura.silentMoveCorrection").select();
-        this.targetedMoveCorrection = new ModeSetting.Option(this.moveCorrectionMode, "modules.settings.aura.targeted_move_correction");
-        this.forceTargetedRanged = new BooleanSetting((SettingOwner)this, "modules.settings.aura.force_targeted_ranged", () -> this.moveCorrectionMode.isSelected(this.targetedMoveCorrection));
-        this.forceBehindTargeted = new BooleanSetting((SettingOwner)this, "modules.settings.aura.force_behind_targeted", () -> !this.forceTargetedRanged.isEnabled() || this.moveCorrectionMode.isSelected(this.targetedMoveCorrection));
         this.styleAttack = new ModeSetting((SettingOwner)this, "modules.settings.aura.styleAttack", () -> true);
         this.modernAttackStyle = new ModeSetting.Option(this.styleAttack, "1.9").select();
         this.legacyAttackStyle = new ModeSetting.Option(new ModeSetting((SettingOwner)this, "unused_legacy", () -> true), "1.8");
@@ -409,14 +403,6 @@ extends Module {
         }
         if (!this.isWithinAttackRange(class_13092)) {
             return this.isProtectedName("\u0434\u0430\u043b\u0435\u043a\u043e (attackDistance)");
-        }
-        if (this.isAutoMaceTargetValid(class_13092) && EntityOverlayGeometry.getAttackHotbarSlot() != null) {
-            if (!this.isFallingForCritical()) {
-                return this.isProtectedName("\u043e\u0436\u0438\u0434\u0430\u0435\u043c \u0432\u044b\u0441\u043e\u0442\u0443 \u0434\u043b\u044f \u0431\u0443\u043b\u0430\u0432\u044b");
-            }
-            if (ServerDetector.isServerProfileSupported(ServerProfile.FUNTIME) && !this.isMaceReady()) {
-                return this.isProtectedName("\u043e\u0436\u0438\u0434\u0430\u0435\u043c \u0441\u0432\u0430\u043f \u043d\u0430 \u0431\u0443\u043b\u0430\u0432\u0443");
-            }
         }
         boolean bl2 = ((Module)(clientAccess = RockstarClient.create().getModuleRegistry().getModule(ElytraTarget.class))).isEnabled() && Aura.minecraftClient.player.isGliding() && Aura.minecraftClient.player.getVelocity().length() < 6.0;
         if (bl2) {
@@ -646,12 +632,7 @@ extends Module {
         if (EntityOverlayGeometry.isEntityTargetable(class_13092) && EntityOverlayGeometry.isEntityAlive(class_13092)) {
             EntityOverlayGeometry.isEntityVisible(class_13092);
         }
-        HotbarSlot hotbarSlot2 = hotbarSlot = this.isAutoMaceTargetValid(class_13092) && this.isFallingForCritical() ? EntityOverlayGeometry.getAttackHotbarSlot() : null;
-        if (hotbarSlot != null && !ServerDetector.isServerProfileSupported(ServerProfile.FUNTIME)) {
-            HotbarActionService.withTemporaryHotbarSlot(hotbarSlot, () -> Aura.minecraftClient.interactionManager.attackEntity((PlayerEntity)Aura.minecraftClient.player, (Entity)class_13092));
-        } else {
-            Aura.minecraftClient.interactionManager.attackEntity((PlayerEntity)Aura.minecraftClient.player, (Entity)class_13092);
-        }
+        Aura.minecraftClient.interactionManager.attackEntity((PlayerEntity)Aura.minecraftClient.player, (Entity)class_13092);
         Aura.minecraftClient.player.swingHand(Hand.MAIN_HAND);
         if (this.attackReady && class_12682 != null) {
             object = class_12682;
@@ -671,17 +652,13 @@ extends Module {
 
     @Compile(obfuscation=1)
     private void performCriticalAttack(LivingEntity class_13092) {
-        boolean bl;
         if (this.onlyWeapon.isEnabled() && !EntityUtils.isHoldingMiningTool()) {
             return;
         }
-        this.disableLocked = bl = this.forceTargetedRanged.isEnabled() && class_13092 != null && this.isHoldingDefensiveItem(class_13092) && !this.moveCorrectionMode.isSelected(this.targetedMoveCorrection);
-        RotationCorrectionMode rotationCorrectionMode = this.moveCorrectionMode.isSelected(this.silentMoveCorrection) ? RotationCorrectionMode.UNSPECIFIED : (this.moveCorrectionMode.isSelected(this.directMoveCorrection) ? RotationCorrectionMode.DIRECT : (this.moveCorrectionMode.isSelected(this.targetedMoveCorrection) || bl ? RotationCorrectionMode.TARGETED : RotationCorrectionMode.NONE));
+        this.disableLocked = false;
+        RotationCorrectionMode rotationCorrectionMode = this.moveCorrectionMode.isSelected(this.silentMoveCorrection) ? RotationCorrectionMode.UNSPECIFIED : (this.moveCorrectionMode.isSelected(this.directMoveCorrection) ? RotationCorrectionMode.DIRECT : RotationCorrectionMode.NONE);
         RotationManager rotationManager = RockstarClient.create().getRotationManager();
         if (this.rotationMode.isSelected(this.noRotation)) {
-            if (rotationCorrectionMode == RotationCorrectionMode.TARGETED && class_13092 != null) {
-                rotationManager.requestRotation(rotationManager.getPlayerRotation(), RotationCorrectionMode.TARGETED, 180.0f, 180.0f, 180.0f, RotationPriority.TARGET_PRIORITY);
-            }
             return;
         }
         Object object = this.rotationMode.getSelectedOption();
@@ -701,18 +678,17 @@ extends Module {
         if (this.returnMode.isSelected(this.noReturnOption)) {
             return RotationReturnMode.NONE;
         }
-        if (this.returnMode.isSelected(this.camera)) {
-            return RotationReturnMode.CAMERA;
-        }
         return RotationReturnMode.SMOOTH;
     }
 
     public AttackCriticalHandler.Mode getCriticalMode() {
-        if (this.onlyCrits != null && this.onlyCrits.isEnabled()) {
-            return AttackCriticalHandler.Mode.ONLY;
-        }
-        if (this.smartCriticals != null && this.smartCriticals.isEnabled()) {
-            return AttackCriticalHandler.Mode.PRIORITIZE;
+        if (this.critsMode != null) {
+            if (this.critsMode.isSelected(this.onlyCrits)) {
+                return AttackCriticalHandler.Mode.ONLY;
+            }
+            if (this.critsMode.isSelected(this.smartCrits)) {
+                return AttackCriticalHandler.Mode.PRIORITIZE;
+            }
         }
         return AttackCriticalHandler.Mode.NONE;
     }
@@ -787,96 +763,17 @@ extends Module {
         if (this.rotationController != null) {
             this.rotationController.onTargetLost();
         }
+        RockstarClient.create().getRotationManager().finishRotation();
         super.onDisable();
     }
 
     private void performEmergencyAttack(LivingEntity class_13092) {
-        if (!ServerDetector.isServerProfileSupported(ServerProfile.FUNTIME) || !this.isAutoMaceAttackValid(class_13092)) {
-            this.resetAttackState();
-            return;
-        }
-        if (Aura.minecraftClient.player.getMainHandStack().isOf(Items.MACE)) {
-            if (Aura.minecraftClient.player.getItemCooldownManager().isCoolingDown(Items.MACE.getDefaultStack())) {
-                this.targetSelected = true;
-            }
-            return;
-        }
-        HotbarSlot hotbarSlot = EntityOverlayGeometry.getAttackHotbarSlot();
-        if (hotbarSlot != null) {
-            this.targetIndex = Aura.minecraftClient.player.age;
-            this.targetSelected = Aura.minecraftClient.player.getItemCooldownManager().isCoolingDown(hotbarSlot.getItemStack());
-        }
-    }
-
-    private boolean isAutoMaceAttackValid(LivingEntity class_13092) {
-        if (!this.autoMace.isEnabled() || class_13092 == null || Aura.minecraftClient.player == null || Aura.minecraftClient.player.isOnGround() || Aura.minecraftClient.player.isGliding() || Aura.minecraftClient.player.hasStatusEffect(StatusEffects.SLOW_FALLING)) {
-            return false;
-        }
-        if (this.isAutoMaceTargetValid(class_13092)) {
-            return true;
-        }
-        HotbarSlot hotbarSlot = EntityOverlayGeometry.getAttackHotbarSlot();
-        if (hotbarSlot == null) {
-            return false;
-        }
-        int n = this.getWeaponSlot(class_13092);
-        return n >= 0 && this.getWeaponSlotIndex(hotbarSlot) >= n - 4;
-    }
-
-    private int getWeaponSlot(LivingEntity class_13092) {
-        double d = Aura.minecraftClient.player.getY();
-        double d2 = Aura.minecraftClient.player.getVelocity().y;
-        float f = Aura.minecraftClient.player.fallDistance;
-        double d3 = class_13092.getBoundingBox().maxY;
-        for (int i = 1; i <= 40; ++i) {
-            d += d2;
-            f = d2 < 0.0 ? (f -= (float)d2) : 0.0f;
-            if (d2 < 0.0 && (double)f + Math.max(0.0, d - d3) > 1.5) {
-                return i;
-            }
-            if (d2 < 0.0 && d < class_13092.getBoundingBox().minY - 2.0) {
-                return -1;
-            }
-            d2 = (d2 - 0.08) * 0.98;
-        }
-        return -1;
-    }
-
-    private int getWeaponSlotIndex(HotbarSlot hotbarSlot) {
-        if (!Aura.minecraftClient.player.getItemCooldownManager().isCoolingDown(hotbarSlot.getItemStack())) {
-            return 0;
-        }
-        ItemCooldownManagerAccessor itemCooldownManagerAccessor = (ItemCooldownManagerAccessor)Aura.minecraftClient.player.getItemCooldownManager();
-        Identifier class_29602 = itemCooldownManagerAccessor.rockstar$getGroup(hotbarSlot.getItemStack());
-        Object object = itemCooldownManagerAccessor.rockstar$getEntries().get(class_29602);
-        if (object == null) {
-            return 0;
-        }
-        return Math.max(0, ((ItemCooldownEntryAccessor)object).rockstar$getEndTick() - itemCooldownManagerAccessor.rockstar$getTick());
+        this.resetAttackState();
     }
 
     private void resetAttackState() {
         this.targetIndex = -1;
         this.targetSelected = false;
-    }
-
-    private boolean isAutoMaceTargetValid(LivingEntity class_13092) {
-        if (!this.autoMace.isEnabled() || class_13092 == null || Aura.minecraftClient.player == null || Aura.minecraftClient.player.isOnGround() || Aura.minecraftClient.player.isGliding() || Aura.minecraftClient.player.hasStatusEffect(StatusEffects.SLOW_FALLING)) {
-            return false;
-        }
-        double d = Math.max(0.0, Aura.minecraftClient.player.getY() - class_13092.getBoundingBox().maxY);
-        return (double)Aura.minecraftClient.player.fallDistance + d > 1.5;
-    }
-
-    private boolean isFallingForCritical() {
-        return Aura.minecraftClient.player.fallDistance > 1.5f && Aura.minecraftClient.player.getVelocity().y < 0.0;
-    }
-
-    private boolean isMaceReady() {
-        if (!Aura.minecraftClient.player.getMainHandStack().isOf(Items.MACE) || Aura.minecraftClient.player.getItemCooldownManager().isCoolingDown(Aura.minecraftClient.player.getMainHandStack())) {
-            return false;
-        }
-        return this.targetIndex < 0 || this.targetSelected || Aura.minecraftClient.player.age - this.targetIndex >= 4;
     }
 
     private long getAttackCooldown() {
@@ -955,12 +852,12 @@ extends Module {
 
     @Generated
     public BooleanSetting getOnlyCritsSetting() {
-        return this.forceTargetedRanged;
+        return null;
     }
 
     @Generated
     public BooleanSetting getSmartCriticalsSetting() {
-        return this.forceBehindTargeted;
+        return this.smartCriticals;
     }
 
     @Generated
@@ -979,8 +876,8 @@ extends Module {
     }
 
     @Generated
-    public BooleanSetting getMobsSetting() {
-        return this.onlyCrits;
+    public ModeSetting getCritsModeSetting() {
+        return this.critsMode;
     }
 
     @Generated
@@ -1000,7 +897,7 @@ extends Module {
 
     @Generated
     public BooleanSetting getRockUsersSetting() {
-        return this.autoMace;
+        return null;
     }
 
     @Generated

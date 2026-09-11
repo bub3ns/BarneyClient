@@ -79,13 +79,14 @@ extends AuraRotationMode {
         float f5 = Math.max((float)Math.toDegrees(Math.atan2(Vec3i.getLengthY() / 2.0, d)), 0.5f);
         double d2 = RotationController.distanceToBox(VanillaChestLootTableGenerator, Vec3i);
         Rotation rotation = rotationManager.getEffectiveRotation();
+        float targetYaw = moscow.rockstar.api.rotation.ContinuousRotationMath.unwrapYaw(rotation.getYaw(), f2);
         if (class_13092.getId() != this.targetEntityId || !this.targetAimPattern.isModelLoaded()) {
-            this.targetAimPattern.initializeModelState(neuralAimModel, rotation.getYaw(), rotation.getPitch(), f2, f3);
+            this.targetAimPattern.initializeModelState(neuralAimModel, rotation.getYaw(), rotation.getPitch(), targetYaw, f3);
             this.targetEntityId = class_13092.getId();
         }
         this.rotationRetryCount = 0;
         float f6 = 0.45f * neuralAimModel.activate(ThreadLocalRandom.current().nextFloat());
-        if (!this.targetAimPattern.calculateAimCorrection(neuralAimModel, rotation.getYaw(), rotation.getPitch(), f2, f3, f4, f5, d2, f6, 12, 0.7f, 4, this.getMaxYawOffset(), this.rotationOffsets)) {
+        if (!this.targetAimPattern.calculateAimCorrection(neuralAimModel, rotation.getYaw(), rotation.getPitch(), targetYaw, f3, f4, f5, d2, f6, 12, 0.7f, 4, this.getMaxYawOffset(), this.rotationOffsets)) {
             return;
         }
         rotationManager.requestRotation(new Rotation(rotation.getYaw() + this.rotationOffsets[0], MathHelper.clamp((float)(rotation.getPitch() + this.rotationOffsets[1]), (float)-90.0f, (float)90.0f)), rotationCorrectionMode, 180.0f, 180.0f, 180.0f, RotationPriority.TARGET_PRIORITY);
@@ -112,10 +113,11 @@ extends AuraRotationMode {
             this.correctionAimPattern.clearModelState();
             return null;
         }
+        float targetYaw2 = moscow.rockstar.api.rotation.ContinuousRotationMath.unwrapYaw(rotation.getYaw(), rotation2.getYaw());
         if (!this.correctionAimPattern.isModelLoaded()) {
-            this.correctionAimPattern.initializeModelState(neuralAimModel, rotation.getYaw(), rotation.getPitch(), rotation2.getYaw(), rotation2.getPitch());
+            this.correctionAimPattern.initializeModelState(neuralAimModel, rotation.getYaw(), rotation.getPitch(), targetYaw2, rotation2.getPitch());
         }
-        if (!this.correctionAimPattern.calculateAimCorrection(neuralAimModel, rotation.getYaw(), rotation.getPitch(), rotation2.getYaw(), rotation2.getPitch(), 5.0f, 15.0f, 3.0, 0.0f, 12, 0.7f, 4, 1.1f, this.rotationOffsets)) {
+        if (!this.correctionAimPattern.calculateAimCorrection(neuralAimModel, rotation.getYaw(), rotation.getPitch(), targetYaw2, rotation2.getPitch(), 5.0f, 15.0f, 3.0, 0.0f, 12, 0.7f, 4, 1.1f, this.rotationOffsets)) {
             return null;
         }
         this.correctionAimPattern.incrementConsecutiveMisses();

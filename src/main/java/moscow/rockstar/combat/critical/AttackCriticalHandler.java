@@ -78,12 +78,27 @@ public class AttackCriticalHandler implements ClientAccess {
         return MeleeDamage.isCriticalAttack(mc.player, target, MeleeDamage.isFullStrength(mc.player));
     }
 
+    private boolean isJumping() {
+        return mc.options != null && mc.options.jumpKey.isPressed();
+    }
+
     private boolean willPlayerBeInCriticalState(LivingEntity target) {
         if (mc.player == null) {
             return false;
         }
-        boolean isRising = mc.player.fallDistance <= 0.0f && mc.player.getVelocity().y > -0.01;
-        return !mc.player.isOnGround() && isRising && canPlayerCritical(target);
+        if (!canPlayerCritical(target)) {
+            return false;
+        }
+        if (mc.player.isOnGround()) {
+            if (isJumping()) {
+                if (mc.player instanceof moscow.rockstar.api.access.PlayerEntityAccess access) {
+                    return access.rockstar$getOnGroundTicks() <= 2;
+                }
+                return true;
+            }
+            return false;
+        }
+        return mc.player.fallDistance <= 0.0f;
     }
 
     private boolean canPlayerCritical(LivingEntity target) {

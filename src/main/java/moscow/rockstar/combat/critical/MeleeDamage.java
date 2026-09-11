@@ -12,7 +12,7 @@ public final class MeleeDamage {
         if (player == null) {
             return false;
         }
-        return player.getAttackCooldownProgress(0.5f) >= 0.9f;
+        return player.getAttackCooldownProgress(0.5f) > 0.9f;
     }
 
     public static boolean criticalStateAllowed(PlayerEntity player, LivingEntity target) {
@@ -32,7 +32,7 @@ public final class MeleeDamage {
         if (player == null || target == null || !isFullStrength) {
             return false;
         }
-        boolean isFalling = player.fallDistance > 0.0f || player.getVelocity().y <= -0.01;
+        boolean isFalling = player.fallDistance > 0.0f;
         return !player.isOnGround() && isFalling && criticalStateAllowed(player, target);
     }
 }
