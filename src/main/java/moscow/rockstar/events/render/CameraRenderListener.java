@@ -26,12 +26,8 @@ import pyrock.events.render.Render3DEvent;
 import pyrock.utility.render.ColorRGBA;
 
 public final class CameraRenderListener {
-    private final EventListener<Render3DEvent> renderListener = render3DEvent -> this.renderSelectedBlockBounds(render3DEvent.getMatrices(), render3DEvent.getCamera());
-
     public static CameraRenderListener createRegistered(ClientServiceRegistry clientServiceRegistry) {
-        CameraRenderListener cameraRenderListener = new CameraRenderListener();
-        clientServiceRegistry.getEventBus().registerListeners(cameraRenderListener);
-        return cameraRenderListener;
+        return new CameraRenderListener();
     }
 
     private void renderSelectedBlockBounds(MatrixStack class_45872, Camera class_41842) {

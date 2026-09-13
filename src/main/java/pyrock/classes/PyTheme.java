@@ -62,6 +62,12 @@ public class PyTheme {
         }
     }
 
+    public void setBackground(ColorRGBA colorRGBA) {
+        if (colorRGBA != null) {
+            ColorPalette.setCurrentBackgroundColor(colorRGBA);
+        }
+    }
+
     public String name() {
         try {
             return RockstarClient.create().getColorTheme().name().toLowerCase(Locale.ROOT);

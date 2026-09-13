@@ -22,6 +22,7 @@ import moscow.rockstar.core.RockstarClient;
 import moscow.rockstar.events.EventListener;
 import net.minecraft.client.MinecraftClient;
 import moscow.rockstar.modules.visuals.esp.entities.ESP;
+import moscow.rockstar.modules.visuals.esp.entities.BlockOverlay;
 import moscow.rockstar.modules.visuals.esp.entities.EntityArrowRenderer;
 import moscow.rockstar.modules.visuals.esp.entities.EntityBoxRenderer;
 import moscow.rockstar.modules.visuals.esp.entities.Fill;
@@ -72,6 +73,7 @@ public class OverlayRegistry {
         this.registerOverlay(new TaksaESP());
         this.registerOverlay(new EntityBoxRenderer());
         this.registerOverlay(new JumpCircles());
+        this.registerOverlay(new BlockOverlay());
     }
 
     private void handleInputCode(int n) {

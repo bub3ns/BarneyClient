@@ -21,6 +21,7 @@ import lombok.Generated;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.VertexFormat;
@@ -34,7 +35,7 @@ public final class CubeRenderer {
     private static final int[][] CUBE_FACE_INDICES = new int[][]{{0, 2, 4}, {0, 4, 3}, {0, 3, 5}, {0, 5, 2}, {1, 4, 2}, {1, 3, 4}, {1, 5, 3}, {1, 2, 5}};
     private static final float[] FACE_BRIGHTNESS = new float[]{1.0f, 0.8f, 0.6f, 0.9f, 0.7f, 0.5f, 0.4f, 0.6f};
 
-    public static void drawCube(MatrixStack class_45872, BufferBuilder class_2872, float f, float f2, float f3, float f4, ColorRGBA colorRGBA) {
+    public static void drawCube(MatrixStack class_45872, VertexConsumer class_2872, float f, float f2, float f3, float f4, ColorRGBA colorRGBA) {
         class_45872.push();
         class_45872.translate(f, f2, f3);
         class_45872.scale(f4, f4, f4);
@@ -51,6 +52,10 @@ public final class CubeRenderer {
             class_2872.vertex(matrix4f, vector3f3.x, vector3f3.y, vector3f3.z).color(n);
         }
         class_45872.pop();
+    }
+
+    public static void drawCube(MatrixStack class_45872, BufferBuilder class_2872, float f, float f2, float f3, float f4, ColorRGBA colorRGBA) {
+        drawCube(class_45872, (VertexConsumer) class_2872, f, f2, f3, f4, colorRGBA);
     }
 
     public static BufferBuilder beginCubeBatch() {

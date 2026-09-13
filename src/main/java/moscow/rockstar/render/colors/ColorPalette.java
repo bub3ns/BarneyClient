@@ -46,11 +46,14 @@ public final class ColorPalette {
     public static final ColorRGBA PRIMARY_TEXT_COLOR = new DynamicPaletteColor(5);
     public static final ColorRGBA HIGHLIGHT_COLOR = new DynamicPaletteColor(8);
     private static final ThemeColorSettings themeColorSettings = new ThemeColorSettings(ACCENT_PURPLE, BASE_PALETTE_COLORS[1], BASE_PALETTE_COLORS[6], BASE_PALETTE_COLORS[5], BASE_PALETTE_COLORS[3], BASE_PALETTE_COLORS[7], BASE_PALETTE_COLORS[5], BASE_PALETTE_COLORS[5], 7.0f, 0.5f, 0.8f, 0.2f, 25.0f, 0.08f, 2.0f, 0.0f, 1.0f, 1.0f);
+    public static final ColorRGBA DEFAULT_BACKGROUND_COLOR = new ColorRGBA(24.0f, 21.0f, 29.0f);
     private static final AnimatedColor animatedAccentColor = new AnimatedColor(500L, ACCENT_PURPLE);
+    private static final AnimatedColor animatedBackgroundColor = new AnimatedColor(500L, DEFAULT_BACKGROUND_COLOR);
     private static final float[] accentHsb = ColorPalette.convertToHsb(ACCENT_PURPLE);
     private static final ColorRGBA[] resolvedPaletteColors = ColorPalette.createPaletteSnapshot();
     private static final ColorRGBA[] themeAdjustedColors = ColorPalette.createPaletteSnapshot();
     private static ColorRGBA currentAccentColor = ACCENT_PURPLE;
+    private static ColorRGBA currentBackgroundColor = DEFAULT_BACKGROUND_COLOR;
     private static long lastPaletteUpdateMillis;
     private static int paletteStateHash;
 
@@ -64,6 +67,16 @@ public final class ColorPalette {
         }
     }
 
+    public static ColorRGBA getCurrentBackgroundColor() {
+        return currentBackgroundColor;
+    }
+
+    public static void setCurrentBackgroundColor(ColorRGBA colorRGBA) {
+        if (colorRGBA != null) {
+            currentBackgroundColor = colorRGBA.withAlpha(255.0f);
+        }
+    }
+
     public static void applyThemeColorSettings(ThemeColorSettings settings) {
         if (settings == null) {
             return;
@@ -71,7 +84,11 @@ public final class ColorPalette {
         if (settings.getAccentColor() != null && settings.getAccentColor().getAlpha() > 0.0f) {
             ColorPalette.setCurrentAccentColor(settings.getAccentColor());
         }
+        if (settings.getPanelColor() != null && settings.getPanelColor().getAlpha() > 0.0f) {
+            ColorPalette.setCurrentBackgroundColor(settings.getPanelColor());
+        }
         animatedAccentColor.setCurrentColor(currentAccentColor);
+        animatedBackgroundColor.setCurrentColor(currentBackgroundColor);
         paletteStateHash = -1;
         themeColorSettings.copyFrom(settings);
     }
@@ -146,9 +163,11 @@ public final class ColorPalette {
         }
         lastPaletteUpdateMillis = l;
         animatedAccentColor.setTargetColor(currentAccentColor);
+        animatedBackgroundColor.setTargetColor(currentBackgroundColor);
         ColorRGBA colorRGBA = animatedAccentColor.getColor();
+        ColorRGBA bgColor = animatedBackgroundColor.getColor();
         ColorTheme colorTheme = ColorPalette.getActiveTheme();
-        int n = 31 * colorRGBA.getRGB() + colorTheme.ordinal();
+        int n = 31 * (31 * colorRGBA.getRGB() + bgColor.getRGB()) + colorTheme.ordinal();
         if (n == paletteStateHash) {
             return;
         }
@@ -156,17 +175,29 @@ public final class ColorPalette {
         float[] fArray = ColorPalette.convertToHsb(colorRGBA);
         float f = fArray[0] - accentHsb[0];
         float f2 = accentHsb[1] == 0.0f ? 1.0f : fArray[1] / accentHsb[1];
-        ColorPalette.resolvedPaletteColors[0] = colorRGBA;
-        for (int i = 1; i < BASE_PALETTE_COLORS.length; ++i) {
-            ColorRGBA colorRGBA2 = BASE_PALETTE_COLORS[i];
-            float[] fArray2 = ColorPalette.convertToHsb(colorRGBA2);
-            if (fArray2[1] == 0.0f) {
-                ColorPalette.resolvedPaletteColors[i] = colorRGBA2;
-                continue;
-            }
-            float f3 = fArray2[0] + f;
-            ColorPalette.resolvedPaletteColors[i] = ColorRGBA.fromHSB(f3 - (float)Math.floor(f3), Math.clamp(fArray2[1] * f2, 0.0f, 1.0f), fArray2[2]).withAlpha(colorRGBA2.getAlpha());
-        }
+        resolvedPaletteColors[0] = colorRGBA;
+
+        ColorRGBA vibrantBase = BASE_PALETTE_COLORS[4];
+        float[] vibrantHsb = ColorPalette.convertToHsb(vibrantBase);
+        float f3 = vibrantHsb[0] + f;
+        resolvedPaletteColors[4] = ColorRGBA.fromHSB(f3 - (float)Math.floor(f3), Math.clamp(vibrantHsb[1] * f2, 0.0f, 1.0f), vibrantHsb[2]).withAlpha(vibrantBase.getAlpha());
+
+        resolvedPaletteColors[5] = BASE_PALETTE_COLORS[5];
+
+        float[] bgHsb = ColorPalette.convertToHsb(bgColor);
+        float h = bgHsb[0];
+        float s = bgHsb[1];
+        float v = bgHsb[2];
+
+        float s_eff = s <= 0.28f ? s : 0.28f + (s - 0.28f) * 0.15f;
+        float v_eff = v <= 0.1137f ? v : 0.1137f + (v - 0.1137f) * ((0.70f - 0.1137f) / (1.0f - 0.1137f));
+
+        resolvedPaletteColors[1] = ColorRGBA.fromHSB(h, s_eff, v_eff).withAlpha(229.5f);
+        resolvedPaletteColors[2] = ColorRGBA.fromHSB(h, s_eff, v_eff).withAlpha(102.0f);
+        resolvedPaletteColors[3] = ColorRGBA.fromHSB(h, Math.clamp(s_eff * 0.866f, 0.0f, 1.0f), Math.clamp(v_eff * 2.45f, 0.0f, 1.0f)).withAlpha(63.75f);
+        resolvedPaletteColors[6] = ColorRGBA.fromHSB(h, Math.clamp(s_eff * 0.935f, 0.0f, 1.0f), Math.clamp(v_eff * 1.07f, 0.0f, 1.0f)).withAlpha(255.0f);
+        resolvedPaletteColors[7] = ColorRGBA.fromHSB(h, Math.clamp(s_eff * 1.55f, 0.0f, 1.0f), Math.clamp(v_eff * 0.24f, 0.0f, 1.0f)).withAlpha(255.0f);
+
         System.arraycopy(resolvedPaletteColors, 0, themeAdjustedColors, 0, resolvedPaletteColors.length);
         if (colorTheme == ColorTheme.LIGHT) {
             ColorPalette.themeAdjustedColors[1] = ColorTheme.LIGHT.getSecondaryTextColor().withAlpha(resolvedPaletteColors[1].getAlpha());

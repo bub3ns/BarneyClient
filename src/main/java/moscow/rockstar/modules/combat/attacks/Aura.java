@@ -149,6 +149,10 @@ extends Module {
     private ModeSetting critsMode;
     private ModeSetting.Option smartCrits;
     private ModeSetting.Option onlyCrits;
+    private ModeSetting.Option staticCrits;
+    private NumberSetting staticCooldown;
+    private final Timer staticAttackTimer = new Timer();
+    private long lastUsingItemTime;
     private ModeSetting styleAttack;
     private ModeSetting.Option legacyAttackStyle;
     private ModeSetting.Option modernAttackStyle;
@@ -234,6 +238,8 @@ extends Module {
         this.critsMode = new ModeSetting(this, "modules.settings.aura.crits_mode");
         this.smartCrits = new ModeSetting.Option(this.critsMode, "modules.settings.aura.crits_mode.smart").select();
         this.onlyCrits = new ModeSetting.Option(this.critsMode, "modules.settings.aura.crits_mode.only");
+        this.staticCrits = new ModeSetting.Option(this.critsMode, "modules.settings.aura.crits_mode.static");
+        this.staticCooldown = new NumberSetting((SettingOwner)this, "modules.settings.aura.cooldown", () -> !this.isStaticCritsSelected()).setMinValue(0.1f).setMaxValue(1.0f).setStep(0.01f).setValue(0.5f).setUnit(" s");
         this.smartCriticals = new BooleanSetting((SettingOwner)this, "modules.settings.aura.smart_criticals", () -> true);
         this.walls = new ModeSetting(this, "modules.settings.aura.walls");
         this.noWallsOption = new ModeSetting.Option(this.walls, "modules.settings.aura.walls.none").select();
@@ -310,6 +316,9 @@ extends Module {
         if (Aura.minecraftClient.player == null) {
             return;
         }
+        if (Aura.minecraftClient.player.isUsingItem() || Aura.minecraftClient.player.isBlocking()) {
+            this.lastUsingItemTime = System.currentTimeMillis();
+        }
         ModeSetting.Option option = this.rotationMode.getSelectedOption();
         if (option instanceof AuraRotationMode) {
             clientAccess = (AuraRotationMode)option;
@@ -381,9 +390,11 @@ extends Module {
         if (this.excludeTeammatesOption.isSelected() && class_13092 instanceof PlayerEntity && TargetFilter.areTeammates((PlayerEntity)Aura.minecraftClient.player, (PlayerEntity)class_13092)) {
             return this.isProtectedName("\u0441\u043e\u044e\u0437\u043d\u0438\u043a");
         }
-        criticals = RockstarClient.create().getModuleRegistry().getModule(Criticals.class);
-        if (criticals.isCriticalsEnvironmentReady() && !criticals.isCriticalsTargetReady()) {
-            return this.isProtectedName("\u043c\u043e\u0434\u0443\u043b\u044c Criticals");
+        if (!this.isStaticCritsSelected()) {
+            criticals = RockstarClient.create().getModuleRegistry().getModule(Criticals.class);
+            if (criticals.isCriticalsEnvironmentReady() && !criticals.isCriticalsTargetReady()) {
+                return this.isProtectedName("\u043c\u043e\u0434\u0443\u043b\u044c Criticals");
+            }
         }
         if (this.onlyWeapon.isEnabled() && !EntityUtils.isHoldingMiningTool()) {
             return this.isProtectedName("\u043d\u0435 \u043e\u0440\u0443\u0436\u0438\u0435 \u0432 \u0440\u0443\u043a\u0435");
@@ -411,7 +422,7 @@ extends Module {
         if (!this.isRaycastPassing(class_13092, bl)) {
             return this.isProtectedName("\u0440\u0435\u0439\u0442\u0440\u0435\u0439\u0441 \u043d\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u0442");
         }
-        if (!AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), class_13092)) {
+        if (!this.isStaticCritsSelected() && !AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), class_13092)) {
             return this.isProtectedName("ждём крит");
         }
         this.attackStatistics.merge("проверки пройдены", 1, Integer::sum);
@@ -419,8 +430,15 @@ extends Module {
     }
 
     public boolean isAirCriticalReady() {
+        if (this.isStaticCritsSelected()) {
+            return true;
+        }
         LivingEntity target = RockstarClient.create().getFriendManager().getTargetLivingEntity();
         return AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), target);
+    }
+
+    public boolean isStaticCritsSelected() {
+        return this.critsMode != null && this.staticCrits != null && this.critsMode.isSelected(this.staticCrits);
     }
 
     private boolean isRaycastPassing(LivingEntity class_13092, boolean bl) {
@@ -455,9 +473,11 @@ extends Module {
 
     public boolean isWithinRange(LivingEntity class_13092, boolean bl) {
         AuraRotationMode auraRotationMode;
-        Criticals criticals = RockstarClient.create().getModuleRegistry().getModule(Criticals.class);
-        if (criticals.isCriticalsEnvironmentReady() && !criticals.isCriticalsTargetReady()) {
-            return false;
+        if (!this.isStaticCritsSelected()) {
+            Criticals criticals = RockstarClient.create().getModuleRegistry().getModule(Criticals.class);
+            if (criticals.isCriticalsEnvironmentReady() && !criticals.isCriticalsTargetReady()) {
+                return false;
+            }
         }
         if (this.onlyWeapon.isEnabled() && !EntityUtils.isHoldingMiningTool()) {
             return false;
@@ -478,6 +498,9 @@ extends Module {
         if (bl ? Aura.minecraftClient.player.getEyePos().add(0.0, -1.0, 0.0).distanceTo(AimRotationMath.translateAimPoint(class_13092, EntityOverlayGeometry.getTargetAimPoint((Entity)class_13092, this.resolver.isSelected()))) > (double)this.getAttackProgress() : !this.isWithinAttackRange(class_13092)) {
             return false;
         }
+        if (this.isStaticCritsSelected()) {
+            return true;
+        }
         return AttackCriticalHandler.getInstance().allowsAttack(this.getCriticalMode(), class_13092);
     }
 
@@ -489,6 +512,10 @@ extends Module {
     public boolean isAttackCooldownReady() {
         if (Aura.minecraftClient.player == null) {
             return false;
+        }
+        if (this.isStaticCritsSelected()) {
+            long cooldownMs = Math.round(this.staticCooldown.getValue() * 1000.0f);
+            return this.staticAttackTimer.hasElapsed(cooldownMs);
         }
         if (Aura.minecraftClient.player.isSubmergedInWater() && ServerDetector.isInventoryServer()) {
             return this.isAttackDelayReady();
@@ -644,6 +671,7 @@ extends Module {
         }
         this.currentRotation = new Rotation(MathUtils.interpolateRandomDouble(5.0, 20.0), MathUtils.interpolateRandomDouble(5.0, 10.0));
         this.cooldownTimer.reset();
+        this.staticAttackTimer.reset();
         this.attackRange = MathUtils.interpolateRandomStrategy(0.0f, 1.0f);
         this.nextAttackTime = 0L;
         ++this.attackCycle;
@@ -743,6 +771,8 @@ extends Module {
 
     @Override
     public void onEnable() {
+        this.lastUsingItemTime = 0L;
+        this.staticAttackTimer.setLastResetTimeMillis(0L);
         ModeSetting.Option option = this.rotationMode.getSelectedOption();
         if (option instanceof AuraRotationMode) {
             AuraRotationMode auraRotationMode = (AuraRotationMode)option;
@@ -755,6 +785,7 @@ extends Module {
 
     @Override
     public void onDisable() {
+        this.lastUsingItemTime = 0L;
         this.resetAttackState();
         RockstarClient.create().getFriendManager().clearTarget();
         if (Aura.minecraftClient.player != null) {
@@ -820,16 +851,20 @@ extends Module {
     }
 
     private boolean isUsingItemAttackReady() {
-        if (Aura.minecraftClient.player == null || !Aura.minecraftClient.player.isUsingItem()) {
+        if (Aura.minecraftClient.player == null) {
             return false;
+        }
+        boolean isUsing = Aura.minecraftClient.player.isUsingItem() || Aura.minecraftClient.player.isBlocking();
+        if (isUsing) {
+            this.lastUsingItemTime = System.currentTimeMillis();
         }
         if (!this.useHit.isSelected()) {
             return false;
         }
-        if (this.isAttackWeaponReady()) {
+        if (isUsing) {
             return true;
         }
-        return Aura.minecraftClient.player.getActiveHand() == Hand.OFF_HAND && !this.isUsingAttackItem();
+        return System.currentTimeMillis() - this.lastUsingItemTime < 100L;
     }
 
     private boolean isHoldingDefensiveItem(LivingEntity class_13092) {
@@ -878,6 +913,16 @@ extends Module {
     @Generated
     public ModeSetting getCritsModeSetting() {
         return this.critsMode;
+    }
+
+    @Generated
+    public ModeSetting.Option getStaticCritsOption() {
+        return this.staticCrits;
+    }
+
+    @Generated
+    public NumberSetting getStaticCooldownSetting() {
+        return this.staticCooldown;
     }
 
     @Generated

@@ -56,6 +56,14 @@ public abstract class TargetRenderModule extends SettingGroup implements ClientA
     }
 
     protected TargetRenderModule(String name, ItemTargetType[] itemTypes, TargetGroup[] targetGroups) {
+        this(name, new PlayerTargetGroup[0], itemTypes, targetGroups);
+    }
+
+    protected TargetRenderModule(String name, PlayerTargetGroup[] playerGroups, TargetGroup[] targetGroups) {
+        this(name, playerGroups, new ItemTargetType[0], targetGroups);
+    }
+
+    protected TargetRenderModule(String name, PlayerTargetGroup[] playerGroups, ItemTargetType[] itemTypes, TargetGroup[] targetGroups) {
         this.name = name;
         this.supportedTargetGroups = new LinkedHashSet<>();
         if (targetGroups == null || targetGroups.length == 0) {
@@ -66,7 +74,11 @@ public abstract class TargetRenderModule extends SettingGroup implements ClientA
 
         this.supportedPlayerGroups = new LinkedHashSet<>();
         if (this.supportedTargetGroups.contains(TargetGroup.PLAYERS)) {
-            Collections.addAll(this.supportedPlayerGroups, PlayerTargetGroup.values());
+            if (playerGroups != null && playerGroups.length > 0) {
+                Collections.addAll(this.supportedPlayerGroups, playerGroups);
+            } else {
+                Collections.addAll(this.supportedPlayerGroups, PlayerTargetGroup.values());
+            }
         }
 
         this.supportedItemTypes = new LinkedHashSet<>();

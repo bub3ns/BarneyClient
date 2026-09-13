@@ -94,6 +94,7 @@ implements SettingOwner {
     private final List<Setting> settings = new ArrayList<Setting>();
     private final ModeSetting languageSetting;
     private final ColorSetting accentColorSetting;
+    private final ColorSetting backgroundColorSetting;
     private final BooleanSetting autoSaveSetting;
     private final Component settingsContainer;
     private boolean settingsPanelOpen;
@@ -101,6 +102,7 @@ implements SettingOwner {
     private UiNode embeddedSettingsNode;
     private int languageIndex;
     private long accentColorChangedAtMillis;
+    private long backgroundColorChangedAtMillis;
     private long visibilityDeadlineMillis;
     private static final float KEYBIND_WINDOW_WIDTH = 207.0f;
     private static final float KEYBIND_HEADER_HEIGHT = 14.0f;
@@ -200,6 +202,7 @@ implements SettingOwner {
         this.languageIndex = SettingPanel.getLanguageIndex(Localization.getLanguage());
         this.languageSetting.select(this.languageSetting.getOptions().get(this.languageIndex));
         this.accentColorSetting = new ColorSetting(this, "theme.colors.accent").setAlphaEnabled(false).setColor(ColorPalette.getCurrentAccentColor());
+        this.backgroundColorSetting = new ColorSetting(this, "theme.colors.background").setAlphaEnabled(false).setColor(ColorPalette.getCurrentBackgroundColor());
         Transition transition = (f, uiNode, state) -> {
             float f2;
             state.progress = 1.0f;
@@ -220,7 +223,7 @@ implements SettingOwner {
                 super.drawChildren(drawContext, f);
                 moscow.rockstar.render.state.UiScissorStack.pop();
             }
-        }.vertical().width(115.0f).padding(Insets.symmetric(6.0f, 0.0f)).onClick(() -> {}).visibleWhen(() -> this.settingsPanelOpen && !this.keybindSearchOpen).transition(transition).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeOutBack)).add(this.createKeybindButton()).add(SettingPanel.createSettingComponent(this.autoSaveSetting)).add(SettingPanel.createSettingComponent(this.accentColorSetting)).add(SettingPanel.createSettingComponent(this.languageSetting)).renderHook((drawContext, component) -> {
+        }.vertical().width(115.0f).padding(Insets.symmetric(6.0f, 0.0f)).onClick(() -> {}).visibleWhen(() -> this.settingsPanelOpen && !this.keybindSearchOpen).transition(transition).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeOutBack)).add(this.createKeybindButton()).add(SettingPanel.createSettingComponent(this.autoSaveSetting)).add(SettingPanel.createSettingComponent(this.accentColorSetting)).add(SettingPanel.createSettingComponent(this.backgroundColorSetting)).add(SettingPanel.createSettingComponent(this.languageSetting)).renderHook((drawContext, component) -> {
             drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f, WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
             this.drawPanelSurface(drawContext, component, 11.0f);
         });
@@ -415,9 +418,11 @@ implements SettingOwner {
         this.settingsPanelOpen = bl;
         if (!bl) {
             this.accentColorSetting.closePicker();
+            this.backgroundColorSetting.closePicker();
             return;
         }
         this.accentColorSetting.updateColor(ColorPalette.getCurrentAccentColor());
+        this.backgroundColorSetting.updateColor(ColorPalette.getCurrentBackgroundColor());
         this.languageIndex = SettingPanel.getLanguageIndex(Localization.getLanguage());
         this.languageSetting.select(this.languageSetting.getOptions().get(this.languageIndex));
         this.autoSaveSetting.setValueInternal(ModuleConfigurationStore.isAutoSaveEnabled());
@@ -785,7 +790,7 @@ implements SettingOwner {
     }
 
     private TextComponent createSearchResultRow(SettingSearchEntry settingSearchEntry, int n) {
-        return new TextComponent().fillWidth().height(18.0f).cursor(Cursor.HAND).hoverMotion(Motion.withLinearEasing(70L)).bind("sel", () -> n == this.selectedKeybindIndex, Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutQuart)).onClick(() -> this.activateSearchResult(settingSearchEntry, true)).paint((drawContext, textComponent) -> this.drawSearchResultRow(drawContext, textComponent, settingSearchEntry, n));
+        return new TextComponent().fillWidth().height(18.0f).cursor(Cursor.HAND).hoverMotion(Motion.withLinearEasing(70L)).bind("sel", () -> n == this.selectedKeybindIndex, Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutQuart)).background(textComponent -> ColorPalette.ACCENT_COLOR.mulAlpha(0.12f * textComponent.sig("sel") + 0.04f * textComponent.hover())).radius(3.0f).onClick(() -> this.activateSearchResult(settingSearchEntry, true)).paint((drawContext, textComponent) -> this.drawSearchResultRow(drawContext, textComponent, settingSearchEntry, n));
     }
 
     private void drawSearchResultRow(RockstarDrawContext drawContext, TextComponent textComponent, SettingSearchEntry settingSearchEntry, int n) {
@@ -796,11 +801,6 @@ implements SettingOwner {
             this.selectedKeybindIndex = n;
         }
         FontMetrics fontMetrics = Font.REGULAR.metrics(8.0f);
-        FontMetrics fontMetrics2 = Font.REGULAR.metrics(7.0f);
-        String string2 = "TAB - \u041e\u0442\u043a\u0440\u044b\u0442\u044c";
-        float f3 = 5.0f;
-        float f4 = textComponent.x() + textComponent.w() - 10.0f - f3;
-        float f5 = f4 - 3.0f - fontMetrics2.measureText(string2);
         float f6 = textComponent.y() + textComponent.h() / 2.0f - fontMetrics.getFontTopOffset() / 2.0f;
         float f7 = textComponent.x() + 10.0f;
         if (settingSearchEntry.hasSetting()) {
@@ -813,21 +813,11 @@ implements SettingOwner {
             f = f7;
         }
         string = settingSearchEntry.getDisplayName();
-        f2 = textComponent.sig("sel");
         float f8 = textComponent.x() + textComponent.w() - 10.0f - f;
-        float f9 = f5 - 6.0f - f;
-        float f10 = f8 + (f9 - f8) * f2;
-        if (fontMetrics.measureText(string) > f10) {
-            drawContext.drawFadeText(fontMetrics, string, f, f6, ColorPalette.PRIMARY_TEXT_COLOR, 0.0f, 8.0f, f10);
+        if (fontMetrics.measureText(string) > f8) {
+            drawContext.drawFadeText(fontMetrics, string, f, f6, ColorPalette.PRIMARY_TEXT_COLOR, 0.0f, 8.0f, f8);
         } else {
             drawContext.drawText(fontMetrics, string, f, f6, ColorPalette.PRIMARY_TEXT_COLOR);
-        }
-        if (n == this.selectedKeybindIndex) {
-            this.selectedRowAnimation.setTarget(textComponent.y());
-            float f11 = this.selectedRowAnimation.getCurrent();
-            ColorRGBA colorRGBA = ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f);
-            drawContext.drawText(fontMetrics2, string2, f5, f11 + textComponent.h() / 2.0f - fontMetrics2.getFontTopOffset() / 2.0f, colorRGBA);
-            drawContext.drawIcon("arrows", f4, f11 + textComponent.h() / 2.0f - f3 / 2.0f, f3, colorRGBA);
         }
     }
 
@@ -1011,6 +1001,17 @@ implements SettingOwner {
         if (this.accentColorChangedAtMillis != 0L && System.currentTimeMillis() - this.accentColorChangedAtMillis > 600L) {
             this.accentColorChangedAtMillis = 0L;
             ModuleConfigurationStore.saveConfiguration();
+            moscow.rockstar.api.data.ClientConfigManager.getInstance().save("client");
+        }
+        ColorRGBA bgRGBA = this.backgroundColorSetting.getColor() == null ? null : this.backgroundColorSetting.getColor().withAlpha(255.0f);
+        if (bgRGBA != null && !bgRGBA.equals(ColorPalette.getCurrentBackgroundColor())) {
+            ColorPalette.setCurrentBackgroundColor(bgRGBA);
+            this.backgroundColorChangedAtMillis = System.currentTimeMillis();
+        }
+        if (this.backgroundColorChangedAtMillis != 0L && System.currentTimeMillis() - this.backgroundColorChangedAtMillis > 600L) {
+            this.backgroundColorChangedAtMillis = 0L;
+            ModuleConfigurationStore.saveConfiguration();
+            moscow.rockstar.api.data.ClientConfigManager.getInstance().save("client");
         }
     }
 

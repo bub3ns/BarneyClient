@@ -64,6 +64,15 @@ esp.boxes.mode=Градиент
 esp.boxes.mode.gradient=Градиент
 esp.boxes.mode.outline=Обводка
 esp.boxes.mode.fill=Заливка
+esp.block_overlay=Block Overlay
+esp.block_overlay.color=Цвет
+esp.block_overlay.fill=Заливка
+esp.block_overlay.outline=Обводка
+esp.block_overlay.flat=Плоский
+esp.block_overlay.speed=Скорость
+esp.block_overlay.lighting=Освещение
+esp.block_overlay.lighting.radius=Радиус света
+esp.block_overlay.lighting.strength=Сила света
 
 modules.descriptions.name_tags=Теги, отображающие информацию о сущностях
 modules.descriptions.ambience=Изменяет окружение мира
@@ -414,6 +423,30 @@ modules.settings.target_esp.mode.crystals=Кристаллы
 modules.settings.target_esp.mode.circle=Кругляшок
 modules.settings.target_esp.mode.swords=Мечи
 
+# Accessories
+modules.descriptions.accessories=Отображает кастомные аксессуары игрока
+modules.settings.accessories.head=Голова
+modules.settings.accessories.head.crystal=Кристалл
+modules.settings.accessories.back=Спина
+modules.settings.accessories.legs=Ноги
+modules.settings.accessories.boots=Ботинки
+modules.settings.accessories.none=Нет
+modules.settings.accessories.color=Цвет
+modules.settings.accessories.amount=Количество
+modules.settings.accessories.radius=Радиус
+modules.settings.accessories.height=Высота
+modules.settings.accessories.min_scale=Мин. размер
+modules.settings.accessories.max_scale=Макс. размер
+modules.settings.accessories.min_lifetime=Мин. время жизни
+modules.settings.accessories.max_lifetime=Макс. время жизни
+modules.settings.accessories.orbit_speed=Скорость орбиты
+modules.settings.accessories.rotation_speed=Скорость вращения
+modules.settings.accessories.bloom=Свечение
+modules.settings.accessories.bloom_size=Размер свечения
+modules.settings.accessories.lighting=Динамический свет
+modules.settings.accessories.light_radius=Радиус света
+modules.settings.accessories.light_strength=Сила света
+
 # Auction
 modules.descriptions.auction=Ваш помощник на аукционе
 
@@ -530,6 +563,8 @@ modules.settings.aura.auto_mace.description=Свапает на булаву п�
 modules.settings.aura.crits_mode=Crits Mode
 modules.settings.aura.crits_mode.smart=Smart
 modules.settings.aura.crits_mode.only=Only
+modules.settings.aura.crits_mode.static=Static
+modules.settings.aura.cooldown=Cooldown
 modules.settings.aura.smart_criticals=Умные криты
 modules.settings.aura.onlyWeapon.description=Модуль будет работать только тогда, когда у вас оружие в руках
 modules.settings.aura.styleAttack=Стиль атаки
@@ -1217,7 +1252,7 @@ menu.modern.shortcuts=Доступные меню
 menu.modern.shortcuts.item_binds=Бинды предметов
 menu.modern.shortcuts.messenger=Мессенджер
 search.tooltip=Чтобы открыть поиск нажмите Ctrl + F
-search.tooltip.tab=Tab - Открыть настройки
+search.tooltip.tab=Tab
 search.tooltip.enter=Enter - Включить/Выключить
 
 # меню
@@ -2210,7 +2245,7 @@ modules.settings.aura.force_targeted_ranged=Таргетить, если у це
 modules.settings.aura.force_behind_targeted=Заходить за спину
 modules.settings.aura.utilities=Дополнительно
 modules.settings.aura.resolver=Резольвер
-modules.settings.aura.useHit=Не бить если ешь
+modules.settings.aura.useHit=Не бить при использовании
 modules.settings.aura.no_teammates_1_8=Не бить свою команду
 modules.settings.aura.hit_dragon_six_blocks=Бить дракона за 6 блоков
 modules.settings.aura.sync=Синхр. критов

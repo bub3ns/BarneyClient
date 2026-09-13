@@ -133,7 +133,7 @@ extends Module {
         this.reallyWorldModeOption = new ModeSetting.Option(this.modeSetting, "modules.settings.air_stuck.mode.reallyworld");
         this.funTimeModeOption = new ModeSetting.Option(this.modeSetting, "modules.settings.air_stuck.mode.funtime");
         this.changeAuraDistanceSetting = new BooleanSetting(this, "modules.settings.air_stuck.change_aura_distance");
-        this.auraDistanceSetting = new NumberSetting((SettingOwner)this, "modules.settings.air_stuck.aura_distance", () -> !this.changeAuraDistanceSetting.isEnabled()).setMinValue(2.0f).setMaxValue(6.0f).setStep(0.1f).setValue(3.0f).setFormatter(f -> " %s".formatted(Localization.translate("block")) + moscow.rockstar.util.NumberFormatting.formatOneDecimal((float)f));
+        this.auraDistanceSetting = new NumberSetting((SettingOwner)this, "modules.settings.air_stuck.aura_distance", () -> !this.changeAuraDistanceSetting.isEnabled()).setMinValue(2.0f).setMaxValue(6.0f).setStep(0.1f).setValue(3.0f).setUnit(" block");
         this.catchMomentSetting = new BooleanSetting((SettingOwner)this, "modules.settings.air_stuck.catch_moment", () -> !this.normalModeOption.isSelected()).enable();
         this.fallCheckSetting = new BooleanSetting((SettingOwner)this, "modules.settings.air_stuck.fall_check", () -> !this.funTimeModeOption.isSelected()).enable();
     }

@@ -69,29 +69,22 @@ import org.jetbrains.annotations.NotNull;
 import pyrock.events.player.ClientPlayerTickEvent;
 import ua.mintantileak.spk.Compile;
 
-@ModuleInfo(name="Web Utils", category=ModuleCategory.OTHER)
+@ModuleInfo(name="Web Trap", category=ModuleCategory.COMBAT)
 public class WebTrap
 extends Module {
-    private MultiBooleanSetting webModeSetting;
-    private MultiBooleanSetting.Option noWebOption;
-    private MultiBooleanSetting.Option trapWebOption;
     private MultiBooleanSetting placementModeSetting;
     private MultiBooleanSetting.Option defaultPlacementOption;
     private MultiBooleanSetting.Option fullBodyPlacementOption;
     private MultiBooleanSetting.Option sidePlacementOption;
     private NumberSetting placementCountSetting;
     private NumberSetting placementDelaySetting;
-    private NumberSetting noWebSpeedSetting;
     private final Timer placementCooldown = new Timer();
     private final EventListener<ClientPlayerTickEvent> clientTickListener = clientPlayerTickEvent -> {
         LivingEntity class_13092;
         if (WebTrap.minecraftClient.player == null || WebTrap.minecraftClient.world == null) {
             return;
         }
-        if (this.noWebOption.isSelected()) {
-            this.applyNoWebMovement();
-        }
-        if (this.trapWebOption.isSelected() && (class_13092 = RockstarClient.create().getFriendManager().getTargetLivingEntity()) != null && WebTrap.minecraftClient.player.getPos().distanceTo(class_13092.getPos()) <= (double)RockstarClient.create().getModuleRegistry().getModule(Aura.class).getAttackDistanceSetting().getValue()) {
+        if ((class_13092 = RockstarClient.create().getFriendManager().getTargetLivingEntity()) != null && WebTrap.minecraftClient.player.getPos().distanceTo(class_13092.getPos()) <= (double)RockstarClient.create().getModuleRegistry().getModule(Aura.class).getAttackDistanceSetting().getValue()) {
             if (this.isEntityInWeb(class_13092)) {
                 return;
             }
@@ -133,36 +126,12 @@ extends Module {
 
     @Compile(obfuscation=4)
     private void initializeTrapSettings() {
-        this.webModeSetting = new MultiBooleanSetting(this, "modules.settings.web_utils");
-        this.noWebOption = new MultiBooleanSetting.Option(this.webModeSetting, "modules.settings.web_utils.no_web");
-        this.trapWebOption = new MultiBooleanSetting.Option(this.webModeSetting, "modules.settings.web_utils.trap_web");
-        this.placementModeSetting = new MultiBooleanSetting((SettingOwner)this, "modules.settings.web_utils.placement_mode", () -> !this.trapWebOption.isSelected());
+        this.placementModeSetting = new MultiBooleanSetting(this, "modules.settings.web_utils.placement_mode");
         this.defaultPlacementOption = new MultiBooleanSetting.Option(this.placementModeSetting, "modules.settings.web_utils.placement_mode.default").select();
         this.fullBodyPlacementOption = new MultiBooleanSetting.Option(this.placementModeSetting, "modules.settings.web_utils.placement_mode.full_body");
         this.sidePlacementOption = new MultiBooleanSetting.Option(this.placementModeSetting, "modules.settings.web_utils.placement_mode.sides");
-        this.placementCountSetting = new NumberSetting((SettingOwner)this, "modules.settings.web_utils.count", () -> !this.trapWebOption.isSelected()).setMinValue(1.0f).setMaxValue(6.0f).setStep(1.0f).setValue(1.0f);
-        this.placementDelaySetting = new NumberSetting((SettingOwner)this, "modules.settings.web_utils.delay", () -> !this.trapWebOption.isSelected()).setMinValue(100.0f).setMaxValue(1000.0f).setStep(50.0f).setValue(150.0f).setUnit("ms");
-        this.noWebSpeedSetting = new NumberSetting((SettingOwner)this, "modules.settings.web_utils.no_web_speed", () -> !this.noWebOption.isSelected()).setMinValue(0.1f).setMaxValue(1.0f).setStep(0.01f).setValue(0.57f);
-    }
-
-    private void applyNoWebMovement() {
-        if (WebTrap.minecraftClient.player == null || WebTrap.minecraftClient.world == null || !this.isPlayerInWeb()) {
-            return;
-        }
-        double d = WebTrap.minecraftClient.options.jumpKey.isPressed() ? 1.3 : (WebTrap.minecraftClient.options.sneakKey.isPressed() ? -1.3 : 0.0);
-        float f = WebTrap.minecraftClient.player.getYaw() * ((float)Math.PI / 180);
-        float f2 = this.noWebSpeedSetting.getValue();
-        float f3 = WebTrap.minecraftClient.player.forwardSpeed * f2;
-        float f4 = WebTrap.minecraftClient.player.sidewaysSpeed * f2;
-        if (f3 != 0.0f || f4 != 0.0f) {
-            WebTrap.minecraftClient.player.setVelocity((double)(-MathHelper.sin((float)f) * f3 + MathHelper.cos((float)f) * f4), d, (double)(MathHelper.cos((float)f) * f3 + MathHelper.sin((float)f) * f4));
-        } else {
-            WebTrap.minecraftClient.player.setVelocity(0.0, d, 0.0);
-        }
-    }
-
-    private boolean isPlayerInWeb() {
-        return this.isEntityInWeb((LivingEntity)WebTrap.minecraftClient.player);
+        this.placementCountSetting = new NumberSetting((SettingOwner)this, "modules.settings.web_utils.count").setMinValue(1.0f).setMaxValue(6.0f).setStep(1.0f).setValue(1.0f);
+        this.placementDelaySetting = new NumberSetting((SettingOwner)this, "modules.settings.web_utils.delay").setMinValue(100.0f).setMaxValue(1000.0f).setStep(50.0f).setValue(150.0f).setUnit("ms");
     }
 
     private boolean isEntityInWeb(LivingEntity class_13092) {
@@ -353,10 +322,6 @@ extends Module {
         }
     }
 
-    @Generated
-    public MultiBooleanSetting.Option getNoWebOption() {
-        return this.noWebOption;
-    }
 
     static final class WebItemSelection {
         private final ItemRule webItemRule;

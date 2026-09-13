@@ -561,8 +561,8 @@ implements OverlayElement {
 
     @Compile(obfuscation=1)
     private Component createModuleRow(ModuleContract moduleContract) {
-        TextComponent textComponent2 = new TextComponent().fill().fade().text(Font.MEDIUM.metrics(7.0f), () -> this.getModuleDisplayText(moduleContract), textComponent -> this.getOverlayAccentColor().mix(ColorPalette.ACCENT_COLOR, 0.5f * textComponent.sig("enabled")).mulAlpha(0.6f + 0.3f * textComponent.sig("enabled") + 0.1f * textComponent.sig("selected"))).bind("enabled", moduleContract::isEnabled, CATEGORY_HOVER_MOTION).bind("selected", () -> this.selectedModule == moduleContract, CATEGORY_HOVER_MOTION).interactive(false);
-        Component component2 = new Component().horizontal().alignment(Alignment.CENTER).height(15.0f).fillWidth().padding(Insets.symmetric(0.0f, 5.0f)).cornerRadius(3.0f).background(component -> ModuleSettingsScreen.interpolateColor(ColorPalette.getPanelBackgroundColor().mulAlpha(0.4f), ColorPalette.ACCENT_COLOR, 0.08f * component.sig("enabled") + 0.018f * component.sig("selected") + 0.025f * component.hover())).bind("enabled", moduleContract::isEnabled, CATEGORY_HOVER_MOTION).bind("selected", () -> this.selectedModule == moduleContract, CATEGORY_HOVER_MOTION).cursor(Cursor.HAND).add(textComponent2).onClick((pointerAction, f, f2) -> this.handleModulePointerAction(moduleContract, pointerAction));
+        TextComponent textComponent2 = new TextComponent().fill().fade().text(Font.MEDIUM.metrics(7.0f), () -> this.getModuleDisplayText(moduleContract), textComponent -> this.getOverlayAccentColor().mix(ColorPalette.ACCENT_COLOR, textComponent.sig("enabled")).mulAlpha(0.6f + 0.3f * textComponent.sig("enabled") + 0.1f * textComponent.sig("selected"))).bind("enabled", moduleContract::isEnabled, CATEGORY_HOVER_MOTION).bind("selected", () -> this.selectedModule == moduleContract, CATEGORY_HOVER_MOTION).interactive(false);
+        Component component2 = new Component().horizontal().alignment(Alignment.CENTER).height(15.0f).fillWidth().padding(Insets.symmetric(0.0f, 5.0f)).cornerRadius(3.0f).background(component -> ColorPalette.ACCENT_COLOR.mulAlpha(0.12f * component.sig("enabled") + 0.04f * component.sig("selected") + 0.04f * component.hover())).bind("enabled", moduleContract::isEnabled, CATEGORY_HOVER_MOTION).bind("selected", () -> this.selectedModule == moduleContract, CATEGORY_HOVER_MOTION).cursor(Cursor.HAND).add(textComponent2).onClick((pointerAction, f, f2) -> this.handleModulePointerAction(moduleContract, pointerAction));
         return component2;
     }
 
@@ -722,18 +722,9 @@ implements OverlayElement {
         return setting instanceof TextLabelSetting ? this.wrapLabelSetting(setting) : this.wrapEditableSetting(setting);
     }
 
-    /**
-     * ORIGINAL: rockstar/ilIlil/IiiIiiIIi#i (Lrockstar/ilIlil/IIiiiIIII;)Lrockstar/ilIlil/iii;.
-     * The setting's own component is always stretched to the card width and inset by
-     * 9px horizontally; without this the row measures at its natural width and its
-     * label/value text runs past the card edge.
-     */
     private static Component createRawSettingComponent(Setting setting) {
         Component component = setting.buildComponent();
         if (component == null) {
-            // ORIGINAL falls back to `new IiiIiiIII(setting)`, an adapter around the
-            // legacy SettingWidget-based renderer. Every Setting here overrides
-            // buildComponent(), so this branch is unreachable in practice.
             return new Component();
         }
         return component.fillWidth().padding(0.0f, 9.0f);
@@ -771,7 +762,7 @@ implements OverlayElement {
     }
 
     private String getProfileTag() {
-        return "LEEK";
+        return "Barney Client";
     }
 
     private int getSelectedModuleKeybind() {

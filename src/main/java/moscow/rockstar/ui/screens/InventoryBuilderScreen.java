@@ -294,9 +294,9 @@ extends MenuScreenBase {
 
     /** ORIGINAL: private iii I(IIIIIiiiI$i) */
     private Component createPresetRow(InventoryPresetLayout layout) {
-        TextComponent name = new TextComponent().fill().fade().text(Font.MEDIUM.metrics(7.0f), () -> layout.layoutName, textComponent -> this.textColor().mix(ColorPalette.ACCENT_COLOR, 0.5f * textComponent.sig("active")).mulAlpha(0.6f + 0.4f * textComponent.sig("active"))).bind("active", () -> this.selectedPreset == layout, ACTIVE_MOTION).interactive(false);
+        TextComponent name = new TextComponent().fill().fade().text(Font.MEDIUM.metrics(7.0f), () -> layout.layoutName, textComponent -> this.textColor().mix(ColorPalette.ACCENT_COLOR, textComponent.sig("active")).mulAlpha(0.6f + 0.4f * textComponent.sig("active"))).bind("active", () -> this.selectedPreset == layout, ACTIVE_MOTION).interactive(false);
         TextComponent count = new TextComponent().width(18.0f).text(Font.REGULAR.metrics(7.0f), () -> String.valueOf(layout.getFilledSlotCount()), textComponent -> this.textColor().mulAlpha(0.42f)).textAlign(Alignment.END).interactive(false);
-        return new Component().horizontal().alignment(Alignment.CENTER).height(15.0f).fillWidth().padding(Insets.symmetric(0.0f, 3.5f)).cornerRadius(3.0f).background(component -> InventoryBuilderScreen.blend(this.rowBaseColor(), ColorPalette.ACCENT_COLOR, 0.05f * component.sig("active") + 0.025f * component.hover())).bind("active", () -> this.selectedPreset == layout, ACTIVE_MOTION).cursor(Cursor.HAND).add(name).add(count).onClick((action, x, y) -> {
+        return new Component().horizontal().alignment(Alignment.CENTER).height(15.0f).fillWidth().padding(Insets.symmetric(0.0f, 3.5f)).cornerRadius(3.0f).background(component -> ColorPalette.ACCENT_COLOR.mulAlpha(0.12f * component.sig("active") + 0.04f * component.hover())).bind("active", () -> this.selectedPreset == layout, ACTIVE_MOTION).cursor(Cursor.HAND).add(name).add(count).onClick((action, x, y) -> {
             if (action == PointerAction.RIGHT_CLICK) {
                 this.openPresetContextMenu(layout, x, y);
                 return;

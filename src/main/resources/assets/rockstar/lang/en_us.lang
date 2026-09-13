@@ -66,6 +66,15 @@ esp.boxes.mode=Gradient
 esp.boxes.mode.gradient=Gradient
 esp.boxes.mode.outline=Outline
 esp.boxes.mode.fill=Fill
+esp.block_overlay=Block Overlay
+esp.block_overlay.color=Color
+esp.block_overlay.fill=Fill
+esp.block_overlay.outline=Outline
+esp.block_overlay.flat=Flat
+esp.block_overlay.speed=Speed
+esp.block_overlay.lighting=Lighting
+esp.block_overlay.lighting.radius=Light Radius
+esp.block_overlay.lighting.strength=Light Strength
 
 modules.descriptions.name_tags=Show nametags ahead of entity with some data
 modules.descriptions.ambience=Changes the world's ambiance
@@ -416,6 +425,30 @@ modules.settings.target_esp.mode.crystals=Crystals
 modules.settings.target_esp.mode.circle=Circle
 modules.settings.target_esp.mode.swords=Swords
 
+# Accessories
+modules.descriptions.accessories=Renders custom accessories and cosmetics on the player
+modules.settings.accessories.head=Head
+modules.settings.accessories.head.crystal=Crystal
+modules.settings.accessories.back=Back
+modules.settings.accessories.legs=Legs
+modules.settings.accessories.boots=Boots
+modules.settings.accessories.none=None
+modules.settings.accessories.color=Color
+modules.settings.accessories.amount=Amount
+modules.settings.accessories.radius=Radius
+modules.settings.accessories.height=Height
+modules.settings.accessories.min_scale=Min Scale
+modules.settings.accessories.max_scale=Max Scale
+modules.settings.accessories.min_lifetime=Min Lifetime
+modules.settings.accessories.max_lifetime=Max Lifetime
+modules.settings.accessories.orbit_speed=Orbit Speed
+modules.settings.accessories.rotation_speed=Rotation Speed
+modules.settings.accessories.bloom=Bloom
+modules.settings.accessories.bloom_size=Bloom Size
+modules.settings.accessories.lighting=Dynamic Light
+modules.settings.accessories.light_radius=Light Radius
+modules.settings.accessories.light_strength=Light Strength
+
 # Auction
 modules.descriptions.auction=Your auction assistant
 
@@ -532,6 +565,8 @@ modules.settings.aura.auto_mace.description=Swaps to a mace for a smash attack; 
 modules.settings.aura.crits_mode=Crits Mode
 modules.settings.aura.crits_mode.smart=Smart
 modules.settings.aura.crits_mode.only=Only
+modules.settings.aura.crits_mode.static=Static
+modules.settings.aura.cooldown=Cooldown
 modules.settings.aura.smart_criticals=Smart critical
 modules.settings.aura.onlyWeapon.description=The module will only work when you have a weapon in your hands
 modules.settings.aura.styleAttack=Attack Mode
@@ -2199,7 +2234,7 @@ modules.settings.aura.force_targeted_ranged=Target if enemy has crossbow or trid
 modules.settings.aura.force_behind_targeted=Go behind back
 modules.settings.aura.utilities=Additional
 modules.settings.aura.resolver=Resolver
-modules.settings.aura.useHit=Don't hit while eating
+modules.settings.aura.useHit=Dont hit while using
 modules.settings.aura.no_teammates_1_8=Don't hit teammates
 modules.settings.aura.hit_dragon_six_blocks=Hit dragon from 6 blocks
 modules.settings.aura.sync=Sync crits

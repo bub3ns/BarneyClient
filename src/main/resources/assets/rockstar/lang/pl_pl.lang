@@ -64,6 +64,15 @@ esp.boxes.mode=Gradient
 esp.boxes.mode.gradient=Gradient
 esp.boxes.mode.outline=Kontur
 esp.boxes.mode.fill=Wypełnienie
+esp.block_overlay=Block Overlay
+esp.block_overlay.color=Kolor
+esp.block_overlay.fill=Wypełnienie
+esp.block_overlay.outline=Kontur
+esp.block_overlay.flat=Płaski
+esp.block_overlay.speed=Prędkość
+esp.block_overlay.lighting=Oświetlenie
+esp.block_overlay.lighting.radius=Promień światła
+esp.block_overlay.lighting.strength=Siła światła
 
 modules.descriptions.name_tags=Wyświetla informacje o przydmiotach/ graczach
 modules.descriptions.ambience=Zmienia otoczenie świata
@@ -400,6 +409,30 @@ modules.settings.target_esp.mode.crystals=Kryształy
 modules.settings.target_esp.mode.circle=Okrąg
 modules.settings.target_esp.mode.swords=Miecze
 
+# Accessories
+modules.descriptions.accessories=Renderuje akcesoria i dodatki gracza
+modules.settings.accessories.head=Głowa
+modules.settings.accessories.head.crystal=Kryształ
+modules.settings.accessories.back=Plecy
+modules.settings.accessories.legs=Nogi
+modules.settings.accessories.boots=Buty
+modules.settings.accessories.none=Brak
+modules.settings.accessories.color=Kolor
+modules.settings.accessories.amount=Ilość
+modules.settings.accessories.radius=Promień
+modules.settings.accessories.height=Wysokość
+modules.settings.accessories.min_scale=Min. rozmiar
+modules.settings.accessories.max_scale=Maks. rozmiar
+modules.settings.accessories.min_lifetime=Min. czas życia
+modules.settings.accessories.max_lifetime=Maks. czas życia
+modules.settings.accessories.orbit_speed=Prędkość orbity
+modules.settings.accessories.rotation_speed=Prędkość obrotu
+modules.settings.accessories.bloom=Poświata
+modules.settings.accessories.bloom_size=Rozmiar poświaty
+modules.settings.accessories.lighting=Dynamiczne światło
+modules.settings.accessories.light_radius=Promień światła
+modules.settings.accessories.light_strength=Moc światła
+
 # Auction
 modules.descriptions.auction=Ah asystent
 
@@ -516,6 +549,8 @@ modules.settings.aura.auto_mace.description=Zmienia broń na maczugę przed atak
 modules.settings.aura.crits_mode=Crits Mode
 modules.settings.aura.crits_mode.smart=Smart
 modules.settings.aura.crits_mode.only=Only
+modules.settings.aura.crits_mode.static=Static
+modules.settings.aura.cooldown=Cooldown
 modules.settings.aura.smartCriticals=inteligentne krytyki
 modules.settings.aura.onlyWeapon.description=Moduł będzie działał tylko wtedy, kiedy masz broń w ręku
 modules.settings.aura.styleAttack=Attack Mode
@@ -2232,7 +2267,7 @@ modules.settings.aura.force_targeted_ranged=Celuj, jeśli wróg ma kuszę lub tr
 modules.settings.aura.force_behind_targeted=Wchodź za plecy
 modules.settings.aura.utilities=Dodatkowe
 modules.settings.aura.resolver=Resolver
-modules.settings.aura.useHit=Nie bij podczas jedzenia
+modules.settings.aura.useHit=Nie bij podczas używania
 modules.settings.aura.no_teammates_1_8=Nie bij swojej drużyny
 modules.settings.aura.hit_dragon_six_blocks=Bij smoka z 6 bloków
 modules.settings.aura.sync=Synchronizacja krytów

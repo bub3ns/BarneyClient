@@ -709,7 +709,7 @@ implements ClientAccess {
     private static JsonObject serializeThemeData(ThemeColorSettings themeColorSettings) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("accent", themeColorSettings.getAccentColor().toJson());
-        jsonObject.add("background", themeColorSettings.getPanelColor().toJson());
+        jsonObject.add("background", ColorPalette.getCurrentBackgroundColor().toJson());
         jsonObject.add("additional", themeColorSettings.getPanelBackgroundColor().toJson());
         jsonObject.add("text", themeColorSettings.getPrimaryTextColor().toJson());
         jsonObject.add("outline", themeColorSettings.getBorderColor().toJson());
@@ -745,7 +745,7 @@ implements ClientAccess {
         float f9 = jsonObject.has("splitters") ? jsonObject.get("splitters").getAsFloat() : 0.0f;
         float f10 = jsonObject.has("albomColor") ? jsonObject.get("albomColor").getAsFloat() : 0.0f;
         ColorRGBA colorRGBA = jsonObject.has("accent") ? ColorRGBA.fromJson(jsonObject.getAsJsonObject("accent")) : new ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f);
-        ColorRGBA colorRGBA2 = jsonObject.has("background") ? ColorRGBA.fromJson(jsonObject.getAsJsonObject("background")) : new ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f);
+        ColorRGBA colorRGBA2 = jsonObject.has("background") ? ColorRGBA.fromJson(jsonObject.getAsJsonObject("background")) : ColorPalette.DEFAULT_BACKGROUND_COLOR;
         ColorRGBA colorRGBA3 = jsonObject.has("additional") ? ColorRGBA.fromJson(jsonObject.getAsJsonObject("additional")) : new ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f);
         ColorRGBA colorRGBA4 = jsonObject.has("text") ? ColorRGBA.fromJson(jsonObject.getAsJsonObject("text")) : new ColorRGBA(255.0f, 255.0f, 255.0f, 255.0f);
         ColorRGBA colorRGBA5 = jsonObject.has("outline") ? ColorRGBA.fromJson(jsonObject.getAsJsonObject("outline")) : new ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f);

@@ -107,7 +107,7 @@ extends Module {
         this.distanceOption = new ModeSetting.Option(this.leaveMode, "modules.settings.auto_leave.leave.distance");
         this.healthOption = new ModeSetting.Option(this.leaveMode, "modules.settings.auto_leave.leave.health");
         this.banOption = new ModeSetting.Option(this.leaveMode, "modules.settings.auto_leave.leave.ban");
-        this.distance = new NumberSetting((SettingOwner)this, "modules.settings.auto_leave.distance", () -> this.healthOption.isSelected() || this.banOption.isSelected()).setFormatter(f -> " %s".formatted(Localization.translate("block")) + moscow.rockstar.util.NumberFormatting.formatOneDecimal((float)f)).setStep(1.0f).setMinValue(1.0f).setMaxValue(150.0f).setValue(30.0f);
+        this.distance = new NumberSetting((SettingOwner)this, "modules.settings.auto_leave.distance", () -> this.healthOption.isSelected() || this.banOption.isSelected()).setUnit(" block").setStep(1.0f).setMinValue(1.0f).setMaxValue(150.0f).setValue(30.0f);
         this.health = new NumberSetting((SettingOwner)this, "modules.settings.auto_leave.health", () -> this.distanceOption.isSelected() || this.banOption.isSelected()).setStep(1.0f).setMinValue(1.0f).setMaxValue(20.0f).setValue(10.0f);
         this.delay = new NumberSetting((SettingOwner)this, "modules.settings.auto_leave.delay", () -> !this.banOption.isSelected() || this.distanceOption.isSelected() || this.healthOption.isSelected()).setUnit(Localization.translate("sec") + ".").setStep(1.0f).setMinValue(1.0f).setMaxValue(60.0f).setValue(40.0f);
         this.targets = new MultiBooleanSetting((SettingOwner)this, "targets", () -> this.healthOption.isSelected() || this.banOption.isSelected());
