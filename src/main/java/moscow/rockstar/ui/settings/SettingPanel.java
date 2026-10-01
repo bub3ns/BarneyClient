@@ -65,8 +65,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import pyrock.utility.render.ColorRGBA;
 
 public class SettingPanel
-extends Component
-implements SettingOwner {
+        extends Component
+        implements SettingOwner {
     private static final float PANEL_WIDTH = 94.0f;
     private static final float PANEL_HEIGHT = 24.0f;
     private static final float KEYBIND_PANEL_WIDTH = 207.0f;
@@ -82,7 +82,8 @@ implements SettingOwner {
     private static final float SHADER_INSET = 16.0f;
     private static final long VISIBILITY_TIMEOUT_MILLIS = 400L;
     private static final FontMetrics HEADER_FONT = Font.MEDIUM.metrics(9.0f);
-    private final AnimatedValue selectedRowAnimation = new AnimatedValue(Motion.resolveMotionMotionFromFloatAndFloat(300.0f, 28.0f));
+    private final AnimatedValue selectedRowAnimation = new AnimatedValue(
+            Motion.resolveMotionMotionFromFloatAndFloat(300.0f, 28.0f));
     private final UiNode anchorNode;
     private final BiConsumer<ModuleContract, Setting> settingSelectionCallback;
     private final UiNode mainHeaderNode;
@@ -148,61 +149,93 @@ implements SettingOwner {
     public SettingPanel(UiNode uiNode2, BiConsumer<ModuleContract, Setting> biConsumer) {
         this.anchorNode = uiNode2;
         this.settingSelectionCallback = biConsumer;
-        TextComponent textComponent2 = new TextComponent().size(12.0f, 12.0f).interactive(false).paint((drawContext, textComponent) -> {
-            float f = textComponent.w() / 2.0f;
-            drawContext.drawRoundedTexture(SettingPanel.getAvatarTexture(), textComponent.x(), textComponent.y(), textComponent.w(), textComponent.h(), WidgetState.uniform(f), ColorPalette.WHITE);
-        });
-        Component component2 = new Component().vertical().gap(2.0f).alignment(Alignment.START).interactive(false).add(new TextComponent().text(Font.MEDIUM.metrics(7.0f), SettingPanel::getLocalUsername, textComponent -> ColorPalette.PRIMARY_TEXT_COLOR).interactive(false)).add(new TextComponent().text(Font.REGULAR.metrics(6.0f), SettingPanel::getProfileSubtitle, textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f)).interactive(false));
-        this.mainHeaderNode = new Component().horizontal().alignment(Alignment.CENTER).gap(4.0f).fillWidth().add(textComponent2).add(component2);
+        TextComponent textComponent2 = new TextComponent().size(12.0f, 12.0f).interactive(false)
+                .paint((drawContext, textComponent) -> {
+                    float f = textComponent.w() / 2.0f;
+                    drawContext.drawRoundedTexture(SettingPanel.getAvatarTexture(), textComponent.x(),
+                            textComponent.y(), textComponent.w(), textComponent.h(), WidgetState.uniform(f),
+                            ColorPalette.WHITE);
+                });
+        Component component2 = new Component().vertical().gap(2.0f).alignment(Alignment.START).interactive(false)
+                .add(new TextComponent().text(Font.MEDIUM.metrics(7.0f), SettingPanel::getLocalUsername,
+                        textComponent -> ColorPalette.PRIMARY_TEXT_COLOR).interactive(false))
+                .add(new TextComponent().text(Font.REGULAR.metrics(6.0f), SettingPanel::getProfileSubtitle,
+                        textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f)).interactive(false));
+        this.mainHeaderNode = new Component().horizontal().alignment(Alignment.CENTER).gap(4.0f).fillWidth()
+                .add(textComponent2).add(component2);
         this.mainHeaderActionNode = this.createIconButton("setting", this::toggleSettingsPanelVisibility);
         this.searchButton = this.createIconButton("search", () -> this.setSearchOpen(true));
         this.clearSearchButton = this.createIconButton("xmark", () -> this.setSearchOpen(false));
-        this.searchField = new TextComponent().fillWidth().height(24.0f).cursor(Cursor.IBEAM).onClick((PointerAction pointerAction, float f, float f2) -> this.getSearchEditor().mouseClicked(f, f2, pointerAction)).paint((drawContext, textComponent) -> {
-            TextInputField textInputField = this.getSearchEditor();
-            textInputField.setBounds(textComponent.x() - 4.0f, textComponent.y(), textComponent.w() + 4.0f, textComponent.h());
-            textInputField.setTextColor(ColorPalette.PRIMARY_TEXT_COLOR);
-            textInputField.setOpacity(1.0f);
-            textInputField.render(drawContext);
-        });
-        this.horizontal().alignment(Alignment.CENTER).overflowMode(JustifyContent.START).gap(6.0f).padding(Insets.of(0.0f, 8.0f, 0.0f, 6.0f)).width(94.0f).height(24.0f).onClick(() -> {}).add(this.mainHeaderNode).add(this.mainHeaderActionNode).add(this.searchButton).renderHook((drawContext, component) -> {
-            this.refreshRenderResources();
-            if (this.embeddedSettingsMode) {
-                return;
-            }
-            drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f, WidgetState.uniform(5.0f), ColorPalette.BLACK.mulAlpha(0.15f));
-            this.drawPanelSurface(drawContext, component, 8.0f);
-        });
+        this.searchField = new TextComponent()
+                .fillWidth().height(24.0f).cursor(Cursor.IBEAM).onClick((PointerAction pointerAction, float f,
+                        float f2) -> this.getSearchEditor().mouseClicked(f, f2, pointerAction))
+                .paint((drawContext, textComponent) -> {
+                    TextInputField textInputField = this.getSearchEditor();
+                    textInputField.setBounds(textComponent.x() - 4.0f, textComponent.y(), textComponent.w() + 4.0f,
+                            textComponent.h());
+                    textInputField.setTextColor(ColorPalette.PRIMARY_TEXT_COLOR);
+                    textInputField.setOpacity(1.0f);
+                    textInputField.render(drawContext);
+                });
+        this.horizontal().alignment(Alignment.CENTER).overflowMode(JustifyContent.START).gap(6.0f)
+                .padding(Insets.of(0.0f, 8.0f, 0.0f, 6.0f)).width(94.0f).height(24.0f).onClick(() -> {
+                }).add(this.mainHeaderNode).add(this.mainHeaderActionNode).add(this.searchButton)
+                .renderHook((drawContext, component) -> {
+                    this.refreshRenderResources();
+                    if (this.embeddedSettingsMode) {
+                        return;
+                    }
+                    drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f,
+                            WidgetState.uniform(5.0f), ColorPalette.BLACK.mulAlpha(0.15f));
+                    this.drawPanelSurface(drawContext, component, 8.0f);
+                });
         SettingPanel.disableTransitionsRecursively(this);
         this.mainHeaderNode.snapPosition();
         this.mainHeaderActionNode.snapPosition();
         this.searchButton.snapPosition(() -> !this.keybindSearchOpen);
-        this.searchField.exit(Transition.HIDDEN).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutCubic));
-        this.clearSearchButton.exit(Transition.HIDDEN).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutCubic));
-        this.keybindListContainer = new Component(){
+        this.searchField.exit(Transition.HIDDEN)
+                .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutCubic));
+        this.clearSearchButton.exit(Transition.HIDDEN)
+                .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutCubic));
+        this.keybindListContainer = new Component() {
 
             @Override
             public boolean mouseScrolled(float f, float f2, float f3, float f4) {
                 return super.mouseScrolled(f, f2, f3, f4) || this.inFlow() && this.contains(f, f2);
             }
-        }.vertical().width(207.0f).maxSize(207.0f, 150.0f).onClick(() -> {}).scrollable().configureLayoutState(scrollBar2 -> scrollBar2.offset(3.0f).padding(7.0f, 6.0f).thickness(2.5f).thumbColor(scrollBar -> ColorRGBA.BLACK.mix(ColorRGBA.WHITE, 0.3f).withAlpha(255.0f * (0.32f + 0.28f * scrollBar.hoverProgress() + 0.3f * scrollBar.dragProgress())))).visibleWhen(() -> this.keybindSearchOpen && this.keybindSearchReady && !this.searchResults.isEmpty(), Easing.easeOutQuart, 240L).collapse().renderHook((drawContext, component) -> {
-            if (this.embeddedSettingsMode) {
-                drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f, WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
-                this.drawEmbeddedContent(drawContext, component, 11.0f);
-            } else {
-                drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f, WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
-                this.drawPanelSurface(drawContext, component, 11.0f);
-            }
-        });
-        this.autoSaveSetting = new BooleanSetting(this, "configs.autosave").setActiveExtra(ModuleConfigurationStore.isAutoSaveEnabled());
+        }.vertical().width(207.0f).maxSize(207.0f, 150.0f).onClick(() -> {
+        }).scrollable().configureLayoutState(scrollBar2 -> scrollBar2.offset(3.0f).padding(7.0f, 6.0f).thickness(2.5f)
+                .thumbColor(scrollBar -> ColorRGBA.BLACK.mix(ColorRGBA.WHITE, 0.3f).withAlpha(
+                        255.0f * (0.32f + 0.28f * scrollBar.hoverProgress() + 0.3f * scrollBar.dragProgress()))))
+                .visibleWhen(() -> this.keybindSearchOpen && this.keybindSearchReady && !this.searchResults.isEmpty(),
+                        Easing.easeOutQuart, 240L)
+                .collapse().renderHook((drawContext, component) -> {
+                    if (this.embeddedSettingsMode) {
+                        drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f,
+                                WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
+                        this.drawEmbeddedContent(drawContext, component, 11.0f);
+                    } else {
+                        drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f,
+                                WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
+                        this.drawPanelSurface(drawContext, component, 11.0f);
+                    }
+                });
+        this.autoSaveSetting = new BooleanSetting(this, "configs.autosave")
+                .setActiveExtra(ModuleConfigurationStore.isAutoSaveEnabled());
         this.languageSetting = new ModeSetting(this, "modules.settings.interface.language");
-        // new ModeSetting.Option(this.languageSetting, "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"); // Русский
+        // new ModeSetting.Option(this.languageSetting,
+        // "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"); // Русский
         new ModeSetting.Option(this.languageSetting, "English");
-        // new ModeSetting.Option(this.languageSetting, "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"); // Українська
+        // new ModeSetting.Option(this.languageSetting,
+        // "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"); //
+        // Українська
         // new ModeSetting.Option(this.languageSetting, "polski");
         this.languageIndex = SettingPanel.getLanguageIndex(Localization.getLanguage());
         this.languageSetting.select(this.languageSetting.getOptions().get(this.languageIndex));
-        this.accentColorSetting = new ColorSetting(this, "theme.colors.accent").setAlphaEnabled(false).setColor(ColorPalette.getCurrentAccentColor());
-        this.backgroundColorSetting = new ColorSetting(this, "theme.colors.background").setAlphaEnabled(false).setColor(ColorPalette.getCurrentBackgroundColor());
+        this.accentColorSetting = new ColorSetting(this, "theme.colors.accent").setAlphaEnabled(false)
+                .setColor(ColorPalette.getCurrentAccentColor());
+        this.backgroundColorSetting = new ColorSetting(this, "theme.colors.background").setAlphaEnabled(false)
+                .setColor(ColorPalette.getCurrentBackgroundColor());
         Transition transition = (f, uiNode, state) -> {
             float f2;
             state.progress = 1.0f;
@@ -210,7 +243,7 @@ implements SettingOwner {
             state.offsetX = -(1.0f - f2) * uiNode.w() / 2.0f;
             state.offsetY = (1.0f - f2) * uiNode.h() / 2.0f;
         };
-        this.settingsContainer = new Component(){
+        this.settingsContainer = new Component() {
 
             @Override
             public boolean mouseScrolled(float f, float f2, float f3, float f4) {
@@ -219,55 +252,81 @@ implements SettingOwner {
 
             @Override
             protected void drawChildren(RockstarDrawContext drawContext, float f) {
-                moscow.rockstar.render.state.UiScissorStack.push((MatrixStack)drawContext.getMatrices(), (float)this.x(), (float)this.y(), (float)this.w(), (float)this.h());
+                moscow.rockstar.render.state.UiScissorStack.push((MatrixStack) drawContext.getMatrices(),
+                        (float) this.x(), (float) this.y(), (float) this.w(), (float) this.h());
                 super.drawChildren(drawContext, f);
                 moscow.rockstar.render.state.UiScissorStack.pop();
             }
-        }.vertical().width(115.0f).padding(Insets.symmetric(6.0f, 0.0f)).onClick(() -> {}).visibleWhen(() -> this.settingsPanelOpen && !this.keybindSearchOpen).transition(transition).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeOutBack)).add(this.createKeybindButton()).add(SettingPanel.createSettingComponent(this.autoSaveSetting)).add(SettingPanel.createSettingComponent(this.accentColorSetting)).add(SettingPanel.createSettingComponent(this.backgroundColorSetting)).add(SettingPanel.createSettingComponent(this.languageSetting)).renderHook((drawContext, component) -> {
-            drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f, WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
-            this.drawPanelSurface(drawContext, component, 11.0f);
-        });
-        this.keybindHeaderNode = new TextComponent().text(Font.MEDIUM.metrics(8.0f), () -> Localization.translate("profile.binds.title"), textComponent -> ColorPalette.PRIMARY_TEXT_COLOR).interactive(false);
+        }.vertical().width(115.0f).padding(Insets.symmetric(6.0f, 0.0f)).onClick(() -> {
+        }).visibleWhen(() -> this.settingsPanelOpen && !this.keybindSearchOpen).transition(transition)
+                .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeOutBack))
+                .add(this.createKeybindButton()).add(SettingPanel.createSettingComponent(this.autoSaveSetting))
+                .add(SettingPanel.createSettingComponent(this.accentColorSetting))
+                .add(SettingPanel.createSettingComponent(this.backgroundColorSetting))
+                .add(SettingPanel.createSettingComponent(this.languageSetting)).renderHook((drawContext, component) -> {
+                    drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f,
+                            WidgetState.uniform(11.0f), ColorPalette.BLACK.mulAlpha(0.5f));
+                    this.drawPanelSurface(drawContext, component, 11.0f);
+                });
+        this.keybindHeaderNode = new TextComponent().text(Font.MEDIUM.metrics(8.0f),
+                () -> Localization.translate("profile.binds.title"), textComponent -> ColorPalette.PRIMARY_TEXT_COLOR)
+                .interactive(false);
         this.keybindHeaderActionNode = this.createIconButton("xmark", () -> this.setKeybindPanelOpen(false));
-        Component component3 = new Component().horizontal().alignment(Alignment.CENTER).overflowMode(JustifyContent.SPACE_BETWEEN).fillWidth().height(14.0f).padding(Insets.symmetric(0.0f, 9.0f)).add(this.keybindHeaderNode).add(this.keybindHeaderActionNode);
-        this.keybindView = new Component(){
+        Component component3 = new Component().horizontal().alignment(Alignment.CENTER)
+                .overflowMode(JustifyContent.SPACE_BETWEEN).fillWidth().height(14.0f)
+                .padding(Insets.symmetric(0.0f, 9.0f)).add(this.keybindHeaderNode).add(this.keybindHeaderActionNode);
+        this.keybindView = new Component() {
 
             @Override
             public boolean mouseScrolled(float f, float f2, float f3, float f4) {
                 return super.mouseScrolled(f, f2, f3, f4) || this.inFlow() && this.contains(f, f2);
             }
-        }.vertical().fillWidth().maxSize(207.0f, 150.0f).onClick(() -> {}).scrollable().configureLayoutState(scrollBar2 -> scrollBar2.offset(3.0f).padding(1.0f, 6.0f).thickness(2.5f).thumbColor(scrollBar -> ColorRGBA.BLACK.mix(ColorRGBA.WHITE, 0.3f).withAlpha(255.0f * (0.32f + 0.28f * scrollBar.hoverProgress() + 0.3f * scrollBar.dragProgress()))));
-        this.settingsView = new Component(){
+        }.vertical().fillWidth().maxSize(207.0f, 150.0f).onClick(() -> {
+        }).scrollable().configureLayoutState(scrollBar2 -> scrollBar2.offset(3.0f).padding(1.0f, 6.0f).thickness(2.5f)
+                .thumbColor(scrollBar -> ColorRGBA.BLACK.mix(ColorRGBA.WHITE, 0.3f).withAlpha(
+                        255.0f * (0.32f + 0.28f * scrollBar.hoverProgress() + 0.3f * scrollBar.dragProgress()))));
+        this.settingsView = new Component() {
 
             @Override
             protected void drawChildren(RockstarDrawContext drawContext, float f) {
-                moscow.rockstar.render.state.UiScissorStack.push((MatrixStack)drawContext.getMatrices(), (float)this.x(), (float)this.y(), (float)this.w(), (float)this.h());
+                moscow.rockstar.render.state.UiScissorStack.push((MatrixStack) drawContext.getMatrices(),
+                        (float) this.x(), (float) this.y(), (float) this.w(), (float) this.h());
                 super.drawChildren(drawContext, f);
                 moscow.rockstar.render.state.UiScissorStack.pop();
             }
-        }.vertical().fillWidth().padding(Insets.of(7.0f, 0.0f, 0.0f, 0.0f)).gap(2.0f).enter(Transition.PROGRESS_ONLY).exit(Transition.HIDDEN).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic)).add(component3).add(this.keybindView);
+        }.vertical().fillWidth().padding(Insets.of(7.0f, 0.0f, 0.0f, 0.0f)).gap(2.0f).enter(Transition.PROGRESS_ONLY)
+                .exit(Transition.HIDDEN)
+                .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic)).add(component3)
+                .add(this.keybindView);
         this.settingsView.renderHook((drawContext, component) -> {
             if (!this.embeddedSettingsMode) {
                 return;
             }
             boolean bl = RockstarClient.create().getColorTheme() == ColorTheme.DARK;
-            ColorRGBA colorRGBA = (bl ? ColorPalette.getPanelColor() : ColorPalette.getPanelBackgroundColor()).withAlpha(255.0f);
-            drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f, WidgetState.uniform(8.0f), ColorPalette.BLACK.mulAlpha(0.15f));
-            drawContext.drawRoundedRect(component.x(), component.y(), component.w(), component.h(), WidgetState.uniform(8.0f), colorRGBA);
-            drawContext.drawRoundedBorder(component.x(), component.y(), component.w(), component.h(), 0.5f, WidgetState.uniform(8.0f), ColorPalette.BORDER_COLOR.withAlpha(89.25f));
+            ColorRGBA colorRGBA = (bl ? ColorPalette.getPanelColor() : ColorPalette.getPanelBackgroundColor())
+                    .withAlpha(255.0f);
+            drawContext.drawShadow(component.x(), component.y(), component.w(), component.h(), 10.0f,
+                    WidgetState.uniform(8.0f), ColorPalette.BLACK.mulAlpha(0.15f));
+            drawContext.drawRoundedRect(component.x(), component.y(), component.w(), component.h(),
+                    WidgetState.uniform(8.0f), colorRGBA);
+            drawContext.drawRoundedBorder(component.x(), component.y(), component.w(), component.h(), 0.5f,
+                    WidgetState.uniform(8.0f), ColorPalette.BORDER_COLOR.withAlpha(89.25f));
         });
         SettingPanel.snapLayoutRecursively(this.settingsView);
     }
 
     /**
-     * ORIGINAL: rockstar/ilIlil/IiiIiiIIi#I (Lrockstar/ilIlil/IIiiiIIII;)Lrockstar/ilIlil/iii;.
+     * ORIGINAL: rockstar/ilIlil/IiiIiiIIi#I
+     * (Lrockstar/ilIlil/IIiiiIIII;)Lrockstar/ilIlil/iii;.
      */
     private static Component createSettingComponent(Setting setting) {
-        return SettingPanel.createRawSettingComponent(setting).collapse().visibleWhen(setting::hasValidSettingValue, Easing.easeOutQuart, 220L);
+        return SettingPanel.createRawSettingComponent(setting).collapse().visibleWhen(setting::hasValidSettingValue,
+                Easing.easeOutQuart, 220L);
     }
 
     /**
-     * ORIGINAL: rockstar/ilIlil/IiiIiiIIi#i (Lrockstar/ilIlil/IIiiiIIII;)Lrockstar/ilIlil/iii;.
+     * ORIGINAL: rockstar/ilIlil/IiiIiiIIi#i
+     * (Lrockstar/ilIlil/IIiiiIIII;)Lrockstar/ilIlil/iii;.
      * The setting's own component is stretched to the panel width and inset by 9px
      * horizontally; without this the row measures at its natural width and its
      * label/value text runs past the panel edge.
@@ -284,9 +343,16 @@ implements SettingOwner {
     }
 
     private Component createKeybindButton() {
-        Component component = new Component().horizontal().alignment(Alignment.CENTER).gap(6.0f).fillWidth().height(20.0f).padding(Insets.symmetric(0.0f, 9.0f)).cursor(Cursor.HAND);
-        TextComponent textComponent2 = new TextComponent().size(8.0f, 8.0f).icon("keyboard", 8.0f, textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f + 0.4f * component.hover())).interactive(false);
-        TextComponent textComponent3 = new TextComponent().text(Font.REGULAR.metrics(8.0f), () -> Localization.translate("profile.binds.title"), textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.75f + 0.25f * component.hover())).fill().interactive(false);
+        Component component = new Component().horizontal().alignment(Alignment.CENTER).gap(6.0f).fillWidth()
+                .height(20.0f).padding(Insets.symmetric(0.0f, 9.0f)).cursor(Cursor.HAND);
+        TextComponent textComponent2 = new TextComponent().size(8.0f, 8.0f)
+                .icon("keyboard", 8.0f,
+                        textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f + 0.4f * component.hover()))
+                .interactive(false);
+        TextComponent textComponent3 = new TextComponent()
+                .text(Font.REGULAR.metrics(8.0f), () -> Localization.translate("profile.binds.title"),
+                        textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.75f + 0.25f * component.hover()))
+                .fill().interactive(false);
         return component.add(textComponent2).add(textComponent3).onClick(() -> {
             this.setSettingsPanelOpen(false);
             this.setKeybindPanelOpen(true);
@@ -317,7 +383,8 @@ implements SettingOwner {
 
     public TextInputField getSearchEditor() {
         if (this.keybindSearchLayout == null) {
-            this.keybindSearchLayout = new TextInputField(this.embeddedKeybindFont != null ? this.embeddedKeybindFont : HEADER_FONT);
+            this.keybindSearchLayout = new TextInputField(
+                    this.embeddedKeybindFont != null ? this.embeddedKeybindFont : HEADER_FONT);
         }
         return this.keybindSearchLayout;
     }
@@ -336,7 +403,8 @@ implements SettingOwner {
     }
 
     private boolean isRenderWindowVisible() {
-        boolean bl = this.keybindSearchOpen || this.settingsPanelOpen || !this.embeddedSettingsMode && this.keybindPanelOpen;
+        boolean bl = this.keybindSearchOpen || this.settingsPanelOpen
+                || !this.embeddedSettingsMode && this.keybindPanelOpen;
         long l = System.currentTimeMillis();
         if (bl) {
             this.visibilityDeadlineMillis = l + 400L;
@@ -354,10 +422,10 @@ implements SettingOwner {
             ShaderRenderer.setRequestedTextureId(1);
         }
         try {
-            drawContext.drawBlurredRect(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 5.0f, 3.0f, widgetState, ColorPalette.WHITE);
+            drawContext.drawBlurredRect(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 5.0f, 3.0f, widgetState,
+                    ColorPalette.WHITE);
             drawContext.drawClientRect(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 1.0f, 0.0f, 3.0f, f, true);
-        }
-        finally {
+        } finally {
             if (bl) {
                 ShaderRenderer.resetRequestedTexture();
             }
@@ -367,14 +435,19 @@ implements SettingOwner {
     private void drawEmbeddedContent(RockstarDrawContext drawContext, UiNode uiNode, float f) {
         boolean bl;
         WidgetState widgetState = WidgetState.uniform(f);
-        boolean bl2 = bl = this.anchorNode != null && this.isRenderWindowVisible() && !WidgetBatchRenderer.textureRenderingActive && ShaderRenderer.textureRegistry.hasTexture(1);
+        boolean bl2 = bl = this.anchorNode != null && this.isRenderWindowVisible()
+                && !WidgetBatchRenderer.textureRenderingActive && ShaderRenderer.textureRegistry.hasTexture(1);
         if (bl) {
             WidgetBatchRenderer.flushCurrentBatch();
             float f2 = 16.0f;
-            drawContext.drawShader(1, uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 1.5f, 1.0f, 1.2f, this.anchorNode.x() + f2, this.anchorNode.y() + f2, this.anchorNode.w() - 2.0f * f2, this.anchorNode.h() - 2.0f * f2, widgetState, ColorPalette.WHITE);
+            drawContext.drawShader(1, uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 1.5f, 1.0f, 1.2f,
+                    this.anchorNode.x() + f2, this.anchorNode.y() + f2, this.anchorNode.w() - 2.0f * f2,
+                    this.anchorNode.h() - 2.0f * f2, widgetState, ColorPalette.WHITE);
         }
-        drawContext.drawRoundedRect(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), widgetState, bl ? SettingPanel.getPanelColor() : SettingPanel.getPanelColor().withAlpha(255.0f));
-        drawContext.drawRoundedBorder(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 0.5f, widgetState, ColorPalette.BORDER_COLOR.withAlpha(89.25f));
+        drawContext.drawRoundedRect(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), widgetState,
+                bl ? SettingPanel.getPanelColor() : SettingPanel.getPanelColor().withAlpha(255.0f));
+        drawContext.drawRoundedBorder(uiNode.x(), uiNode.y(), uiNode.w(), uiNode.h(), 0.5f, widgetState,
+                ColorPalette.BORDER_COLOR.withAlpha(89.25f));
     }
 
     public void openKeybindSearch() {
@@ -397,13 +470,13 @@ implements SettingOwner {
     private static int getLanguageIndex(Language language) {
         return 0;
         /*
-        return switch (language) {
-            case Language.EN_US -> 1;
-            case Language.UK_UA -> 2;
-            case Language.PL_PL -> 3;
-            default -> 0;
-        };
-        */
+         * return switch (language) {
+         * case Language.EN_US -> 1;
+         * case Language.UK_UA -> 2;
+         * case Language.PL_PL -> 3;
+         * default -> 0;
+         * };
+         */
     }
 
     private void toggleSettingsPanelVisibility() {
@@ -414,7 +487,8 @@ implements SettingOwner {
         if (this.settingsPanelOpen == bl) {
             return;
         }
-        this.settingsContainer.lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, bl ? Easing.easeOutBack : Easing.easeInBack));
+        this.settingsContainer.lifeMotion(
+                Motion.resolveMotionMotionFromLongAndEasing(300L, bl ? Easing.easeOutBack : Easing.easeInBack));
         this.settingsPanelOpen = bl;
         if (!bl) {
             this.accentColorSetting.closePicker();
@@ -430,14 +504,16 @@ implements SettingOwner {
 
     public void handleOutsideClick(float f, float f2) {
         boolean bl;
-        boolean bl2 = bl = !this.embeddedSettingsMode && this.contains(f, f2) || this.embeddedSettingsMode && this.embeddedSettingsNode != null && this.embeddedSettingsNode.contains(f, f2);
+        boolean bl2 = bl = !this.embeddedSettingsMode && this.contains(f, f2) || this.embeddedSettingsMode
+                && this.embeddedSettingsNode != null && this.embeddedSettingsNode.contains(f, f2);
         if (this.settingsPanelOpen && !bl && !this.settingsContainer.contains(f, f2)) {
             this.setSettingsPanelOpen(false);
         }
         if (this.keybindPanelOpen && !this.contains(f, f2)) {
             this.setKeybindPanelOpen(false);
         }
-        if (!(!this.keybindSearchOpen || this.embeddedKeybindNode == null || this.embeddedKeybindNode.contains(f, f2) || this.keybindListContainer.inFlow() && this.keybindListContainer.contains(f, f2))) {
+        if (!(!this.keybindSearchOpen || this.embeddedKeybindNode == null || this.embeddedKeybindNode.contains(f, f2)
+                || this.keybindListContainer.inFlow() && this.keybindListContainer.contains(f, f2))) {
             this.setSearchOpen(false);
         }
     }
@@ -465,13 +541,14 @@ implements SettingOwner {
             this.setSettingsPanelOpen(false);
             this.setSearchOpen(false);
             this.rebuildKeybindEntries();
-            float f = Math.min(150.0f, (float)Math.max(1, this.keybindEntries.size()) * 18.0f + 6.0f);
+            float f = Math.min(150.0f, (float) Math.max(1, this.keybindEntries.size()) * 18.0f + 6.0f);
             float f2 = 23.0f + f;
             this.width(207.0f).height(f2).padding(Insets.NONE);
             if (this.embeddedSettingsMode) {
                 Window PackageInfo10412 = MinecraftClient.getInstance().getWindow();
                 this.snapToSize(207.0f, f2);
-                this.snapAt(((float)PackageInfo10412.getScaledWidth() - 207.0f) / 2.0f, ((float)PackageInfo10412.getScaledHeight() - f2) / 2.0f);
+                this.snapAt(((float) PackageInfo10412.getScaledWidth() - 207.0f) / 2.0f,
+                        ((float) PackageInfo10412.getScaledHeight() - f2) / 2.0f);
                 this.settingsView.lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeOutBack));
             }
             this.updateChildren(List.of(this.settingsView));
@@ -479,9 +556,12 @@ implements SettingOwner {
             this.settingsView.lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeInBack));
             this.updateChildren(List.of());
         } else {
-            this.mainHeaderNode.enter(Transition.PROGRESS_ONLY).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
-            this.mainHeaderActionNode.enter(Transition.PROGRESS_ONLY).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
-            this.searchButton.enter(Transition.PROGRESS_ONLY).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
+            this.mainHeaderNode.enter(Transition.PROGRESS_ONLY)
+                    .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
+            this.mainHeaderActionNode.enter(Transition.PROGRESS_ONLY)
+                    .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
+            this.searchButton.enter(Transition.PROGRESS_ONLY)
+                    .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
             this.width(94.0f).height(24.0f).padding(Insets.of(0.0f, 8.0f, 0.0f, 6.0f));
             this.updateChildren(List.of(this.mainHeaderNode, this.mainHeaderActionNode, this.searchButton));
         }
@@ -490,7 +570,8 @@ implements SettingOwner {
     private void rebuildKeybindEntries() {
         SettingDataStore settingDataStore;
         this.keybindEntries.clear();
-        List<ModuleContract> list = RockstarClient.create().getModuleRegistry().getModules().stream().filter(ModuleContract::isAvailable).sorted(Comparator.comparing(ModuleContract::getName)).toList();
+        List<ModuleContract> list = RockstarClient.create().getModuleRegistry().getModules().stream()
+                .filter(ModuleContract::isAvailable).sorted(Comparator.comparing(ModuleContract::getName)).toList();
         for (ModuleContract object42 : list) {
             if (object42.getKeyBind() != -1) {
                 this.keybindEntries.add(new KeybindEntry(List.of(object42.getName()), object42::getKeyBind, n -> {
@@ -500,28 +581,38 @@ implements SettingOwner {
             }
             for (Setting setting : object42.getSettings()) {
                 IntegerSetting integerSetting;
-                if (!(setting instanceof IntegerSetting) || !(integerSetting = (IntegerSetting)setting).hasValidSettingValue() || integerSetting.getValue() == -1) continue;
-                this.keybindEntries.add(new KeybindEntry(List.of(object42.getName(), Localization.translate(setting.getName())), integerSetting::getValue, n -> {
-                    integerSetting.setValue(n);
-                    SettingPanel.saveSettings();
-                }));
+                if (!(setting instanceof IntegerSetting)
+                        || !(integerSetting = (IntegerSetting) setting).hasValidSettingValue()
+                        || integerSetting.getValue() == -1)
+                    continue;
+                this.keybindEntries
+                        .add(new KeybindEntry(List.of(object42.getName(), Localization.translate(setting.getName())),
+                                integerSetting::getValue, n -> {
+                                    integerSetting.setValue(n);
+                                    SettingPanel.saveSettings();
+                                }));
             }
         }
         Assist assist = RockstarClient.create().getModuleRegistry().getModule(Assist.class);
         if (assist != null) {
             for (AssistItemProvider provider : assist.getAssistSettings()) {
-                if (provider.getKeyCode() == -1) continue;
-                this.keybindEntries.add(new KeybindEntry(List.of("Assist", "Macros", Localization.translate(provider.getSettingKey())), provider::getKeyCode, n -> {
-                    provider.setKeyCode(n);
-                    SettingPanel.saveSettings();
-                }));
+                if (provider.getKeyCode() == -1)
+                    continue;
+                this.keybindEntries.add(
+                        new KeybindEntry(List.of("Assist", "Macros", Localization.translate(provider.getSettingKey())),
+                                provider::getKeyCode, n -> {
+                                    provider.setKeyCode(n);
+                                    SettingPanel.saveSettings();
+                                }));
             }
         }
         if ((settingDataStore = RockstarClient.create().getSettingDataStore()) != null) {
             for (SettingEntry settingEntry : settingDataStore.getBindings()) {
-                if (settingEntry.getKeyCode() == -1) continue;
+                if (settingEntry.getKeyCode() == -1)
+                    continue;
                 String string = settingEntry.getCommand();
-                this.keybindEntries.add(new KeybindEntry(List.of(string), () -> SettingPanel.findKeyCode(string), n -> SettingPanel.updateKeyBinding(string, n)));
+                this.keybindEntries.add(new KeybindEntry(List.of(string), () -> SettingPanel.findKeyCode(string),
+                        n -> SettingPanel.updateKeyBinding(string, n)));
             }
         }
         List<UiNode> keybindNodes = new ArrayList<>(this.keybindEntries.size() + 1);
@@ -549,7 +640,8 @@ implements SettingOwner {
         SettingDataStore settingDataStore = RockstarClient.create().getSettingDataStore();
         if (settingDataStore != null) {
             for (SettingEntry settingEntry : settingDataStore.getBindings()) {
-                if (!settingEntry.getCommand().equalsIgnoreCase(string)) continue;
+                if (!settingEntry.getCommand().equalsIgnoreCase(string))
+                    continue;
                 return settingEntry.getKeyCode();
             }
         }
@@ -569,16 +661,24 @@ implements SettingOwner {
     }
 
     private Component createEmptyKeybindList() {
-        TextComponent textComponent2 = new TextComponent().fill().interactive(false).text(Font.REGULAR.metrics(8.0f), () -> Localization.translate("commands.bind.list_empty"), textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
-        Component component = new Component().horizontal().alignment(Alignment.CENTER).height(18.0f).fillWidth().padding(Insets.symmetric(0.0f, 9.0f)).add(textComponent2);
+        TextComponent textComponent2 = new TextComponent().fill().interactive(false).text(Font.REGULAR.metrics(8.0f),
+                () -> Localization.translate("commands.bind.list_empty"),
+                textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
+        Component component = new Component().horizontal().alignment(Alignment.CENTER).height(18.0f).fillWidth()
+                .padding(Insets.symmetric(0.0f, 9.0f)).add(textComponent2);
         SettingPanel.snapLayoutRecursively(component);
         return component;
     }
 
     private Component createKeybindRow(KeybindEntry keybindEntry) {
-        KeyBindingControl keyBindingControl = new KeyBindingControl(Font.REGULAR.metrics(7.0f), keybindEntry.getKeyCodeSupplier(), keybindEntry.getKeyCodeConsumer());
-        TextComponent textComponent2 = new TextComponent().fill().interactive(false).paint((drawContext, textComponent) -> this.drawKeybindPath(drawContext, textComponent, keybindEntry.getPathSegments()));
-        Component component = ((Component)new Component().height(18.0f).fillWidth().padding(Insets.symmetric(0.0f, 9.0f)).add(textComponent2).add(keyBindingControl).gap(5.0f).layout(Layout.ROW).overflowMode(JustifyContent.SPACE_BETWEEN).alignment(Alignment.CENTER).onClick(keyBindingControl::handlePointerClick)).cursor(Cursor.HAND);
+        KeyBindingControl keyBindingControl = new KeyBindingControl(Font.REGULAR.metrics(7.0f),
+                keybindEntry.getKeyCodeSupplier(), keybindEntry.getKeyCodeConsumer());
+        TextComponent textComponent2 = new TextComponent().fill().interactive(false).paint((drawContext,
+                textComponent) -> this.drawKeybindPath(drawContext, textComponent, keybindEntry.getPathSegments()));
+        Component component = ((Component) new Component().height(18.0f).fillWidth()
+                .padding(Insets.symmetric(0.0f, 9.0f)).add(textComponent2).add(keyBindingControl).gap(5.0f)
+                .layout(Layout.ROW).overflowMode(JustifyContent.SPACE_BETWEEN).alignment(Alignment.CENTER)
+                .onClick(keyBindingControl::handlePointerClick)).cursor(Cursor.HAND);
         SettingPanel.snapLayoutRecursively(component);
         return component;
     }
@@ -590,11 +690,14 @@ implements SettingOwner {
         for (int i = 0; i < list.size(); ++i) {
             boolean bl = i == list.size() - 1;
             String string = list.get(i);
-            drawContext.drawText(fontMetrics, string, f2, f, ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(bl ? 1.0f : 0.5f));
+            drawContext.drawText(fontMetrics, string, f2, f,
+                    ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(bl ? 1.0f : 0.5f));
             f2 += fontMetrics.measureText(string);
-            if (bl) continue;
+            if (bl)
+                continue;
             float f3 = f2 + 3.0f;
-            drawContext.drawRoundedRect(f3, textComponent.y() + textComponent.h() / 2.0f - 1.0f, 2.0f, 2.0f, WidgetState.uniform(1.0f), ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
+            drawContext.drawRoundedRect(f3, textComponent.y() + textComponent.h() / 2.0f - 1.0f, 2.0f, 2.0f,
+                    WidgetState.uniform(1.0f), ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
             f2 = f3 + 2.0f + 4.0f;
         }
     }
@@ -608,13 +711,16 @@ implements SettingOwner {
     }
 
     private TextComponent createIconButton(String string, Runnable runnable) {
-        return new TextComponent().size(8.0f, 8.0f).textInset(1.0f).icon(string, 8.0f, textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f + 0.4f * textComponent.hover())).cursor(Cursor.HAND).onClick(runnable);
+        return new TextComponent().size(8.0f, 8.0f).textInset(1.0f)
+                .icon(string, 8.0f,
+                        textComponent -> ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f + 0.4f * textComponent.hover()))
+                .cursor(Cursor.HAND).onClick(runnable);
     }
 
     private static void disableTransitionsRecursively(UiNode uiNode) {
         uiNode.enter(Transition.NO_OP);
         if (uiNode instanceof Component) {
-            Component component = (Component)uiNode;
+            Component component = (Component) uiNode;
             for (UiNode uiNode2 : component.children()) {
                 SettingPanel.disableTransitionsRecursively(uiNode2);
             }
@@ -624,7 +730,7 @@ implements SettingOwner {
     private static void snapLayoutRecursively(UiNode uiNode) {
         uiNode.snapPosition().snapSize();
         if (uiNode instanceof Component) {
-            Component component = (Component)uiNode;
+            Component component = (Component) uiNode;
             for (UiNode uiNode2 : component.children()) {
                 SettingPanel.snapLayoutRecursively(uiNode2);
             }
@@ -633,7 +739,8 @@ implements SettingOwner {
 
     @Override
     protected void drawChildren(RockstarDrawContext drawContext, float f) {
-        if (!(!this.embeddedSettingsMode || this.keybindPanelOpen || this.keybindSearchOpen || this.isEmbeddedKeybindAnimationComplete() || this.isEmbeddedSearchReady())) {
+        if (!(!this.embeddedSettingsMode || this.keybindPanelOpen || this.keybindSearchOpen
+                || this.isEmbeddedKeybindAnimationComplete() || this.isEmbeddedSearchReady())) {
             return;
         }
         if (this.embeddedSettingsMode || !this.keybindPanelOpen) {
@@ -641,7 +748,8 @@ implements SettingOwner {
             return;
         }
         MatrixStack class_45872 = drawContext.getMatrices();
-        moscow.rockstar.render.state.UiScissorStack.push((MatrixStack)class_45872, (float)this.x(), (float)this.y(), (float)this.w(), (float)this.h());
+        moscow.rockstar.render.state.UiScissorStack.push((MatrixStack) class_45872, (float) this.x(), (float) this.y(),
+                (float) this.w(), (float) this.h());
         super.drawChildren(drawContext, f);
         moscow.rockstar.render.state.UiScissorStack.pop();
     }
@@ -660,12 +768,14 @@ implements SettingOwner {
             return;
         }
         this.keybindSearchOpen = bl;
-        Motion motion2 = motion = bl ? Motion.motion2 : Motion.resolveMotionMotionFromLongAndEasing(320L, Easing.easeOutQuart);
+        Motion motion2 = motion = bl ? Motion.motion2
+                : Motion.resolveMotionMotionFromLongAndEasing(320L, Easing.easeOutQuart);
         if (this.embeddedKeybindNode == null) {
             this.motion(motion);
         }
         this.searchButton.motion(motion);
-        this.keybindListContainer.lifeMotion(bl ? Motion.resolveMotionMotionFromLongAndEasing(180L, Easing.easeOutQuart) : Motion.resolveMotionMotionFromLongAndEasing(260L, Easing.easeOutQuart));
+        this.keybindListContainer.lifeMotion(bl ? Motion.resolveMotionMotionFromLongAndEasing(180L, Easing.easeOutQuart)
+                : Motion.resolveMotionMotionFromLongAndEasing(260L, Easing.easeOutQuart));
         if (bl) {
             this.setSettingsPanelOpen(false);
             this.setKeybindPanelOpen(false);
@@ -684,8 +794,10 @@ implements SettingOwner {
             this.getSearchEditor().clear();
             this.getSearchEditor().setFocused(false);
         } else {
-            this.mainHeaderNode.enter(Transition.PROGRESS_ONLY).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
-            this.mainHeaderActionNode.enter(Transition.PROGRESS_ONLY).lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
+            this.mainHeaderNode.enter(Transition.PROGRESS_ONLY)
+                    .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
+            this.mainHeaderActionNode.enter(Transition.PROGRESS_ONLY)
+                    .lifeMotion(Motion.resolveMotionMotionFromLongAndEasing(220L, Easing.easeOutCubic));
             this.width(94.0f).height(24.0f).padding(Insets.of(0.0f, 8.0f, 0.0f, 6.0f));
             this.updateChildren(List.of(this.mainHeaderNode, this.mainHeaderActionNode, this.searchButton));
             this.getSearchEditor().setFocused(false);
@@ -713,7 +825,8 @@ implements SettingOwner {
 
     private static int fuzzyMatchScore(String string, String string2, String string3) {
         String normalizedName = SearchMatcher.normalize(string);
-        return Math.min(SearchMatcher.scoreNormalized(normalizedName, string2), SearchMatcher.scoreNormalized(normalizedName, string3));
+        return Math.min(SearchMatcher.scoreNormalized(normalizedName, string2),
+                SearchMatcher.scoreNormalized(normalizedName, string3));
     }
 
     private void updateSearchResults() {
@@ -722,7 +835,9 @@ implements SettingOwner {
         String string2 = SearchMatcher.normalize(string);
         String string3 = SearchMatcher.normalize(SettingPanel.convertKeyboardLayout(string.toLowerCase()));
         this.searchResults.clear();
-        List<ModuleContract> list = RockstarClient.create().getModuleRegistry().getModules().stream().filter(ModuleContract::isAvailable).sorted(Comparator.comparing(ModuleContract::getName, String.CASE_INSENSITIVE_ORDER)).toList();
+        List<ModuleContract> list = RockstarClient.create().getModuleRegistry().getModules().stream()
+                .filter(ModuleContract::isAvailable)
+                .sorted(Comparator.comparing(ModuleContract::getName, String.CASE_INSENSITIVE_ORDER)).toList();
         if (string2.isEmpty()) {
             for (ModuleContract moduleContract : list) {
                 this.searchResults.add(new SettingSearchEntry(moduleContract, null, moduleContract.getName(), 0));
@@ -734,7 +849,8 @@ implements SettingOwner {
         int n2 = Integer.MAX_VALUE;
         for (ModuleContract object : list) {
             n = SettingPanel.fuzzyMatchScore(object.getName(), string2, string3);
-            if (n > 10 || n >= n2) continue;
+            if (n > 10 || n >= n2)
+                continue;
             moduleContract = object;
             n2 = n;
         }
@@ -742,8 +858,10 @@ implements SettingOwner {
             this.searchResults.add(new SettingSearchEntry(moduleContract, null, moduleContract.getName(), n2));
             int n3 = 0;
             for (Setting setting : moduleContract.getSettings()) {
-                if (!setting.hasValidSettingValue()) continue;
-                this.searchResults.add(new SettingSearchEntry(moduleContract, setting, Localization.translate(setting.getName()), 100 + n3++));
+                if (!setting.hasValidSettingValue())
+                    continue;
+                this.searchResults.add(new SettingSearchEntry(moduleContract, setting,
+                        Localization.translate(setting.getName()), 100 + n3++));
             }
             this.renderSearchResults();
             return;
@@ -757,7 +875,8 @@ implements SettingOwner {
             }
             int n3 = 0;
             for (Setting setting : moduleContract2.getSettings()) {
-                if (!setting.hasValidSettingValue()) continue;
+                if (!setting.hasValidSettingValue())
+                    continue;
                 String string4 = Localization.translate(setting.getName());
                 int n4 = SettingPanel.fuzzyMatchScore(string4, string2, string3);
                 if (n4 != Integer.MAX_VALUE) {
@@ -768,7 +887,10 @@ implements SettingOwner {
                 ++n3;
             }
         }
-        this.searchResults.sort(Comparator.comparingInt(SettingSearchEntry::getMatchScore).thenComparing(settingSearchEntry -> settingSearchEntry.getModule().getName(), String.CASE_INSENSITIVE_ORDER).thenComparing(SettingSearchEntry::getDisplayName, String.CASE_INSENSITIVE_ORDER));
+        this.searchResults.sort(Comparator.comparingInt(SettingSearchEntry::getMatchScore)
+                .thenComparing(settingSearchEntry -> settingSearchEntry.getModule().getName(),
+                        String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(SettingSearchEntry::getDisplayName, String.CASE_INSENSITIVE_ORDER));
         this.renderSearchResults();
     }
 
@@ -790,10 +912,18 @@ implements SettingOwner {
     }
 
     private TextComponent createSearchResultRow(SettingSearchEntry settingSearchEntry, int n) {
-        return new TextComponent().fillWidth().height(18.0f).cursor(Cursor.HAND).hoverMotion(Motion.withLinearEasing(70L)).bind("sel", () -> n == this.selectedKeybindIndex, Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutQuart)).background(textComponent -> ColorPalette.ACCENT_COLOR.mulAlpha(0.12f * textComponent.sig("sel") + 0.04f * textComponent.hover())).radius(3.0f).onClick(() -> this.activateSearchResult(settingSearchEntry, true)).paint((drawContext, textComponent) -> this.drawSearchResultRow(drawContext, textComponent, settingSearchEntry, n));
+        return new TextComponent().fillWidth().height(18.0f).cursor(Cursor.HAND)
+                .hoverMotion(Motion.withLinearEasing(70L))
+                .bind("sel", () -> n == this.selectedKeybindIndex,
+                        Motion.resolveMotionMotionFromLongAndEasing(160L, Easing.easeOutQuart))
+                .background(textComponent -> ColorPalette.ACCENT_COLOR
+                        .mulAlpha(0.12f * textComponent.sig("sel") + 0.04f * textComponent.hover()))
+                .radius(3.0f).onClick(() -> this.activateSearchResult(settingSearchEntry, true)).paint((drawContext,
+                        textComponent) -> this.drawSearchResultRow(drawContext, textComponent, settingSearchEntry, n));
     }
 
-    private void drawSearchResultRow(RockstarDrawContext drawContext, TextComponent textComponent, SettingSearchEntry settingSearchEntry, int n) {
+    private void drawSearchResultRow(RockstarDrawContext drawContext, TextComponent textComponent,
+            SettingSearchEntry settingSearchEntry, int n) {
         float f;
         float f2;
         String string;
@@ -807,7 +937,8 @@ implements SettingOwner {
             string = settingSearchEntry.getModule().getName();
             drawContext.drawText(fontMetrics, string, f7, f6, ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
             f2 = f7 + fontMetrics.measureText(string) + 2.0f;
-            drawContext.drawRoundedRect(f2, textComponent.y() + textComponent.h() / 2.0f - 1.0f, 2.0f, 2.0f, WidgetState.uniform(1.0f), ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
+            drawContext.drawRoundedRect(f2, textComponent.y() + textComponent.h() / 2.0f - 1.0f, 2.0f, 2.0f,
+                    WidgetState.uniform(1.0f), ColorPalette.PRIMARY_TEXT_COLOR.mulAlpha(0.5f));
             f = f2 + 2.0f + 4.0f;
         } else {
             f = f7;
@@ -839,7 +970,7 @@ implements SettingOwner {
         } else {
             Setting setting = settingSearchEntry.getSetting();
             if (setting instanceof BooleanSetting) {
-                BooleanSetting booleanSetting = (BooleanSetting)setting;
+                BooleanSetting booleanSetting = (BooleanSetting) setting;
                 booleanSetting.toggle();
             }
         }
@@ -882,7 +1013,7 @@ implements SettingOwner {
                 this.activateSelectedSearchResult(true);
                 break;
             }
-            case 257: 
+            case 257:
             case 335: {
                 this.activateSelectedSearchResult(false);
                 break;
@@ -931,29 +1062,36 @@ implements SettingOwner {
         this.selectedRowAnimation.update(f);
         float f4 = this.desiredW();
         float f5 = this.desiredH();
-        boolean bl = this.keybindSearchReady = this.keybindSearchOpen && System.currentTimeMillis() - this.keybindSearchOpenedAtMillis > 140L;
+        boolean bl = this.keybindSearchReady = this.keybindSearchOpen
+                && System.currentTimeMillis() - this.keybindSearchOpenedAtMillis > 140L;
         if ((this.keybindSearchOpen || this.isEmbeddedSearchReady()) && this.embeddedKeybindNode == null) {
             Window window = MinecraftClient.getInstance().getWindow();
-            float f6 = this.searchResults.isEmpty() ? 0.0f : Math.min(150.0f, (float)this.searchResults.size() * 18.0f + 12.0f);
+            float f6 = this.searchResults.isEmpty() ? 0.0f
+                    : Math.min(150.0f, (float) this.searchResults.size() * 18.0f + 12.0f);
             float f7 = f5 + (f6 > 0.0f ? 6.0f + f6 : 0.0f);
-            this.at(((float)window.getScaledWidth() - f4) / 2.0f, ((float)window.getScaledHeight() - f7) / 2.0f);
+            this.at(((float) window.getScaledWidth() - f4) / 2.0f, ((float) window.getScaledHeight() - f7) / 2.0f);
         } else if (this.keybindPanelOpen || this.isEmbeddedKeybindAnimationComplete()) {
             Window window = MinecraftClient.getInstance().getWindow();
-            this.at(((float)window.getScaledWidth() - f4) / 2.0f, ((float)window.getScaledHeight() - f5) / 2.0f);
+            this.at(((float) window.getScaledWidth() - f4) / 2.0f, ((float) window.getScaledHeight() - f5) / 2.0f);
         } else {
-            this.at(this.anchorNode.x() + (this.anchorNode.w() - f4) / 2.0f, this.anchorNode.y() + this.anchorNode.h() + 10.0f);
+            this.at(this.anchorNode.x() + (this.anchorNode.w() - f4) / 2.0f,
+                    this.anchorNode.y() + this.anchorNode.h() + 10.0f);
         }
         if (this.embeddedKeybindNode != null) {
-            this.keybindListContainer.snapAt(this.anchorNode.x() + (this.anchorNode.w() - 207.0f) / 2.0f, this.anchorNode.y() + (this.anchorNode.h() - this.keybindListContainer.h()) / 2.0f);
+            this.keybindListContainer.snapAt(this.anchorNode.x() + (this.anchorNode.w() - 207.0f) / 2.0f,
+                    this.anchorNode.y() + (this.anchorNode.h() - this.keybindListContainer.h()) / 2.0f);
         } else {
             this.keybindListContainer.snapAt(this.x(), this.y() + this.h() + 6.0f);
         }
         if (this.settingsPanelOpen) {
-            UiNode settingsAnchor = this.embeddedSettingsNode != null ? this.embeddedSettingsNode : this.mainHeaderActionNode;
+            UiNode settingsAnchor = this.embeddedSettingsNode != null ? this.embeddedSettingsNode
+                    : this.mainHeaderActionNode;
             if (this.embeddedSettingsMode && this.embeddedSettingsNode != null) {
-                this.settingsContainer.snapAt(settingsAnchor.x() + settingsAnchor.w() + 5.0f, settingsAnchor.y() + settingsAnchor.h() - this.settingsContainer.h());
+                this.settingsContainer.snapAt(settingsAnchor.x() + settingsAnchor.w() + 5.0f,
+                        settingsAnchor.y() + settingsAnchor.h() - this.settingsContainer.h());
             } else {
-                this.settingsContainer.snapAt(settingsAnchor.x(), settingsAnchor.y() + settingsAnchor.h() / 2.0f - this.settingsContainer.h() / 2.0f);
+                this.settingsContainer.snapAt(settingsAnchor.x(),
+                        settingsAnchor.y() + settingsAnchor.h() / 2.0f - this.settingsContainer.h() / 2.0f);
             }
         }
         this.applySettingsChanges();
@@ -980,35 +1118,39 @@ implements SettingOwner {
             this.languageIndex = n;
             Localization.setLanguage(Language.EN_US);
             /*
-            Localization.setLanguage(switch (n) {
-                case 1 -> Language.EN_US;
-                case 2 -> Language.UK_UA;
-                case 3 -> Language.PL_PL;
-                default -> Language.RU_RU;
-            });
-            */
+             * Localization.setLanguage(switch (n) {
+             * case 1 -> Language.EN_US;
+             * case 2 -> Language.UK_UA;
+             * case 3 -> Language.PL_PL;
+             * default -> Language.RU_RU;
+             * });
+             */
             ModuleConfigurationStore.saveConfiguration();
         }
         if (this.autoSaveSetting.isEnabled() != ModuleConfigurationStore.isAutoSaveEnabled()) {
             ModuleConfigurationStore.setAutoSaveEnabled(this.autoSaveSetting.isEnabled());
             SettingPanel.reloadClientSettings();
         }
-        ColorRGBA colorRGBA2 = colorRGBA = this.accentColorSetting.getColor() == null ? null : this.accentColorSetting.getColor().withAlpha(255.0f);
+        ColorRGBA colorRGBA2 = colorRGBA = this.accentColorSetting.getColor() == null ? null
+                : this.accentColorSetting.getColor().withAlpha(255.0f);
         if (colorRGBA != null && !colorRGBA.equals(ColorPalette.getCurrentAccentColor())) {
             ColorPalette.setCurrentAccentColor(colorRGBA);
             this.accentColorChangedAtMillis = System.currentTimeMillis();
         }
-        if (this.accentColorChangedAtMillis != 0L && System.currentTimeMillis() - this.accentColorChangedAtMillis > 600L) {
+        if (this.accentColorChangedAtMillis != 0L
+                && System.currentTimeMillis() - this.accentColorChangedAtMillis > 600L) {
             this.accentColorChangedAtMillis = 0L;
             ModuleConfigurationStore.saveConfiguration();
             moscow.rockstar.api.data.ClientConfigManager.getInstance().save("client");
         }
-        ColorRGBA bgRGBA = this.backgroundColorSetting.getColor() == null ? null : this.backgroundColorSetting.getColor().withAlpha(255.0f);
+        ColorRGBA bgRGBA = this.backgroundColorSetting.getColor() == null ? null
+                : this.backgroundColorSetting.getColor().withAlpha(255.0f);
         if (bgRGBA != null && !bgRGBA.equals(ColorPalette.getCurrentBackgroundColor())) {
             ColorPalette.setCurrentBackgroundColor(bgRGBA);
             this.backgroundColorChangedAtMillis = System.currentTimeMillis();
         }
-        if (this.backgroundColorChangedAtMillis != 0L && System.currentTimeMillis() - this.backgroundColorChangedAtMillis > 600L) {
+        if (this.backgroundColorChangedAtMillis != 0L
+                && System.currentTimeMillis() - this.backgroundColorChangedAtMillis > 600L) {
             this.backgroundColorChangedAtMillis = 0L;
             ModuleConfigurationStore.saveConfiguration();
             moscow.rockstar.api.data.ClientConfigManager.getInstance().save("client");
@@ -1032,17 +1174,20 @@ implements SettingOwner {
 
         @Override
         public final String toString() {
-            return moscow.rockstar.util.RecordValueSupport.toString(this, "pathSegments", "keyCodeSupplier", "keyCodeConsumer");
+            return moscow.rockstar.util.RecordValueSupport.toString(this, "pathSegments", "keyCodeSupplier",
+                    "keyCodeConsumer");
         }
 
         @Override
         public final int hashCode() {
-            return moscow.rockstar.util.RecordValueSupport.hashCode(this, "pathSegments", "keyCodeSupplier", "keyCodeConsumer");
+            return moscow.rockstar.util.RecordValueSupport.hashCode(this, "pathSegments", "keyCodeSupplier",
+                    "keyCodeConsumer");
         }
 
         @Override
         public final boolean equals(Object object) {
-            return moscow.rockstar.util.RecordValueSupport.equals(this, object, "pathSegments", "keyCodeSupplier", "keyCodeConsumer");
+            return moscow.rockstar.util.RecordValueSupport.equals(this, object, "pathSegments", "keyCodeSupplier",
+                    "keyCodeConsumer");
         }
 
         public List<String> getPathSegments() {
@@ -1077,17 +1222,20 @@ implements SettingOwner {
 
         @Override
         public final String toString() {
-            return moscow.rockstar.util.RecordValueSupport.toString(this, "module", "setting", "displayName", "matchScore");
+            return moscow.rockstar.util.RecordValueSupport.toString(this, "module", "setting", "displayName",
+                    "matchScore");
         }
 
         @Override
         public final int hashCode() {
-            return moscow.rockstar.util.RecordValueSupport.hashCode(this, "module", "setting", "displayName", "matchScore");
+            return moscow.rockstar.util.RecordValueSupport.hashCode(this, "module", "setting", "displayName",
+                    "matchScore");
         }
 
         @Override
         public final boolean equals(Object object) {
-            return moscow.rockstar.util.RecordValueSupport.equals(this, object, "module", "setting", "displayName", "matchScore");
+            return moscow.rockstar.util.RecordValueSupport.equals(this, object, "module", "setting", "displayName",
+                    "matchScore");
         }
 
         public ModuleContract getModule() {

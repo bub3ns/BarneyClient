@@ -126,7 +126,7 @@ import pyrock.events.render.Render3DEvent;
 import pyrock.utility.render.ColorRGBA;
 
 public class CropFarmMode
-extends FarmModeBase {
+        extends FarmModeBase {
     private final ModeSetting cropModeSetting;
     private final ModeSetting.Option netherWartOption;
     private final ModeSetting.Option wheatOption;
@@ -215,8 +215,12 @@ extends FarmModeBase {
         if (CropFarmMode.minecraftClient.world == null || CropFarmMode.minecraftClient.player == null) {
             return;
         }
-        BlockPos adminsky2 = this.automationState == CropAutomationState.NAVIGATING_TO_CROP || this.automationState == CropAutomationState.HARVESTING || this.automationState == CropAutomationState.PLANTING ? this.targetCropPosition : null;
-        BlockPos adminsky3 = adminsky = this.automationState == CropAutomationState.NAVIGATING_TO_CHEST || this.automationState == CropAutomationState.RETURNING_TO_CROPS || this.automationState == CropAutomationState.TRANSFERRING_ITEMS ? this.targetChestPosition : null;
+        BlockPos adminsky2 = this.automationState == CropAutomationState.NAVIGATING_TO_CROP
+                || this.automationState == CropAutomationState.HARVESTING
+                || this.automationState == CropAutomationState.PLANTING ? this.targetCropPosition : null;
+        BlockPos adminsky3 = adminsky = this.automationState == CropAutomationState.NAVIGATING_TO_CHEST
+                || this.automationState == CropAutomationState.RETURNING_TO_CROPS
+                || this.automationState == CropAutomationState.TRANSFERRING_ITEMS ? this.targetChestPosition : null;
         if (adminsky2 == null && adminsky == null) {
             return;
         }
@@ -227,21 +231,35 @@ extends FarmModeBase {
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShader((ShaderProgramKey)ShaderProgramKeys.POSITION_COLOR);
-        BufferBuilder class_2872 = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader((ShaderProgramKey) ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder class_2872 = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS,
+                VertexFormats.POSITION_COLOR);
         if (adminsky2 != null) {
-            RenderUtils.drawFilledBox(class_45872, class_2872, this.getCropRenderBounds(adminsky2).offset(-VanillaChestLootTableGenerator.x, -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z), matureCropColor.withAlpha(45.0f));
+            RenderUtils.drawFilledBox(class_45872, class_2872,
+                    this.getCropRenderBounds(adminsky2).offset(-VanillaChestLootTableGenerator.x,
+                            -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z),
+                    matureCropColor.withAlpha(45.0f));
         }
         if (adminsky != null) {
-            RenderUtils.drawFilledBox(class_45872, class_2872, this.getCropRenderBounds(adminsky).offset(-VanillaChestLootTableGenerator.x, -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z), unripeCropColor.withAlpha(45.0f));
+            RenderUtils.drawFilledBox(class_45872, class_2872,
+                    this.getCropRenderBounds(adminsky).offset(-VanillaChestLootTableGenerator.x,
+                            -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z),
+                    unripeCropColor.withAlpha(45.0f));
         }
         ItemRenderUtils.flushVertexConsumer(class_2872);
-        BufferBuilder CreativeInventoryActionC2SPacket = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        BufferBuilder CreativeInventoryActionC2SPacket = RenderSystem.renderThreadTesselator()
+                .begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         if (adminsky2 != null) {
-            RenderUtils.drawBoxOutline(class_45872, CreativeInventoryActionC2SPacket, this.getCropRenderBounds(adminsky2).offset(-VanillaChestLootTableGenerator.x, -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z), matureCropColor.withAlpha(180.0f));
+            RenderUtils.drawBoxOutline(class_45872, CreativeInventoryActionC2SPacket,
+                    this.getCropRenderBounds(adminsky2).offset(-VanillaChestLootTableGenerator.x,
+                            -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z),
+                    matureCropColor.withAlpha(180.0f));
         }
         if (adminsky != null) {
-            RenderUtils.drawBoxOutline(class_45872, CreativeInventoryActionC2SPacket, this.getCropRenderBounds(adminsky).offset(-VanillaChestLootTableGenerator.x, -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z), unripeCropColor.withAlpha(180.0f));
+            RenderUtils.drawBoxOutline(class_45872, CreativeInventoryActionC2SPacket,
+                    this.getCropRenderBounds(adminsky).offset(-VanillaChestLootTableGenerator.x,
+                            -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z),
+                    unripeCropColor.withAlpha(180.0f));
         }
         ItemRenderUtils.flushVertexConsumer(CreativeInventoryActionC2SPacket);
         RenderSystem.defaultBlendFunc();
@@ -252,21 +270,34 @@ extends FarmModeBase {
 
     public CropFarmMode(AutoFarm autoFarm, ModeSetting modeSetting) {
         super(autoFarm, modeSetting, "modules.settings.auto_farm.modes.crop");
-        this.cropModeSetting = new ModeSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.crop", () -> !this.isSelected());
-        this.netherWartOption = new ModeSetting.Option(this.cropModeSetting, "modules.settings.crop_farm.crop.nether_wart").select();
+        this.cropModeSetting = new ModeSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.crop",
+                () -> !this.isSelected());
+        this.netherWartOption = new ModeSetting.Option(this.cropModeSetting,
+                "modules.settings.crop_farm.crop.nether_wart").select();
         this.wheatOption = new ModeSetting.Option(this.cropModeSetting, "modules.settings.crop_farm.crop.wheat");
         this.carrotOption = new ModeSetting.Option(this.cropModeSetting, "modules.settings.crop_farm.crop.carrots");
         this.potatoOption = new ModeSetting.Option(this.cropModeSetting, "modules.settings.crop_farm.crop.potatoes");
         this.beetrootOption = new ModeSetting.Option(this.cropModeSetting, "modules.settings.crop_farm.crop.beetroots");
-        this.sugarCaneOption = new ModeSetting.Option(this.cropModeSetting, "modules.settings.crop_farm.crop.sugar_cane");
-        this.scanRadiusSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.scan_radius", () -> !this.isSelected()).setStep(2.0f).setMinValue(8.0f).setMaxValue(64.0f).setValue(24.0f);
-        this.verticalRangeSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.vertical_range", () -> !this.isSelected()).setStep(1.0f).setMinValue(1.0f).setMaxValue(8.0f).setValue(3.0f);
-        this.replantSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.replant", () -> !this.isSelected()).enable();
-        this.hoeUseSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.use_hoe", () -> !this.isSelected()).enable();
-        this.pickupSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.pickup", () -> !this.isSelected()).enable();
-        this.autoDepositSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.auto_deposit", () -> !this.isSelected()).enable();
-        this.targetEspSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.target_esp", () -> !this.isSelected()).enable();
-        this.actionDelaySetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.crop_farm.action_delay", () -> !this.isSelected()).setStep(10.0f).setMinValue(0.0f).setMaxValue(500.0f).setValue(80.0f).setUnit("ms");
+        this.sugarCaneOption = new ModeSetting.Option(this.cropModeSetting,
+                "modules.settings.crop_farm.crop.sugar_cane");
+        this.scanRadiusSetting = new NumberSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.scan_radius",
+                () -> !this.isSelected()).setStep(2.0f).setMinValue(8.0f).setMaxValue(64.0f).setValue(24.0f);
+        this.verticalRangeSetting = new NumberSetting((SettingOwner) autoFarm,
+                "modules.settings.crop_farm.vertical_range", () -> !this.isSelected()).setStep(1.0f).setMinValue(1.0f)
+                .setMaxValue(8.0f).setValue(3.0f);
+        this.replantSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.replant",
+                () -> !this.isSelected()).enable();
+        this.hoeUseSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.use_hoe",
+                () -> !this.isSelected()).enable();
+        this.pickupSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.pickup",
+                () -> !this.isSelected()).enable();
+        this.autoDepositSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.auto_deposit",
+                () -> !this.isSelected()).enable();
+        this.targetEspSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.target_esp",
+                () -> !this.isSelected()).enable();
+        this.actionDelaySetting = new NumberSetting((SettingOwner) autoFarm, "modules.settings.crop_farm.action_delay",
+                () -> !this.isSelected()).setStep(10.0f).setMinValue(0.0f).setMaxValue(500.0f).setValue(80.0f)
+                .setUnit("ms");
     }
 
     @Override
@@ -307,7 +338,7 @@ extends FarmModeBase {
     @Override
     public ItemStack getFarmDisplayItem() {
         Item class_17922 = this.getSelectedSeedItem();
-        return new ItemStack((ItemConvertible)(class_17922 == null ? Items.WHEAT : class_17922));
+        return new ItemStack((ItemConvertible) (class_17922 == null ? Items.WHEAT : class_17922));
     }
 
     private void clearCropTargets() {
@@ -353,7 +384,8 @@ extends FarmModeBase {
         }
         if (this.isCropWithinInteractionRange(this.targetCropPosition)) {
             this.cancelCropNavigation();
-            this.automationState = this.isMatureCrop(this.targetCropPosition) ? CropAutomationState.HARVESTING : CropAutomationState.PLANTING;
+            this.automationState = this.isMatureCrop(this.targetCropPosition) ? CropAutomationState.HARVESTING
+                    : CropAutomationState.PLANTING;
             this.clearRotationTarget();
             this.actionCooldown.reset();
             return;
@@ -395,7 +427,8 @@ extends FarmModeBase {
         }
         if (!this.isMatureCrop(this.targetCropPosition)) {
             BlockState class_26802 = CropFarmMode.minecraftClient.world.getBlockState(this.targetCropPosition);
-            if (class_26802.isAir() && this.replantSetting.isEnabled() && this.isPlantingSurfaceValid(this.targetCropPosition)) {
+            if (class_26802.isAir() && this.replantSetting.isEnabled()
+                    && this.isPlantingSurfaceValid(this.targetCropPosition)) {
                 this.automationState = CropAutomationState.PLANTING;
                 this.clearRotationTarget();
                 this.actionCooldown.reset();
@@ -412,14 +445,16 @@ extends FarmModeBase {
         if (this.hoeUseSetting.isEnabled()) {
             this.selectBestCropTool(CropFarmMode.minecraftClient.world.getBlockState(this.targetCropPosition));
         }
-        if (!this.isRotationAligned(VanillaChestLootTableGenerator = this.getCropHitPosition(this.targetCropPosition, class_23502 = this.getClosestInteractionSide(this.targetCropPosition)))) {
+        if (!this.isRotationAligned(VanillaChestLootTableGenerator = this.getCropHitPosition(this.targetCropPosition,
+                class_23502 = this.getClosestInteractionSide(this.targetCropPosition)))) {
             return;
         }
-        if (!this.actionCooldown.hasElapsed((long)this.actionDelaySetting.getValue())) {
+        if (!this.actionCooldown.hasElapsed((long) this.actionDelaySetting.getValue())) {
             return;
         }
         CropFarmMode.minecraftClient.interactionManager.attackBlock(this.targetCropPosition, class_23502);
-        CropFarmMode.minecraftClient.interactionManager.updateBlockBreakingProgress(this.targetCropPosition, class_23502);
+        CropFarmMode.minecraftClient.interactionManager.updateBlockBreakingProgress(this.targetCropPosition,
+                class_23502);
         CropFarmMode.minecraftClient.player.swingHand(Hand.MAIN_HAND);
         this.actionCooldown.reset();
     }
@@ -449,15 +484,17 @@ extends FarmModeBase {
             return;
         }
         BlockPos adminsky = this.targetCropPosition.down();
-        Vec3d VanillaChestLootTableGenerator = new Vec3d((double)adminsky.getX() + 0.5, (double)adminsky.getY() + 1.0, (double)adminsky.getZ() + 0.5);
+        Vec3d VanillaChestLootTableGenerator = new Vec3d((double) adminsky.getX() + 0.5, (double) adminsky.getY() + 1.0,
+                (double) adminsky.getZ() + 0.5);
         if (!this.isRotationAligned(VanillaChestLootTableGenerator)) {
             return;
         }
-        if (!this.actionCooldown.hasElapsed((long)this.actionDelaySetting.getValue())) {
+        if (!this.actionCooldown.hasElapsed((long) this.actionDelaySetting.getValue())) {
             return;
         }
         BlockHitResult class_39652 = new BlockHitResult(VanillaChestLootTableGenerator, Direction.UP, adminsky, false);
-        CropFarmMode.minecraftClient.interactionManager.interactBlock(CropFarmMode.minecraftClient.player, Hand.MAIN_HAND, class_39652);
+        CropFarmMode.minecraftClient.interactionManager.interactBlock(CropFarmMode.minecraftClient.player,
+                Hand.MAIN_HAND, class_39652);
         CropFarmMode.minecraftClient.player.swingHand(Hand.MAIN_HAND);
         this.actionCooldown.reset();
         this.selectNextCropTarget();
@@ -479,14 +516,18 @@ extends FarmModeBase {
         double d2 = Double.MAX_VALUE;
         for (n = 0; n < this.matureCropPositions.size(); ++n) {
             adminsky = this.matureCropPositions.get(n);
-            if (!this.isMatureCrop(adminsky) || !((d = Vec3d.ofCenter((Vec3i)adminsky).squaredDistanceTo(VanillaChestLootTableGenerator)) < d2)) continue;
+            if (!this.isMatureCrop(adminsky)
+                    || !((d = Vec3d.ofCenter((Vec3i) adminsky).squaredDistanceTo(VanillaChestLootTableGenerator)) < d2))
+                continue;
             d2 = d;
             n2 = n;
             bl = false;
         }
         for (n = 0; n < this.plantableCropPositions.size(); ++n) {
             adminsky = this.plantableCropPositions.get(n);
-            if (!this.isCropPlantingLocationReady(adminsky) || !((d = Vec3d.ofCenter((Vec3i)adminsky).squaredDistanceTo(VanillaChestLootTableGenerator)) < d2)) continue;
+            if (!this.isCropPlantingLocationReady(adminsky)
+                    || !((d = Vec3d.ofCenter((Vec3i) adminsky).squaredDistanceTo(VanillaChestLootTableGenerator)) < d2))
+                continue;
             d2 = d;
             n2 = n;
             bl = true;
@@ -537,7 +578,8 @@ extends FarmModeBase {
         }
         while (!this.nearbyDropEntities.isEmpty()) {
             ItemEntity class_15422 = this.nearbyDropEntities.removeFirst();
-            if (class_15422 == null || class_15422.isRemoved() || !class_15422.isAlive()) continue;
+            if (class_15422 == null || class_15422.isRemoved() || !class_15422.isAlive())
+                continue;
             this.targetDropEntity = class_15422;
             return;
         }
@@ -556,13 +598,15 @@ extends FarmModeBase {
             return;
         }
         Vec3d VanillaChestLootTableGenerator = this.targetDropEntity.getPos();
-        if (CropFarmMode.minecraftClient.player.getPos().squaredDistanceTo(VanillaChestLootTableGenerator) <= 1.9599999999999997) {
+        if (CropFarmMode.minecraftClient.player.getPos()
+                .squaredDistanceTo(VanillaChestLootTableGenerator) <= 1.9599999999999997) {
             this.cancelCropNavigation();
             this.advanceDropCollection();
             return;
         }
         if (!this.navigationActive) {
-            TextureReloadProvider.getTextureReloadTask().registerCollisionProbe(new BlockRegion(BlockPos.ofFloored((Position)VanillaChestLootTableGenerator), 1));
+            TextureReloadProvider.getTextureReloadTask().registerCollisionProbe(
+                    new BlockRegion(BlockPos.ofFloored((Position) VanillaChestLootTableGenerator), 1));
             this.navigationActive = true;
             this.navigationStartedAt = System.currentTimeMillis();
             return;
@@ -588,10 +632,15 @@ extends FarmModeBase {
         ArrayList<ItemEntity> arrayList = new ArrayList<ItemEntity>();
         for (Entity class_12972 : CropFarmMode.minecraftClient.world.getEntities()) {
             ItemEntity class_15423;
-            if (!(class_12972 instanceof ItemEntity) || (class_15423 = (ItemEntity)class_12972).isRemoved() || !class_15423.isAlive() || VanillaChestLootTableGenerator.squaredDistanceTo(class_15423.getPos()) > d2 || !this.isSelectedCropItem(class_15423.getStack())) continue;
+            if (!(class_12972 instanceof ItemEntity) || (class_15423 = (ItemEntity) class_12972).isRemoved()
+                    || !class_15423.isAlive()
+                    || VanillaChestLootTableGenerator.squaredDistanceTo(class_15423.getPos()) > d2
+                    || !this.isSelectedCropItem(class_15423.getStack()))
+                continue;
             arrayList.add(class_15423);
         }
-        arrayList.sort(Comparator.comparingDouble(class_15422 -> VanillaChestLootTableGenerator.squaredDistanceTo(class_15422.getPos())));
+        arrayList.sort(Comparator.comparingDouble(
+                class_15422 -> VanillaChestLootTableGenerator.squaredDistanceTo(class_15422.getPos())));
         this.nearbyDropEntities.addAll(arrayList);
     }
 
@@ -627,8 +676,8 @@ extends FarmModeBase {
 
     private void scanCropBlocks() {
         BlockPos adminsky = CropFarmMode.minecraftClient.player.getBlockPos();
-        int n = (int)this.scanRadiusSetting.getValue();
-        int n2 = (int)this.verticalRangeSetting.getValue();
+        int n = (int) this.scanRadiusSetting.getValue();
+        int n2 = (int) this.verticalRangeSetting.getValue();
         Predicate<BlockState> predicate = this.getSelectedCropPredicate();
         boolean bl = this.replantSetting.isEnabled() && !this.sugarCaneOption.isSelected();
         for (int i = -n2; i <= n2; ++i) {
@@ -640,7 +689,8 @@ extends FarmModeBase {
                         this.matureCropPositions.add(adminsky2.toImmutable());
                         continue;
                     }
-                    if (!bl || !class_26802.isAir() || !this.isPlantingSurfaceValid(adminsky2)) continue;
+                    if (!bl || !class_26802.isAir() || !this.isPlantingSurfaceValid(adminsky2))
+                        continue;
                     this.plantableCropPositions.add(adminsky2.toImmutable());
                 }
             }
@@ -654,8 +704,10 @@ extends FarmModeBase {
         }
         int n2 = this.findDominantCropAxis(this.matureCropPositions, true);
         boolean bl = n2 >= (n = this.findDominantCropAxis(this.matureCropPositions, false));
-        Comparator<BlockPos> comparator = bl ? Comparator.comparingInt(Vec3i::getZ) : Comparator.comparingInt(Vec3i::getX);
-        Comparator<BlockPos> comparator2 = bl ? Comparator.comparingInt(Vec3i::getX) : Comparator.comparingInt(Vec3i::getZ);
+        Comparator<BlockPos> comparator = bl ? Comparator.comparingInt(Vec3i::getZ)
+                : Comparator.comparingInt(Vec3i::getX);
+        Comparator<BlockPos> comparator2 = bl ? Comparator.comparingInt(Vec3i::getX)
+                : Comparator.comparingInt(Vec3i::getZ);
         this.matureCropPositions.sort(comparator.thenComparingInt(Vec3i::getY).thenComparing(comparator2));
         ArrayList<BlockPos> reorderedTargets = new ArrayList<>(this.matureCropPositions.size());
         int n3 = 0;
@@ -669,7 +721,8 @@ extends FarmModeBase {
                 int n8;
                 targetPosition = this.matureCropPositions.get(n5);
                 int n9 = n8 = bl ? targetPosition.getZ() : targetPosition.getX();
-                if (n8 != n6 || targetPosition.getY() != n7) break;
+                if (n8 != n6 || targetPosition.getY() != n7)
+                    break;
             }
             List<BlockPos> targetGroup = new ArrayList<>(this.matureCropPositions.subList(n3, n5));
             if ((n4 & 1) != 0) {
@@ -693,22 +746,26 @@ extends FarmModeBase {
         int n2 = 0;
         Iterator iterator = hashMap.values().iterator();
         while (iterator.hasNext()) {
-            n = (Integer)iterator.next();
-            if (n <= n2) continue;
+            n = (Integer) iterator.next();
+            if (n <= n2)
+                continue;
             n2 = n;
         }
         return n2;
     }
 
     private BlockPos findSupportBlock(BlockPos adminsky) {
-        Direction[] class_2350Array = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+        Direction[] class_2350Array = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST,
+                Direction.WEST };
         BlockPos adminsky2 = null;
         Vec3d VanillaChestLootTableGenerator = CropFarmMode.minecraftClient.player.getPos();
         double d = Double.MAX_VALUE;
         for (Direction class_23502 : class_2350Array) {
             double d2;
             BlockPos adminsky3 = adminsky.offset(class_23502);
-            if (!this.isSupportBlockValid(adminsky3) || !((d2 = Vec3d.ofCenter((Vec3i)adminsky3).squaredDistanceTo(VanillaChestLootTableGenerator)) < d)) continue;
+            if (!this.isSupportBlockValid(adminsky3) || !((d2 = Vec3d.ofCenter((Vec3i) adminsky3)
+                    .squaredDistanceTo(VanillaChestLootTableGenerator)) < d))
+                continue;
             d = d2;
             adminsky2 = adminsky3;
         }
@@ -722,10 +779,10 @@ extends FarmModeBase {
         if (class_26802.isAir()) {
             return false;
         }
-        if (!class_26803.getCollisionShape((BlockView)CropFarmMode.minecraftClient.world, adminsky).isEmpty()) {
+        if (!class_26803.getCollisionShape((BlockView) CropFarmMode.minecraftClient.world, adminsky).isEmpty()) {
             return false;
         }
-        return class_26804.getCollisionShape((BlockView)CropFarmMode.minecraftClient.world, adminsky.up()).isEmpty();
+        return class_26804.getCollisionShape((BlockView) CropFarmMode.minecraftClient.world, adminsky.up()).isEmpty();
     }
 
     private Predicate<BlockState> getSelectedCropPredicate() {
@@ -758,11 +815,11 @@ extends FarmModeBase {
     private boolean isCropStateValid(BlockPos adminsky, BlockState class_26802) {
         Block class_22482 = class_26802.getBlock();
         if (class_22482 instanceof CropBlock) {
-            CropBlock class_23022 = (CropBlock)class_22482;
+            CropBlock class_23022 = (CropBlock) class_22482;
             return class_23022.isMature(class_26802);
         }
         if (class_22482 == Blocks.NETHER_WART) {
-            return (Integer)class_26802.get((Property)NetherWartBlock.AGE) >= 3;
+            return (Integer) class_26802.get((Property) NetherWartBlock.AGE) >= 3;
         }
         if (class_22482 == Blocks.SUGAR_CANE) {
             return CropFarmMode.minecraftClient.world.getBlockState(adminsky.down()).getBlock() == Blocks.SUGAR_CANE;
@@ -805,12 +862,13 @@ extends FarmModeBase {
 
     private boolean isCropWithinInteractionRange(BlockPos adminsky) {
         double d = CropFarmMode.minecraftClient.player.getBlockInteractionRange();
-        return CropFarmMode.minecraftClient.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter((Vec3i)adminsky)) <= d * d;
+        return CropFarmMode.minecraftClient.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter((Vec3i) adminsky)) <= d
+                * d;
     }
 
     private Direction getClosestInteractionSide(BlockPos adminsky) {
         Vec3d VanillaChestLootTableGenerator = CropFarmMode.minecraftClient.player.getEyePos();
-        Vec3d WallPlayerSkullBlock = Vec3d.ofCenter((Vec3i)adminsky);
+        Vec3d WallPlayerSkullBlock = Vec3d.ofCenter((Vec3i) adminsky);
         double d = VanillaChestLootTableGenerator.x - WallPlayerSkullBlock.x;
         double d2 = VanillaChestLootTableGenerator.y - WallPlayerSkullBlock.y;
         double d3 = VanillaChestLootTableGenerator.z - WallPlayerSkullBlock.z;
@@ -827,7 +885,8 @@ extends FarmModeBase {
     }
 
     private Vec3d getCropHitPosition(BlockPos adminsky, Direction class_23502) {
-        return Vec3d.ofCenter((Vec3i)adminsky).add((double)class_23502.getOffsetX() * 0.5, (double)class_23502.getOffsetY() * 0.5, (double)class_23502.getOffsetZ() * 0.5);
+        return Vec3d.ofCenter((Vec3i) adminsky).add((double) class_23502.getOffsetX() * 0.5,
+                (double) class_23502.getOffsetY() * 0.5, (double) class_23502.getOffsetZ() * 0.5);
     }
 
     private boolean isRotationAligned(Vec3d VanillaChestLootTableGenerator) {
@@ -836,7 +895,8 @@ extends FarmModeBase {
             this.targetRotation = rotation;
             this.rotationConfirmationCount = 0;
         }
-        RockstarClient.create().getRotationManager().requestRotation(rotation, RotationCorrectionMode.UNSPECIFIED, 180.0f, 180.0f, 180.0f, RotationPriority.ITEM_USE_PRIORITY);
+        RockstarClient.create().getRotationManager().requestRotation(rotation, RotationCorrectionMode.UNSPECIFIED,
+                180.0f, 180.0f, 180.0f, RotationPriority.ITEM_USE_PRIORITY);
         Rotation rotation2 = RockstarClient.create().getRotationManager().getCurrentRotation();
         if (rotation2 != null && rotation2.angleDistanceTo(rotation) <= 1.5f) {
             ++this.rotationConfirmationCount;
@@ -851,7 +911,8 @@ extends FarmModeBase {
     }
 
     private void selectBestCropTool(BlockState class_26802) {
-        Predicate<ItemStack> predicate = class_17992 -> class_17992.getItem() instanceof HoeItem && CropFarmMode.hasUsableToolDurability(class_17992);
+        Predicate<ItemStack> predicate = class_17992 -> class_17992.getItem() instanceof HoeItem
+                && CropFarmMode.hasUsableToolDurability(class_17992);
         this.equipBestCropTool(class_26802, predicate);
     }
 
@@ -859,10 +920,12 @@ extends FarmModeBase {
         ItemStack class_17992 = CropFarmMode.minecraftClient.player.getMainHandStack();
         ToolMiningStats toolMiningStats = this.getToolMiningStats(class_17992, class_26802, predicate);
         ItemRule itemRule = null;
-        for (ItemRule itemRule2 : ItemRuleSets.getHotbarRules().combineRules(ItemRuleSets.getInventoryRules()).getRules()) {
+        for (ItemRule itemRule2 : ItemRuleSets.getHotbarRules().combineRules(ItemRuleSets.getInventoryRules())
+                .getRules()) {
             ItemStack class_17993 = itemRule2.getItemStack();
             ToolMiningStats toolMiningStats2 = this.getToolMiningStats(class_17993, class_26802, predicate);
-            if (!toolMiningStats2.isBetterThan(toolMiningStats)) continue;
+            if (!toolMiningStats2.isBetterThan(toolMiningStats))
+                continue;
             toolMiningStats = toolMiningStats2;
             itemRule = itemRule2;
         }
@@ -870,24 +933,25 @@ extends FarmModeBase {
             return false;
         }
         if (itemRule instanceof HotbarSlot) {
-            HotbarSlot hotbarSlot = (HotbarSlot)itemRule;
+            HotbarSlot hotbarSlot = (HotbarSlot) itemRule;
             InventoryUtils.setSelectedHotbarSlot(hotbarSlot);
         } else if (itemRule instanceof InventorySlotRule) {
             ItemRule itemRule2;
-            itemRule2 = (InventorySlotRule)itemRule;
+            itemRule2 = (InventorySlotRule) itemRule;
             int n = CropFarmMode.minecraftClient.player.getInventory().selectedSlot;
-            InventoryUtils.dropItem(((InventorySlotRule)itemRule2).getClickSlot(), n);
+            InventoryUtils.dropItem(((InventorySlotRule) itemRule2).getClickSlot(), n);
         }
         return true;
     }
 
-    private ToolMiningStats getToolMiningStats(ItemStack class_17992, BlockState class_26802, Predicate<ItemStack> predicate) {
+    private ToolMiningStats getToolMiningStats(ItemStack class_17992, BlockState class_26802,
+            Predicate<ItemStack> predicate) {
         if (class_17992 == null || class_17992.isEmpty() || !predicate.test(class_17992)) {
             return new ToolMiningStats(-1.0f, -1, -1, -1.0f);
         }
         float f = class_17992.getMiningSpeedMultiplier(class_26802);
-        int n = EnchantmentUtils.getEnchantmentLevel(class_17992, (RegistryKey<Enchantment>)Enchantments.EFFICIENCY);
-        int n2 = EnchantmentUtils.getEnchantmentLevel(class_17992, (RegistryKey<Enchantment>)Enchantments.FORTUNE);
+        int n = EnchantmentUtils.getEnchantmentLevel(class_17992, (RegistryKey<Enchantment>) Enchantments.EFFICIENCY);
+        int n2 = EnchantmentUtils.getEnchantmentLevel(class_17992, (RegistryKey<Enchantment>) Enchantments.FORTUNE);
         float f2 = CropFarmMode.getToolDurabilityRatio(class_17992);
         return new ToolMiningStats(f, n, n2, f2);
     }
@@ -900,7 +964,7 @@ extends FarmModeBase {
         if (n <= 0) {
             return 1.0f;
         }
-        return (float)(n - class_17992.getDamage()) / (float)n;
+        return (float) (n - class_17992.getDamage()) / (float) n;
     }
 
     private static boolean hasUsableToolDurability(ItemStack class_17992) {
@@ -927,7 +991,8 @@ extends FarmModeBase {
         int n = 0;
         for (int i = 0; i < class_16612.size(); ++i) {
             ItemStack class_17992 = class_16612.getStack(i);
-            if (class_17992.isEmpty() || !this.isSelectedCropItem(class_17992)) continue;
+            if (class_17992.isEmpty() || !this.isSelectedCropItem(class_17992))
+                continue;
             if (class_17922 != null && class_17992.getItem() == class_17922) {
                 n += class_17992.getCount();
                 continue;
@@ -964,13 +1029,17 @@ extends FarmModeBase {
             return null;
         }
         BlockPos adminsky = CropFarmMode.minecraftClient.player.getBlockPos();
-        int n = (int)this.scanRadiusSetting.getValue() + 4;
+        int n = (int) this.scanRadiusSetting.getValue() + 4;
         BlockPos adminsky2 = null;
         double d = Double.MAX_VALUE;
-        for (BlockPos adminsky3 : BlockPos.iterateOutwards((BlockPos)adminsky, (int)n, (int)n, (int)n)) {
+        for (BlockPos adminsky3 : BlockPos.iterateOutwards((BlockPos) adminsky, (int) n, (int) n, (int) n)) {
             double d2;
             BlockPos adminsky4 = adminsky3.toImmutable();
-            if (this.unreachableChestPositions.contains(adminsky4) || !(CropFarmMode.minecraftClient.world.getBlockEntity(adminsky4) instanceof ChestBlockEntity) || !((d2 = adminsky3.getSquaredDistance((Position)CropFarmMode.minecraftClient.player.getPos())) < d)) continue;
+            if (this.unreachableChestPositions.contains(adminsky4)
+                    || !(CropFarmMode.minecraftClient.world.getBlockEntity(adminsky4) instanceof ChestBlockEntity)
+                    || !((d2 = adminsky3
+                            .getSquaredDistance((Position) CropFarmMode.minecraftClient.player.getPos())) < d))
+                continue;
             d = d2;
             adminsky2 = adminsky4;
         }
@@ -991,7 +1060,8 @@ extends FarmModeBase {
             return;
         }
         if (!this.navigationActive) {
-            TextureReloadProvider.getTextureReloadTask().registerCollisionProbe(new BlockRegion(this.targetChestPosition, 2));
+            TextureReloadProvider.getTextureReloadTask()
+                    .registerCollisionProbe(new BlockRegion(this.targetChestPosition, 2));
             this.navigationActive = true;
             this.navigationStartedAt = System.currentTimeMillis();
             return;
@@ -1026,15 +1096,17 @@ extends FarmModeBase {
             this.navigationActive = false;
             return;
         }
-        Vec3d VanillaChestLootTableGenerator = Vec3d.ofCenter((Vec3i)this.targetChestPosition);
+        Vec3d VanillaChestLootTableGenerator = Vec3d.ofCenter((Vec3i) this.targetChestPosition);
         if (!this.isRotationAligned(VanillaChestLootTableGenerator)) {
             return;
         }
-        if (!this.actionCooldown.hasElapsed((long)this.actionDelaySetting.getValue())) {
+        if (!this.actionCooldown.hasElapsed((long) this.actionDelaySetting.getValue())) {
             return;
         }
-        BlockHitResult class_39652 = new BlockHitResult(VanillaChestLootTableGenerator, Direction.UP, this.targetChestPosition, false);
-        CropFarmMode.minecraftClient.interactionManager.interactBlock(CropFarmMode.minecraftClient.player, Hand.MAIN_HAND, class_39652);
+        BlockHitResult class_39652 = new BlockHitResult(VanillaChestLootTableGenerator, Direction.UP,
+                this.targetChestPosition, false);
+        CropFarmMode.minecraftClient.interactionManager.interactBlock(CropFarmMode.minecraftClient.player,
+                Hand.MAIN_HAND, class_39652);
         CropFarmMode.minecraftClient.player.swingHand(Hand.MAIN_HAND);
         this.actionCooldown.reset();
     }
@@ -1045,13 +1117,13 @@ extends FarmModeBase {
             this.resetDepositState(false);
             return;
         }
-        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler)class_17032;
-        if (!this.actionCooldown.hasElapsed((long)this.actionDelaySetting.getValue())) {
+        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler) class_17032;
+        if (!this.actionCooldown.hasElapsed((long) this.actionDelaySetting.getValue())) {
             return;
         }
         ItemStack selectedStack = this.selectedInventorySlot == -1
-            ? ItemStack.EMPTY
-            : class_17072.slots.get(this.selectedInventorySlot).getStack();
+                ? ItemStack.EMPTY
+                : class_17072.slots.get(this.selectedInventorySlot).getStack();
         if (this.selectedInventorySlot != -1 && !selectedStack.isEmpty()
                 && selectedStack.getCount() >= this.selectedItemCount
                 && this.isSelectedCropItem(selectedStack)) {
@@ -1063,7 +1135,10 @@ extends FarmModeBase {
         for (int i = 0; i < containerSlots.size(); ++i) {
             ItemStack class_17992;
             Slot class_17352 = containerSlots.get(i);
-            if (class_17352.inventory != CropFarmMode.minecraftClient.player.getInventory() || class_17352.getIndex() == n || (class_17992 = class_17352.getStack()).isEmpty() || !this.isSelectedCropItem(class_17992)) continue;
+            if (class_17352.inventory != CropFarmMode.minecraftClient.player.getInventory()
+                    || class_17352.getIndex() == n || (class_17992 = class_17352.getStack()).isEmpty()
+                    || !this.isSelectedCropItem(class_17992))
+                continue;
             InventoryUtils.quickMoveItem(i);
             this.selectedInventorySlot = i;
             this.selectedItemCount = class_17992.getCount();
@@ -1107,7 +1182,8 @@ extends FarmModeBase {
         int n2 = -1;
         for (int i = 0; i < class_16612.size(); ++i) {
             ItemStack class_17992 = class_16612.getStack(i);
-            if (class_17992.isEmpty() || class_17992.getItem() != class_17922 || class_17992.getCount() <= n2) continue;
+            if (class_17992.isEmpty() || class_17992.getItem() != class_17922 || class_17992.getCount() <= n2)
+                continue;
             n2 = class_17992.getCount();
             n = i;
         }
@@ -1147,7 +1223,7 @@ extends FarmModeBase {
         RETURNING_TO_CROPS,
         TRANSFERRING_ITEMS,
         WAITING_FOR_RESOURCES;
-}
+    }
 
     static final class ToolMiningStats {
         private final float miningSpeed;
@@ -1181,17 +1257,20 @@ extends FarmModeBase {
 
         @Override
         public final String toString() {
-            return moscow.rockstar.util.RecordValueSupport.toString(this, "miningSpeed", "efficiencyLevel", "fortuneLevel", "durabilityRatio");
+            return moscow.rockstar.util.RecordValueSupport.toString(this, "miningSpeed", "efficiencyLevel",
+                    "fortuneLevel", "durabilityRatio");
         }
 
         @Override
         public final int hashCode() {
-            return moscow.rockstar.util.RecordValueSupport.hashCode(this, "miningSpeed", "efficiencyLevel", "fortuneLevel", "durabilityRatio");
+            return moscow.rockstar.util.RecordValueSupport.hashCode(this, "miningSpeed", "efficiencyLevel",
+                    "fortuneLevel", "durabilityRatio");
         }
 
         @Override
         public final boolean equals(Object object) {
-            return moscow.rockstar.util.RecordValueSupport.equals(this, object, "miningSpeed", "efficiencyLevel", "fortuneLevel", "durabilityRatio");
+            return moscow.rockstar.util.RecordValueSupport.equals(this, object, "miningSpeed", "efficiencyLevel",
+                    "fortuneLevel", "durabilityRatio");
         }
 
         public float getMiningSpeed() {
@@ -1211,4 +1290,3 @@ extends FarmModeBase {
         }
     }
 }
-

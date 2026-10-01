@@ -49,7 +49,8 @@ public abstract class UiNode {
     protected boolean fillW;
     protected boolean fillH;
     protected UiNode parent;
-    private final AnimatedValue hover = new AnimatedValue(0.0f, Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeInOutCubicBezier));
+    private final AnimatedValue hover = new AnimatedValue(0.0f,
+            Motion.resolveMotionMotionFromLongAndEasing(300L, Easing.easeInOutCubicBezier));
     private final AnimatedValue press = new AnimatedValue(0.0f, Motion.motion5);
     private Map<String, AnimatedValue> signals;
     private Map<String, SignalValueProvider> bindings;
@@ -60,7 +61,8 @@ public abstract class UiNode {
     private boolean hovered;
     boolean hoverable = true;
     protected LifecyclePhase phase = LifecyclePhase.VISIBLE;
-    final AnimatedValue appear = new AnimatedValue(1.0f, Motion.resolveMotionMotionFromLongAndEasing(240L, Easing.easeOutCubic));
+    final AnimatedValue appear = new AnimatedValue(1.0f,
+            Motion.resolveMotionMotionFromLongAndEasing(240L, Easing.easeOutCubic));
     private Transition enterT = Transition.PROGRESS_ONLY;
     private Transition exitT = Transition.PROGRESS_ONLY;
     private float appearDelay;
@@ -584,7 +586,8 @@ public abstract class UiNode {
     public void setSlot(float f, float f2, float f3, float f4) {
         boolean bl;
         boolean bl2 = this.epochSnap();
-        boolean bl3 = bl2 || !this.ignoreSnap && (this.forcedSnap || this.snapPosition != null && this.snapPosition.getAsBoolean());
+        boolean bl3 = bl2 || !this.ignoreSnap
+                && (this.forcedSnap || this.snapPosition != null && this.snapPosition.getAsBoolean());
         this.forcedSnap = false;
         this.snappedThisFrame = bl3;
         if (bl3) {
@@ -650,7 +653,8 @@ public abstract class UiNode {
 
     private AnimatedValue spotlightAnim() {
         if (this.spotlightAnim == null) {
-            this.spotlightAnim = new AnimatedValue(0.0f, Motion.resolveMotionMotionFromLongAndEasing(200L, Easing.easeOutQuart));
+            this.spotlightAnim = new AnimatedValue(0.0f,
+                    Motion.resolveMotionMotionFromLongAndEasing(200L, Easing.easeOutQuart));
         }
         return this.spotlightAnim;
     }
@@ -809,7 +813,7 @@ public abstract class UiNode {
         this.hover.setTarget(this.hovered ? 1.0f : 0.0f);
         this.press.setTarget(this.pressed && this.hovered ? 1.0f : 0.0f);
         if (this.hovered && this.cursor != null) {
-            moscow.rockstar.ui.input.CursorManager.request((Cursor)this.cursor);
+            moscow.rockstar.ui.input.CursorManager.request((Cursor) this.cursor);
         }
         if (this.bindings != null) {
             for (Map.Entry<String, SignalValueProvider> object : this.bindings.entrySet()) {
@@ -854,7 +858,8 @@ public abstract class UiNode {
         if (transition != null) {
             transition.apply(this.appear.getCurrent(), this, this.tweak);
         }
-        if ((f4 = (f + (1.0f - f) * (f3 = this.spotlightAmount())) * this.tweak.progress) <= 0.003f && !this.onSpotlightPath) {
+        if ((f4 = (f + (1.0f - f) * (f3 = this.spotlightAmount())) * this.tweak.progress) <= 0.003f
+                && !this.onSpotlightPath) {
             return;
         }
         if (DRAW_CLIP && ((f2 = this.y.getCurrent()) + this.h.getCurrent() < DRAW_CLIP_MIN || f2 > DRAW_CLIP_MAX)) {
@@ -863,14 +868,16 @@ public abstract class UiNode {
         MatrixStack class_45872 = drawContext.getMatrices();
         boolean bl3 = bl2 = this.collapse && this.appear.getCurrent() < 0.999f;
         if (bl2) {
-            moscow.rockstar.render.state.UiScissorStack.push((MatrixStack)class_45872, (float)this.x.getCurrent(), (float)this.y.getCurrent(), (float)this.w.getCurrent(), (float)Math.max(0.0f, this.desiredH()));
+            moscow.rockstar.render.state.UiScissorStack.push((MatrixStack) class_45872, (float) this.x.getCurrent(),
+                    (float) this.y.getCurrent(), (float) this.w.getCurrent(), (float) Math.max(0.0f, this.desiredH()));
         }
         float f5 = bl2 ? (1.0f - this.collapseScale()) * this.h.getCurrent() : 0.0f;
         float f6 = 0.0f;
         if (this.shakeLeft > 0.0f) {
-            f6 = (float)Math.sin(this.shakeElapsed * 0.05f) * this.shakeAmp * (this.shakeLeft / this.shakeDur);
+            f6 = (float) Math.sin(this.shakeElapsed * 0.05f) * this.shakeAmp * (this.shakeLeft / this.shakeDur);
         }
-        boolean bl4 = bl = this.tweak.offsetX != 0.0f || this.tweak.offsetY != 0.0f || this.tweak.scale != 1.0f || f5 != 0.0f || f6 != 0.0f;
+        boolean bl4 = bl = this.tweak.offsetX != 0.0f || this.tweak.offsetY != 0.0f || this.tweak.scale != 1.0f
+                || f5 != 0.0f || f6 != 0.0f;
         if (bl) {
             class_45872.push();
             if (f6 != 0.0f) {
@@ -890,7 +897,7 @@ public abstract class UiNode {
                 class_45872.translate(-f7, -f8, 0.0f);
             }
         }
-        RenderSystem.setShaderColor((float)1.0f, (float)1.0f, (float)1.0f, (float)f4);
+        RenderSystem.setShaderColor((float) 1.0f, (float) 1.0f, (float) 1.0f, (float) f4);
         if (f3 > 0.0f) {
             this.drawSpotlightBackdrop(drawContext, (1.0f - f) * f3);
         }
@@ -899,7 +906,7 @@ public abstract class UiNode {
         }
         this.drawSelf(drawContext, f4);
         this.drawChildren(drawContext, f4);
-        RenderSystem.setShaderColor((float)1.0f, (float)1.0f, (float)1.0f, (float)f);
+        RenderSystem.setShaderColor((float) 1.0f, (float) 1.0f, (float) 1.0f, (float) f);
         if (bl) {
             class_45872.pop();
         }
@@ -920,7 +927,8 @@ public abstract class UiNode {
         WidgetState widgetState = this.shapeRadius();
         float f5 = this.shapeSquircle();
         if (this.glassAlpha >= 0.0f) {
-            drawContext.drawClientRect(f, f2, f3, f4, this.glassAlpha, 0.0f, f5, widgetState.topLeftRadius(), this.glassOutline);
+            drawContext.drawClientRect(f, f2, f3, f4, this.glassAlpha, 0.0f, f5, widgetState.topLeftRadius(),
+                    this.glassOutline);
             return;
         }
         ColorRGBA colorRGBA2 = colorRGBA = this.blurTint == null ? ColorRGBA.WHITE : this.blurTint;
@@ -948,7 +956,8 @@ public abstract class UiNode {
         }
         float f6 = this.backdropRadius();
         float f7 = Math.min(f6 > 0.0f ? f6 : 7.0f, Math.min(f4, f5) / 2.0f);
-        drawContext.drawSquircle(f2, f3, f4, f5, 3.0f, WidgetState.uniform(f7), ColorPalette.getPanelColor().mulAlpha(0.85f * f));
+        drawContext.drawSquircle(f2, f3, f4, f5, 3.0f, WidgetState.uniform(f7),
+                ColorPalette.getPanelColor().mulAlpha(0.85f * f));
     }
 
     protected void drawSelf(RockstarDrawContext drawContext, float f) {
@@ -1014,9 +1023,9 @@ public abstract class UiNode {
             if (this.posClick != null) {
                 this.posClick.handleClick(pointerAction, f, f2);
             }
-        }
-        catch (Throwable throwable) {
-            RockstarClient.LOGGER.error("[ui] click handler failed on {}", (Object)this.getClass().getSimpleName(), (Object)throwable);
+        } catch (Throwable throwable) {
+            RockstarClient.LOGGER.error("[ui] click handler failed on {}", (Object) this.getClass().getSimpleName(),
+                    (Object) throwable);
         }
         return bl || this.leftClick != null || this.buttonClick != null || this.posClick != null;
     }
@@ -1032,13 +1041,13 @@ public abstract class UiNode {
 
     private void dropLostPress(float f, float f2) {
         PointerAction pointerAction = this.pressed
-            ? this.pressedButton
-            : (this.dragging ? PointerAction.LEFT_CLICK : null);
+                ? this.pressedButton
+                : (this.dragging ? PointerAction.LEFT_CLICK : null);
         if (pointerAction == null) {
             return;
         }
         long l = MinecraftClient.getInstance().getWindow().getHandle();
-        if (GLFW.glfwGetMouseButton((long)l, (int)pointerAction.getButtonCode()) == 1) {
+        if (GLFW.glfwGetMouseButton((long) l, (int) pointerAction.getButtonCode()) == 1) {
             return;
         }
         this.mouseReleased(f, f2, pointerAction);
@@ -1066,7 +1075,7 @@ public abstract class UiNode {
         EXITING,
         DISCARDED,
         HIDDEN;
-}
+    }
 
     public static interface PointerClickHandler {
         public void handleClick(PointerAction var1, float var2, float var3);
@@ -1076,4 +1085,3 @@ public abstract class UiNode {
         public float getValue();
     }
 }
-

@@ -16,3 +16,6 @@ accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	field	net/minecraft/client/gui/screen/ingame/HandledScreen	focusedSlot	Lnet/minecraft/screen/slot/Slot;
 accessible	method	net/minecraft/client/MinecraftClient	doAttack	()Z
 accessible	method	net/minecraft/client/MinecraftClient	handleBlockBreaking	(Z)V
+accessible	field	net/minecraft/world/chunk/light/ChunkLightProvider	lightStorage	Lnet/minecraft/world/chunk/light/LightStorage;
+accessible	field	net/minecraft/world/chunk/light/LightStorage	storage	Lnet/minecraft/world/chunk/ChunkToNibbleArrayMap;
+accessible	field	net/minecraft/world/chunk/ChunkToNibbleArrayMap	arrays	Lit/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap;

@@ -95,9 +95,9 @@ import pyrock.events.player.ClientPlayerTickEvent;
 import pyrock.events.player.InputEvent;
 import ua.mintantileak.spk.Compile;
 
-@ModuleInfo(name="Scaffold", description="modules.descriptions.scaffold", category=ModuleCategory.PLAYER)
+@ModuleInfo(name = "Scaffold", description = "modules.descriptions.scaffold", category = ModuleCategory.PLAYER)
 public class Scaffold
-extends Module {
+        extends Module {
     private static final int PENDING_PLACEMENT_QUEUE_CAPACITY = 4;
     private static final int DEFAULT_EXPAND_LENGTH = 4;
     private static final double MIN_PLACE_DISTANCE = 0.001;
@@ -210,10 +210,12 @@ extends Module {
         this.initializeSettings();
     }
 
-    @Compile(obfuscation=4)
+    @Compile(obfuscation = 4)
     private void initializeSettings() {
-        this.delay = new RangeSetting(this, "modules.settings.scaffold.delay").setMinimum(0.0f).setMaximum(40.0f).setStep(1.0f).setFirstValue(0.0f).setSecondValue(0.0f);
-        this.minDist = new NumberSetting(this, "modules.settings.scaffold.min_dist").setMinValue(0.0f).setMaxValue(0.25f).setStep(0.01f).setValue(0.0f);
+        this.delay = new RangeSetting(this, "modules.settings.scaffold.delay").setMinimum(0.0f).setMaximum(40.0f)
+                .setStep(1.0f).setFirstValue(0.0f).setSecondValue(0.0f);
+        this.minDist = new NumberSetting(this, "modules.settings.scaffold.min_dist").setMinValue(0.0f)
+                .setMaxValue(0.25f).setStep(0.01f).setValue(0.0f);
         this.technique = new ModeSetting(this, "modules.settings.scaffold.technique");
         this.normal = new ModeSetting.Option(this.technique, "modules.settings.scaffold.technique.normal").select();
         this.expand = new ModeSetting.Option(this.technique, "modules.settings.scaffold.technique.expand");
@@ -231,56 +233,111 @@ extends Module {
         this.karhu = new ModeSetting.Option(this.tower, "modules.settings.scaffold.tower.karhu");
         this.vulcan = new ModeSetting.Option(this.tower, "modules.settings.scaffold.tower.vulcan");
         this.hypixelMotion = new ModeSetting.Option(this.tower, "modules.settings.scaffold.tower.hypixel");
-        this.rotationMode = new ModeSetting((SettingOwner)this, "modules.settings.scaffold.rotation_mode", () -> !this.technique.isSelected(this.normal));
+        this.rotationMode = new ModeSetting((SettingOwner) this, "modules.settings.scaffold.rotation_mode",
+                () -> !this.technique.isSelected(this.normal));
         this.center = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.center");
         this.random = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.random");
-        this.stabilized = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.stabilized").select();
-        this.nearestRotation = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.nearest_rotation");
-        this.reverseYaw = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.reverse_yaw");
-        this.diagonalYaw = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.diagonal_yaw");
+        this.stabilized = new ModeSetting.Option(this.rotationMode,
+                "modules.settings.scaffold.rotation_mode.stabilized").select();
+        this.nearestRotation = new ModeSetting.Option(this.rotationMode,
+                "modules.settings.scaffold.rotation_mode.nearest_rotation");
+        this.reverseYaw = new ModeSetting.Option(this.rotationMode,
+                "modules.settings.scaffold.rotation_mode.reverse_yaw");
+        this.diagonalYaw = new ModeSetting.Option(this.rotationMode,
+                "modules.settings.scaffold.rotation_mode.diagonal_yaw");
         this.angleYaw = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.angle_yaw");
-        this.edgePoint = new ModeSetting.Option(this.rotationMode, "modules.settings.scaffold.rotation_mode.edge_point");
+        this.edgePoint = new ModeSetting.Option(this.rotationMode,
+                "modules.settings.scaffold.rotation_mode.edge_point");
         this.rotationTiming = new ModeSetting(this, "modules.settings.scaffold.rotation_timing");
-        this.tickRotation = new ModeSetting.Option(this.rotationTiming, "modules.settings.scaffold.rotation_timing.normal").select();
+        this.tickRotation = new ModeSetting.Option(this.rotationTiming,
+                "modules.settings.scaffold.rotation_timing.normal").select();
         this.onTick = new ModeSetting.Option(this.rotationTiming, "modules.settings.scaffold.rotation_timing.on_tick");
-        this.onTickSnap = new ModeSetting.Option(this.rotationTiming, "modules.settings.scaffold.rotation_timing.on_tick_snap");
-        this.rotationSpeed = new NumberSetting(this, "modules.settings.scaffold.rotation_speed").setStep(5.0f).setMinValue(30.0f).setMaxValue(180.0f).setValue(180.0f);
-        this.aimTolerance = new NumberSetting(this, "modules.settings.scaffold.aim_tolerance").setStep(0.5f).setMinValue(1.0f).setMaxValue(20.0f).setValue(10.0f);
-        this.stableTicks = new NumberSetting(this, "modules.settings.scaffold.stable_ticks").setStep(1.0f).setMinValue(0.0f).setMaxValue(5.0f).setValue(0.0f);
-        this.considerInventory = new BooleanSetting(this, "modules.settings.scaffold.consider_inventory").setActiveExtra(false);
+        this.onTickSnap = new ModeSetting.Option(this.rotationTiming,
+                "modules.settings.scaffold.rotation_timing.on_tick_snap");
+        this.rotationSpeed = new NumberSetting(this, "modules.settings.scaffold.rotation_speed").setStep(5.0f)
+                .setMinValue(30.0f).setMaxValue(180.0f).setValue(180.0f);
+        this.aimTolerance = new NumberSetting(this, "modules.settings.scaffold.aim_tolerance").setStep(0.5f)
+                .setMinValue(1.0f).setMaxValue(20.0f).setValue(10.0f);
+        this.stableTicks = new NumberSetting(this, "modules.settings.scaffold.stable_ticks").setStep(1.0f)
+                .setMinValue(0.0f).setMaxValue(5.0f).setValue(0.0f);
+        this.considerInventory = new BooleanSetting(this, "modules.settings.scaffold.consider_inventory")
+                .setActiveExtra(false);
         this.moveCorrection = new ModeSetting(this, "modules.settings.scaffold.move_correction");
-        this.moveCorrectionOff = new ModeSetting.Option(this.moveCorrection, "modules.settings.scaffold.move_correction.off");
+        this.moveCorrectionOff = new ModeSetting.Option(this.moveCorrection,
+                "modules.settings.scaffold.move_correction.off");
         this.strict = new ModeSetting.Option(this.moveCorrection, "modules.settings.scaffold.move_correction.strict");
-        this.silent = new ModeSetting.Option(this.moveCorrection, "modules.settings.scaffold.move_correction.silent").select();
-        this.changeLook = new ModeSetting.Option(this.moveCorrection, "modules.settings.scaffold.move_correction.change_look");
+        this.silent = new ModeSetting.Option(this.moveCorrection, "modules.settings.scaffold.move_correction.silent")
+                .select();
+        this.changeLook = new ModeSetting.Option(this.moveCorrection,
+                "modules.settings.scaffold.move_correction.change_look");
         this.autoBlock = new BooleanSetting(this, "modules.settings.scaffold.auto_block").enable();
-        this.always = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.auto_block.always", () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
-        this.slotResetDelay = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.auto_block.slot_reset_delay", () -> !this.technique.isSelected(this.normal)).setMinValue(0.0f).setMaxValue(40.0f).setStep(1.0f).setValue(5.0f);
-        this.doNotUseBelow = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.auto_block.do_not_use_below", () -> !this.technique.isSelected(this.normal)).setMinValue(0.0f).setMaxValue(64.0f).setStep(1.0f).setValue(1.0f);
+        this.always = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.auto_block.always",
+                () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
+        this.slotResetDelay = new NumberSetting((SettingOwner) this,
+                "modules.settings.scaffold.auto_block.slot_reset_delay", () -> !this.technique.isSelected(this.normal))
+                .setMinValue(0.0f).setMaxValue(40.0f).setStep(1.0f).setValue(5.0f);
+        this.doNotUseBelow = new NumberSetting((SettingOwner) this,
+                "modules.settings.scaffold.auto_block.do_not_use_below", () -> !this.technique.isSelected(this.normal))
+                .setMinValue(0.0f).setMaxValue(64.0f).setStep(1.0f).setValue(1.0f);
         this.ledge = new BooleanSetting(this, "modules.settings.scaffold.ledge").enable();
-        this.eagle = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.eagle", () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
-        this.blocks = new RangeSetting(this, "modules.settings.scaffold.eagle.blocks", () -> !this.technique.isSelected(this.normal)).setMinimum(0.0f).setMaximum(10.0f).setStep(1.0f).setFirstValue(0.0f).setSecondValue(0.0f);
-        this.edgeDistance = new RangeSetting(this, "modules.settings.scaffold.eagle.edge_distance", () -> !this.eagle.isEnabled()).setMinimum(0.01f).setMaximum(1.3f).setStep(0.01f).setFirstValue(0.01f).setSecondValue(0.05f);
-        this.onlyOnGround = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.eagle.only_on_ground", () -> !this.eagle.isEnabled()).enable();
-        this.down = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.down", () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
-        this.stabilizeMovement = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.stabilize_movement", () -> !this.technique.isSelected(this.normal)).enable();
-        this.ceiling = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.ceiling", () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
-        this.headHitter = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.head_hitter", () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
+        this.eagle = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.eagle",
+                () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
+        this.blocks = new RangeSetting(this, "modules.settings.scaffold.eagle.blocks",
+                () -> !this.technique.isSelected(this.normal)).setMinimum(0.0f).setMaximum(10.0f).setStep(1.0f)
+                .setFirstValue(0.0f).setSecondValue(0.0f);
+        this.edgeDistance = new RangeSetting(this, "modules.settings.scaffold.eagle.edge_distance",
+                () -> !this.eagle.isEnabled()).setMinimum(0.01f).setMaximum(1.3f).setStep(0.01f).setFirstValue(0.01f)
+                .setSecondValue(0.05f);
+        this.onlyOnGround = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.eagle.only_on_ground",
+                () -> !this.eagle.isEnabled()).enable();
+        this.down = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.down",
+                () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
+        this.stabilizeMovement = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.stabilize_movement",
+                () -> !this.technique.isSelected(this.normal)).enable();
+        this.ceiling = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.ceiling",
+                () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
+        this.headHitter = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.head_hitter",
+                () -> !this.technique.isSelected(this.normal)).setActiveExtra(false);
         this.speedLimiter = new BooleanSetting(this, "modules.settings.scaffold.speed_limiter").setActiveExtra(false);
-        this.speed = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.speed_limiter.speed", () -> !this.speedLimiter.isEnabled()).setMinValue(0.01f).setMaxValue(0.4f).setStep(0.01f).setValue(0.11f);
-        this.length = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.expand.length", () -> !this.technique.isSelected(this.expand)).setMinValue(1.0f).setMaxValue(10.0f).setStep(1.0f).setValue(4.0f);
-        this.sneakDistance = new RangeSetting(this, "modules.settings.scaffold.breezily.edge_distance", () -> !this.technique.isSelected(this.breezily)).setMinimum(0.25f).setMaximum(0.5f).setStep(0.01f).setFirstValue(0.45f).setSecondValue(0.5f);
-        this.sneakTime = new RangeSetting(this, "modules.settings.scaffold.god_bridge.sneak_time", () -> !this.technique.isSelected(this.godBridge)).setMinimum(1.0f).setMaximum(10.0f).setStep(1.0f).setFirstValue(1.0f).setSecondValue(1.0f);
-        this.forceSneakBelow = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.god_bridge.force_sneak_below", () -> !this.technique.isSelected(this.godBridge)).setMinValue(0.0f).setMaxValue(10.0f).setStep(1.0f).setValue(3.0f);
-        this.motionConfig = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.tower.motion", () -> !this.tower.isSelected(this.motionMode)).setMinValue(0.0f).setMaxValue(1.0f).setStep(0.01f).setValue(0.42f);
-        this.triggerHeight = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.tower.trigger_height", () -> !this.tower.isSelected(this.motionMode)).setMinValue(0.76f).setMaxValue(1.0f).setStep(0.01f).setValue(0.78f);
-        this.slow = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.tower.slow", () -> !this.tower.isSelected(this.motionMode)).setMinValue(0.0f).setMaxValue(3.0f).setStep(0.05f).setValue(1.0f);
-        this.pulldownTrigger = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.tower.pulldown_trigger", () -> !this.tower.isSelected(this.pulldown)).setMinValue(0.0f).setMaxValue(0.2f).setStep(0.01f).setValue(0.1f);
-        this.karhuTrigger = new NumberSetting((SettingOwner)this, "modules.settings.scaffold.tower.karhu_trigger", () -> !this.tower.isSelected(this.karhu)).setMinValue(0.0f).setMaxValue(0.2f).setStep(0.01f).setValue(0.06f);
-        this.karhuPulldown = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.tower.karhu_pulldown", () -> !this.tower.isSelected(this.karhu)).enable();
+        this.speed = new NumberSetting((SettingOwner) this, "modules.settings.scaffold.speed_limiter.speed",
+                () -> !this.speedLimiter.isEnabled()).setMinValue(0.01f).setMaxValue(0.4f).setStep(0.01f)
+                .setValue(0.11f);
+        this.length = new NumberSetting((SettingOwner) this, "modules.settings.scaffold.expand.length",
+                () -> !this.technique.isSelected(this.expand)).setMinValue(1.0f).setMaxValue(10.0f).setStep(1.0f)
+                .setValue(4.0f);
+        this.sneakDistance = new RangeSetting(this, "modules.settings.scaffold.breezily.edge_distance",
+                () -> !this.technique.isSelected(this.breezily)).setMinimum(0.25f).setMaximum(0.5f).setStep(0.01f)
+                .setFirstValue(0.45f).setSecondValue(0.5f);
+        this.sneakTime = new RangeSetting(this, "modules.settings.scaffold.god_bridge.sneak_time",
+                () -> !this.technique.isSelected(this.godBridge)).setMinimum(1.0f).setMaximum(10.0f).setStep(1.0f)
+                .setFirstValue(1.0f).setSecondValue(1.0f);
+        this.forceSneakBelow = new NumberSetting((SettingOwner) this,
+                "modules.settings.scaffold.god_bridge.force_sneak_below",
+                () -> !this.technique.isSelected(this.godBridge)).setMinValue(0.0f).setMaxValue(10.0f).setStep(1.0f)
+                .setValue(3.0f);
+        this.motionConfig = new NumberSetting((SettingOwner) this, "modules.settings.scaffold.tower.motion",
+                () -> !this.tower.isSelected(this.motionMode)).setMinValue(0.0f).setMaxValue(1.0f).setStep(0.01f)
+                .setValue(0.42f);
+        this.triggerHeight = new NumberSetting((SettingOwner) this, "modules.settings.scaffold.tower.trigger_height",
+                () -> !this.tower.isSelected(this.motionMode)).setMinValue(0.76f).setMaxValue(1.0f).setStep(0.01f)
+                .setValue(0.78f);
+        this.slow = new NumberSetting((SettingOwner) this, "modules.settings.scaffold.tower.slow",
+                () -> !this.tower.isSelected(this.motionMode)).setMinValue(0.0f).setMaxValue(3.0f).setStep(0.05f)
+                .setValue(1.0f);
+        this.pulldownTrigger = new NumberSetting((SettingOwner) this,
+                "modules.settings.scaffold.tower.pulldown_trigger", () -> !this.tower.isSelected(this.pulldown))
+                .setMinValue(0.0f).setMaxValue(0.2f).setStep(0.01f).setValue(0.1f);
+        this.karhuTrigger = new NumberSetting((SettingOwner) this, "modules.settings.scaffold.tower.karhu_trigger",
+                () -> !this.tower.isSelected(this.karhu)).setMinValue(0.0f).setMaxValue(0.2f).setStep(0.01f)
+                .setValue(0.06f);
+        this.karhuPulldown = new BooleanSetting((SettingOwner) this, "modules.settings.scaffold.tower.karhu_pulldown",
+                () -> !this.tower.isSelected(this.karhu)).enable();
         this.resetSprint = new BooleanSetting(this, "modules.settings.scaffold.reset_sprint").enable();
-        this.simulatePlacementAttempts = new BooleanSetting(this, "modules.settings.scaffold.simulate_placement_attempts").setActiveExtra(false);
-        this.failedOnly = new BooleanSetting((SettingOwner)this, "modules.settings.scaffold.simulate_placement_attempts.failed_only", () -> !this.simulatePlacementAttempts.isEnabled()).enable();
+        this.simulatePlacementAttempts = new BooleanSetting(this,
+                "modules.settings.scaffold.simulate_placement_attempts").setActiveExtra(false);
+        this.failedOnly = new BooleanSetting((SettingOwner) this,
+                "modules.settings.scaffold.simulate_placement_attempts.failed_only",
+                () -> !this.simulatePlacementAttempts.isEnabled()).enable();
     }
 
     @Override
@@ -331,13 +388,15 @@ extends Module {
         if (Scaffold.minecraftClient.player == null) {
             return;
         }
-        if (this.headHitter.isEnabled() && this.normal.isSelected() && this.isPlacementWorldReady() && this.isPlacementTargetReady()) {
+        if (this.headHitter.isEnabled() && this.normal.isSelected() && this.isPlacementWorldReady()
+                && this.isPlacementTargetReady()) {
             Scaffold.minecraftClient.player.jump();
         }
     }
 
     void resetTargetState() {
-        if (Scaffold.minecraftClient.player == null || this.tower.isSelected(this.none) || !this.isBlockFeatureReady() || this.getSelectedBlockCount() <= 0 || !this.isPlacementPlayerReady()) {
+        if (Scaffold.minecraftClient.player == null || this.tower.isSelected(this.none) || !this.isBlockFeatureReady()
+                || this.getSelectedBlockCount() <= 0 || !this.isPlacementPlayerReady()) {
             this.lastPlacementTime = Double.NaN;
             return;
         }
@@ -346,48 +405,63 @@ extends Module {
             if (Double.isNaN(this.lastPlacementTime)) {
                 return;
             }
-            if (Scaffold.minecraftClient.player.getY() > this.lastPlacementTime + (double)this.triggerHeight.getValue()) {
-                Scaffold.minecraftClient.player.setPosition(Scaffold.minecraftClient.player.getX(), Math.floor(Scaffold.minecraftClient.player.getY()), Scaffold.minecraftClient.player.getZ());
+            if (Scaffold.minecraftClient.player.getY() > this.lastPlacementTime
+                    + (double) this.triggerHeight.getValue()) {
+                Scaffold.minecraftClient.player.setPosition(Scaffold.minecraftClient.player.getX(),
+                        Math.floor(Scaffold.minecraftClient.player.getY()), Scaffold.minecraftClient.player.getZ());
                 Vec3d WallPlayerSkullBlock = Scaffold.minecraftClient.player.getVelocity();
                 double d = this.slow.getValue();
-                Scaffold.minecraftClient.player.setVelocity(WallPlayerSkullBlock.x * d, (double)this.motionConfig.getValue(), WallPlayerSkullBlock.z * d);
+                Scaffold.minecraftClient.player.setVelocity(WallPlayerSkullBlock.x * d,
+                        (double) this.motionConfig.getValue(), WallPlayerSkullBlock.z * d);
                 this.lastPlacementTime = Scaffold.minecraftClient.player.getY();
             }
             return;
         }
         if (this.tower.isSelected(this.pulldown)) {
-            if (!Scaffold.minecraftClient.player.isOnGround() && VanillaChestLootTableGenerator.y < (double)this.pulldownTrigger.getValue()) {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, -1.0, VanillaChestLootTableGenerator.z);
+            if (!Scaffold.minecraftClient.player.isOnGround()
+                    && VanillaChestLootTableGenerator.y < (double) this.pulldownTrigger.getValue()) {
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, -1.0,
+                        VanillaChestLootTableGenerator.z);
             }
             return;
         }
         if (this.tower.isSelected(this.karhu)) {
-            if (this.karhuPulldown.isEnabled() && !Scaffold.minecraftClient.player.isOnGround() && VanillaChestLootTableGenerator.y < (double)this.karhuTrigger.getValue()) {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, VanillaChestLootTableGenerator.y - 1.0, VanillaChestLootTableGenerator.z);
+            if (this.karhuPulldown.isEnabled() && !Scaffold.minecraftClient.player.isOnGround()
+                    && VanillaChestLootTableGenerator.y < (double) this.karhuTrigger.getValue()) {
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x,
+                        VanillaChestLootTableGenerator.y - 1.0, VanillaChestLootTableGenerator.z);
             }
             return;
         }
         if (this.tower.isSelected(this.vulcan)) {
             if (Scaffold.minecraftClient.player.age % 2 == 0) {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, 0.7, VanillaChestLootTableGenerator.z);
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, 0.7,
+                        VanillaChestLootTableGenerator.z);
             } else {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, this.isPlacementTargetReady() ? 0.42 : 0.6, VanillaChestLootTableGenerator.z);
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x,
+                        this.isPlacementTargetReady() ? 0.42 : 0.6, VanillaChestLootTableGenerator.z);
             }
             return;
         }
         if (this.tower.isSelected(this.hypixelMotion)) {
             if (Scaffold.minecraftClient.player.getX() % 1.0 != 0.0 && !this.isPlacementTargetReady()) {
-                Scaffold.minecraftClient.player.setVelocity(Math.min((double)Math.round(Scaffold.minecraftClient.player.getX()) - Scaffold.minecraftClient.player.getX(), 0.281), VanillaChestLootTableGenerator.y, VanillaChestLootTableGenerator.z);
+                Scaffold.minecraftClient.player.setVelocity(
+                        Math.min((double) Math.round(Scaffold.minecraftClient.player.getX())
+                                - Scaffold.minecraftClient.player.getX(), 0.281),
+                        VanillaChestLootTableGenerator.y, VanillaChestLootTableGenerator.z);
             }
             if (this.retryCount > 14) {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x * 0.6, VanillaChestLootTableGenerator.y - 0.09, VanillaChestLootTableGenerator.z * 0.6);
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x * 0.6,
+                        VanillaChestLootTableGenerator.y - 0.09, VanillaChestLootTableGenerator.z * 0.6);
                 return;
             }
             if (this.retryCount % 3 == 0) {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, 0.42, VanillaChestLootTableGenerator.z);
-                this.updatePlacementDistance(0.247 - (double)(ThreadLocalRandom.current().nextFloat() / 100.0f));
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, 0.42,
+                        VanillaChestLootTableGenerator.z);
+                this.updatePlacementDistance(0.247 - (double) (ThreadLocalRandom.current().nextFloat() / 100.0f));
             } else if (this.retryCount % 3 == 2) {
-                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x, 1.0 - Scaffold.minecraftClient.player.getY() % 1.0, VanillaChestLootTableGenerator.z);
+                Scaffold.minecraftClient.player.setVelocity(VanillaChestLootTableGenerator.x,
+                        1.0 - Scaffold.minecraftClient.player.getY() % 1.0, VanillaChestLootTableGenerator.z);
             }
         }
     }
@@ -414,7 +488,8 @@ extends Module {
             return;
         }
         this.resetPlacementTarget(placementTarget);
-        if (this.rotationTiming.isSelected(this.tickRotation) && (rotation = this.getTargetRotation(placementTarget)) != null) {
+        if (this.rotationTiming.isSelected(this.tickRotation)
+                && (rotation = this.getTargetRotation(placementTarget)) != null) {
             this.applyFallbackRotation(rotation);
         }
     }
@@ -455,7 +530,7 @@ extends Module {
             return;
         }
         ++this.currentSlot;
-        if (this.currentSlot < (int)this.stableTicks.getValue()) {
+        if (this.currentSlot < (int) this.stableTicks.getValue()) {
             return;
         }
         if (!this.cooldownTimer.hasElapsed(this.getLastRotationTime())) {
@@ -481,7 +556,12 @@ extends Module {
     }
 
     private void applyPlacementRotation(Rotation rotation) {
-        Scaffold.minecraftClient.player.networkHandler.sendPacket((Packet)new PlayerMoveC2SPacket.Full(Scaffold.minecraftClient.player.getX(), Scaffold.minecraftClient.player.getY(), Scaffold.minecraftClient.player.getZ(), rotation.getYaw(), MathHelper.clamp((float)rotation.getPitch(), (float)-90.0f, (float)90.0f), Scaffold.minecraftClient.player.isOnGround(), Scaffold.minecraftClient.player.horizontalCollision));
+        Scaffold.minecraftClient.player.networkHandler
+                .sendPacket((Packet) new PlayerMoveC2SPacket.Full(Scaffold.minecraftClient.player.getX(),
+                        Scaffold.minecraftClient.player.getY(), Scaffold.minecraftClient.player.getZ(),
+                        rotation.getYaw(), MathHelper.clamp((float) rotation.getPitch(), (float) -90.0f, (float) 90.0f),
+                        Scaffold.minecraftClient.player.isOnGround(),
+                        Scaffold.minecraftClient.player.horizontalCollision));
         RockstarClient.create().getRotationManager().getPacketRotation().setYaw(rotation.getYaw());
         RockstarClient.create().getRotationManager().getPacketRotation().setPitch(rotation.getPitch());
     }
@@ -495,7 +575,8 @@ extends Module {
         if ((option = this.getPlacementModeOption()) == this.expand) {
             return this.findPlacementTarget(VanillaChestLootTableGenerator);
         }
-        PlacementTarget placementTarget = this.findCandidatePlacement(this.getNearbyBlocks(VanillaChestLootTableGenerator), option == this.normal);
+        PlacementTarget placementTarget = this
+                .findCandidatePlacement(this.getNearbyBlocks(VanillaChestLootTableGenerator), option == this.normal);
         if (placementTarget == null && this.currentPlacement != null && this.isTargetSelected(this.currentPlacement)) {
             return this.adjustPlacementTarget(this.currentPlacement, Scaffold.minecraftClient.player.getEyePos());
         }
@@ -503,11 +584,13 @@ extends Module {
     }
 
     private PlacementTarget findPlacementTarget(Vec3d VanillaChestLootTableGenerator) {
-        int n = (int)this.length.getValue();
+        int n = (int) this.length.getValue();
         for (int i = 0; i <= n; ++i) {
             BlockPos adminsky = this.getBlockAtOffset(VanillaChestLootTableGenerator, i);
-            PlacementTarget placementTarget = this.findCandidatePlacement(this.getPlacementFaces(this.getNeighborBlock(adminsky), PlacementFaceMode.STANDARD), false);
-            if (placementTarget == null) continue;
+            PlacementTarget placementTarget = this.findCandidatePlacement(
+                    this.getPlacementFaces(this.getNeighborBlock(adminsky), PlacementFaceMode.STANDARD), false);
+            if (placementTarget == null)
+                continue;
             return placementTarget.withFallbackHit(true);
         }
         return null;
@@ -521,18 +604,28 @@ extends Module {
         ArrayList<BlockPos> arrayList = new ArrayList<BlockPos>(set);
         arrayList.sort(this.createPlacementComparator(Scaffold.minecraftClient.player.getPos(), this.motionSnapshot));
         for (BlockPos adminsky : arrayList) {
-            if (!this.isBlockPositionSelected(adminsky)) continue;
+            if (!this.isBlockPositionSelected(adminsky))
+                continue;
             for (Direction class_23502 : Direction.values()) {
                 Direction class_23503;
                 BlockPos adminsky2;
-                if (class_23502 == Direction.UP && !bl || !this.isFaceSelected(adminsky2 = adminsky.offset(class_23502), class_23503 = class_23502.getOpposite())) continue;
-                for (Vec3d WallPlayerSkullBlock : this.collectPlacementCandidates(adminsky2, class_23503, VanillaChestLootTableGenerator)) {
+                if (class_23502 == Direction.UP && !bl || !this.isFaceSelected(adminsky2 = adminsky.offset(class_23502),
+                        class_23503 = class_23502.getOpposite()))
+                    continue;
+                for (Vec3d WallPlayerSkullBlock : this.collectPlacementCandidates(adminsky2, class_23503,
+                        VanillaChestLootTableGenerator)) {
                     double d2 = Scaffold.minecraftClient.player.getBlockInteractionRange();
                     double d3 = VanillaChestLootTableGenerator.squaredDistanceTo(WallPlayerSkullBlock);
-                    if (d3 > d2 * d2) continue;
-                    PlacementTarget placementTarget2 = new PlacementTarget(adminsky, adminsky2, class_23503, WallPlayerSkullBlock, this.calculateRotationBetween(VanillaChestLootTableGenerator, WallPlayerSkullBlock), !bl || this.isPlacementFeatureReady());
-                    PlacementTarget placementTarget3 = this.adjustPlacementTarget(placementTarget2, VanillaChestLootTableGenerator);
-                    if (placementTarget3 == null) continue;
+                    if (d3 > d2 * d2)
+                        continue;
+                    PlacementTarget placementTarget2 = new PlacementTarget(adminsky, adminsky2, class_23503,
+                            WallPlayerSkullBlock,
+                            this.calculateRotationBetween(VanillaChestLootTableGenerator, WallPlayerSkullBlock),
+                            !bl || this.isPlacementFeatureReady());
+                    PlacementTarget placementTarget3 = this.adjustPlacementTarget(placementTarget2,
+                            VanillaChestLootTableGenerator);
+                    if (placementTarget3 == null)
+                        continue;
                     Rotation rotation2 = placementTarget3.getRotation();
                     double d4 = d3 + this.calculateRotationDifference(rotation, rotation2) * 0.15;
                     if (this.isHitResultValid(this.raycastRotation(rotation), placementTarget3)) {
@@ -541,7 +634,8 @@ extends Module {
                     if (this.motionSnapshot != null) {
                         d4 += this.motionSnapshot.getDistanceTo(placementTarget3.getPlacedBlock().toCenterPos()) * 0.25;
                     }
-                    if (!(d4 < d)) continue;
+                    if (!(d4 < d))
+                        continue;
                     d = d4;
                     placementTarget = placementTarget3;
                 }
@@ -550,13 +644,15 @@ extends Module {
         return placementTarget;
     }
 
-    private PlacementTarget adjustPlacementTarget(PlacementTarget placementTarget, Vec3d VanillaChestLootTableGenerator) {
+    private PlacementTarget adjustPlacementTarget(PlacementTarget placementTarget,
+            Vec3d VanillaChestLootTableGenerator) {
         if (!this.isTargetSelected(placementTarget)) {
             return null;
         }
         Rotation rotation = this.calculateFallbackRotation(placementTarget, VanillaChestLootTableGenerator);
         PlacementTarget placementTarget2 = placementTarget.withRotation(rotation);
-        if (placementTarget2.allowsFallbackHit() || this.isHitResultValid(this.raycastRotationFrom(rotation, VanillaChestLootTableGenerator), placementTarget2)) {
+        if (placementTarget2.allowsFallbackHit() || this.isHitResultValid(
+                this.raycastRotationFrom(rotation, VanillaChestLootTableGenerator), placementTarget2)) {
             return placementTarget2;
         }
         Rotation rotation2 = this.calculatePlacementRotation(placementTarget, VanillaChestLootTableGenerator);
@@ -568,12 +664,16 @@ extends Module {
 
     private Rotation calculatePlacementRotation(PlacementTarget placementTarget, Vec3d VanillaChestLootTableGenerator) {
         Vec3d WallPlayerSkullBlock = Scaffold.minecraftClient.player.getVelocity();
-        int n = Math.max(1, (int)Math.ceil(2.0));
+        int n = Math.max(1, (int) Math.ceil(2.0));
         for (int i = 1; i <= n; ++i) {
-            Vec3d VanillaEntityLootTableGenerator = VanillaChestLootTableGenerator.add(WallPlayerSkullBlock.x * (double)i, 0.0, WallPlayerSkullBlock.z * (double)i);
+            Vec3d VanillaEntityLootTableGenerator = VanillaChestLootTableGenerator
+                    .add(WallPlayerSkullBlock.x * (double) i, 0.0, WallPlayerSkullBlock.z * (double) i);
             Rotation rotation = this.calculateFallbackRotation(placementTarget, VanillaEntityLootTableGenerator);
             PlacementTarget placementTarget2 = placementTarget.withRotation(rotation);
-            if (!placementTarget2.allowsFallbackHit() && !this.isHitResultValid(this.raycastRotationFrom(rotation, VanillaEntityLootTableGenerator), placementTarget2)) continue;
+            if (!placementTarget2.allowsFallbackHit()
+                    && !this.isHitResultValid(this.raycastRotationFrom(rotation, VanillaEntityLootTableGenerator),
+                            placementTarget2))
+                continue;
             return rotation;
         }
         return null;
@@ -587,7 +687,8 @@ extends Module {
             return this.getStableRotation(placementTarget);
         }
         if (this.technique.isSelected(this.expand)) {
-            return this.calculateRotationBetween(VanillaChestLootTableGenerator, placementTarget.getPlacedBlock().toCenterPos());
+            return this.calculateRotationBetween(VanillaChestLootTableGenerator,
+                    placementTarget.getPlacedBlock().toCenterPos());
         }
         return placementTarget.getRotation();
     }
@@ -603,7 +704,8 @@ extends Module {
             return this.getStableRotation(placementTarget);
         }
         if (this.expand.isSelected()) {
-            return this.calculateRotationBetween(Scaffold.minecraftClient.player.getEyePos(), placementTarget.getPlacedBlock().toCenterPos());
+            return this.calculateRotationBetween(Scaffold.minecraftClient.player.getEyePos(),
+                    placementTarget.getPlacedBlock().toCenterPos());
         }
         return placementTarget.getRotation();
     }
@@ -614,21 +716,27 @@ extends Module {
             return this.getEdgeRotation(placementTarget);
         }
         float f = this.calculateMovementScale(this.calculateContextWeight(this.placementContext) + 180.0f);
-        boolean bl2 = bl = Math.floorMod((int)f, 90) == 0;
+        boolean bl2 = bl = Math.floorMod((int) f, 90) == 0;
         if (!bl) {
             return new Rotation(f, 75.6f);
         }
         if (Scaffold.minecraftClient.player.isOnGround()) {
             double d = Math.toRadians(f);
-            this.disableLocked = Math.floor(Scaffold.minecraftClient.player.getX() + Math.cos(d) * 0.5) != Math.floor(Scaffold.minecraftClient.player.getX()) || Math.floor(Scaffold.minecraftClient.player.getZ() + Math.sin(d) * 0.5) != Math.floor(Scaffold.minecraftClient.player.getZ());
-            Vec3d VanillaChestLootTableGenerator = Scaffold.minecraftClient.player.getPos().add(Math.cos(d) * 0.6, 0.0, Math.sin(d) * 0.6);
-            boolean bl3 = Scaffold.minecraftClient.world.getBlockState(Scaffold.minecraftClient.player.getBlockPos().down()).isAir();
-            boolean bl4 = Scaffold.minecraftClient.world.getBlockState(BlockPos.ofFloored((Position)VanillaChestLootTableGenerator).down()).isAir();
+            this.disableLocked = Math.floor(Scaffold.minecraftClient.player.getX() + Math.cos(d) * 0.5) != Math
+                    .floor(Scaffold.minecraftClient.player.getX())
+                    || Math.floor(Scaffold.minecraftClient.player.getZ() + Math.sin(d) * 0.5) != Math
+                            .floor(Scaffold.minecraftClient.player.getZ());
+            Vec3d VanillaChestLootTableGenerator = Scaffold.minecraftClient.player.getPos().add(Math.cos(d) * 0.6, 0.0,
+                    Math.sin(d) * 0.6);
+            boolean bl3 = Scaffold.minecraftClient.world
+                    .getBlockState(Scaffold.minecraftClient.player.getBlockPos().down()).isAir();
+            boolean bl4 = Scaffold.minecraftClient.world
+                    .getBlockState(BlockPos.ofFloored((Position) VanillaChestLootTableGenerator).down()).isAir();
             if (bl3 && bl4) {
                 this.disableLocked = !this.disableLocked;
             }
         }
-        return new Rotation(f + (float)(this.disableLocked ? 45 : -45), 75.7f);
+        return new Rotation(f + (float) (this.disableLocked ? 45 : -45), 75.7f);
     }
 
     private Rotation getStableRotation(PlacementTarget placementTarget) {
@@ -636,12 +744,12 @@ extends Module {
             return this.getEdgeRotation(placementTarget);
         }
         float f = this.calculateMovementScale(this.calculateContextWeight(this.placementContext) + 180.0f);
-        boolean bl = Math.floorMod((int)f, 90) == 0;
+        boolean bl = Math.floorMod((int) f, 90) == 0;
         return new Rotation(f, bl ? 80.0f : 75.6f);
     }
 
     private Rotation getEdgeRotation(PlacementTarget placementTarget) {
-        float f = (float)Math.floor(placementTarget.getRotation().getYaw() / 90.0f) * 90.0f;
+        float f = (float) Math.floor(placementTarget.getRotation().getYaw() / 90.0f) * 90.0f;
         return new Rotation(f + 45.0f, 75.0f);
     }
 
@@ -661,26 +769,33 @@ extends Module {
     }
 
     private boolean isHitResultAllowed(BlockHitResult class_39652) {
-        Vec3d VanillaChestLootTableGenerator = class_39652.getPos().subtract(Scaffold.minecraftClient.player.getEyePos());
+        Vec3d VanillaChestLootTableGenerator = class_39652.getPos()
+                .subtract(Scaffold.minecraftClient.player.getEyePos());
         Direction class_23502 = class_39652.getSide();
         if (class_23502.getAxis() != Direction.Axis.Y) {
-            double d = class_23502 == Direction.NORTH || class_23502 == Direction.SOUTH ? VanillaChestLootTableGenerator.z : VanillaChestLootTableGenerator.x;
-            return Math.abs(d) >= (double)this.minDist.getValue();
+            double d = class_23502 == Direction.NORTH || class_23502 == Direction.SOUTH
+                    ? VanillaChestLootTableGenerator.z
+                    : VanillaChestLootTableGenerator.x;
+            return Math.abs(d) >= (double) this.minDist.getValue();
         }
         return true;
     }
 
     private Set<BlockPos> getNearbyBlocks(Vec3d VanillaChestLootTableGenerator) {
         PlacementFaceMode placementFaceMode;
-        BlockPos adminsky = this.getNeighborBlock(BlockPos.ofFloored((Position)VanillaChestLootTableGenerator));
-        PlacementFaceMode placementFaceMode2 = placementFaceMode = this.isPlacementFeatureReady() ? PlacementFaceMode.ALL_FACES : PlacementFaceMode.STANDARD;
+        BlockPos adminsky = this.getNeighborBlock(BlockPos.ofFloored((Position) VanillaChestLootTableGenerator));
+        PlacementFaceMode placementFaceMode2 = placementFaceMode = this.isPlacementFeatureReady()
+                ? PlacementFaceMode.ALL_FACES
+                : PlacementFaceMode.STANDARD;
         if (this.ceiling.isEnabled() && this.normal.isSelected() && this.isMovementFeatureReady()) {
             placementFaceMode = PlacementFaceMode.ADJACENT;
         }
         Set<BlockPos> set = this.getPlacementFaces(adminsky, placementFaceMode);
         Vec3d WallPlayerSkullBlock = Scaffold.minecraftClient.player.getVelocity();
-        this.updateCandidateDistances(set, VanillaChestLootTableGenerator.x + WallPlayerSkullBlock.x, adminsky.getY(), VanillaChestLootTableGenerator.z + WallPlayerSkullBlock.z);
-        Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox().offset(WallPlayerSkullBlock.x, 0.0, WallPlayerSkullBlock.z);
+        this.updateCandidateDistances(set, VanillaChestLootTableGenerator.x + WallPlayerSkullBlock.x, adminsky.getY(),
+                VanillaChestLootTableGenerator.z + WallPlayerSkullBlock.z);
+        Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox().offset(WallPlayerSkullBlock.x, 0.0,
+                WallPlayerSkullBlock.z);
         this.updateCandidateDistances(set, HorizontalFacingBlock.minX, adminsky.getY(), HorizontalFacingBlock.minZ);
         this.updateCandidateDistances(set, HorizontalFacingBlock.minX, adminsky.getY(), HorizontalFacingBlock.maxZ);
         this.updateCandidateDistances(set, HorizontalFacingBlock.maxX, adminsky.getY(), HorizontalFacingBlock.minZ);
@@ -713,7 +828,7 @@ extends Module {
     }
 
     private void updateCandidateDistances(Set<BlockPos> set, double d, double d2, double d3) {
-        set.add(BlockPos.ofFloored((double)d, (double)d2, (double)d3));
+        set.add(BlockPos.ofFloored((double) d, (double) d2, (double) d3));
     }
 
     private BlockPos getNeighborBlock(BlockPos adminsky) {
@@ -726,14 +841,17 @@ extends Module {
         if (this.ceiling.isEnabled() && this.normal.isSelected() && this.isMovementFeatureReady()) {
             return adminsky.add(0, 3, 0);
         }
-        if (Scaffold.minecraftClient.player.input.playerInput.sneak() && (!this.isPlacementTargetReady() || Scaffold.minecraftClient.player.horizontalCollision)) {
+        if (Scaffold.minecraftClient.player.input.playerInput.sneak()
+                && (!this.isPlacementTargetReady() || Scaffold.minecraftClient.player.horizontalCollision)) {
             return adminsky.down();
         }
         if (this.sameY.isSelected(this.on)) {
             return new BlockPos(adminsky.getX(), this.placementAttempts, adminsky.getZ());
         }
         if (this.sameY.isSelected(this.falling)) {
-            return Scaffold.minecraftClient.player.getVelocity().y < 0.2 ? new BlockPos(adminsky.getX(), this.placementAttempts, adminsky.getZ()) : adminsky.down();
+            return Scaffold.minecraftClient.player.getVelocity().y < 0.2
+                    ? new BlockPos(adminsky.getX(), this.placementAttempts, adminsky.getZ())
+                    : adminsky.down();
         }
         if (this.sameY.isSelected(this.hypixel)) {
             if (Scaffold.minecraftClient.player.getVelocity().y == -0.15233518685055708 && this.placementCount >= 2) {
@@ -747,16 +865,19 @@ extends Module {
 
     private BlockPos getSupportBlock(BlockPos adminsky) {
         if (this.tower.isSelected(this.hypixelMotion) && !this.isPlacementTargetReady()) {
-            BlockPos[] adminskyArray = new BlockPos[]{adminsky.add(0, 0, 1), adminsky.add(0, 0, -1), adminsky.add(1, 0, 0), adminsky.add(-1, 0, 0)};
+            BlockPos[] adminskyArray = new BlockPos[] { adminsky.add(0, 0, 1), adminsky.add(0, 0, -1),
+                    adminsky.add(1, 0, 0), adminsky.add(-1, 0, 0) };
             BlockPos adminsky2 = null;
             double d = Double.MAX_VALUE;
             for (BlockPos adminsky3 : adminskyArray) {
                 double d2 = this.getBlockCenter(adminsky3).squaredDistanceTo(Scaffold.minecraftClient.player.getPos());
-                if (!(d2 < d)) continue;
+                if (!(d2 < d))
+                    continue;
                 d = d2;
                 adminsky2 = adminsky3.down();
             }
-            if (adminsky2 != null && !Scaffold.minecraftClient.world.getBlockState(adminsky2).isSideSolidFullSquare((BlockView)Scaffold.minecraftClient.world, adminsky2, Direction.UP)) {
+            if (adminsky2 != null && !Scaffold.minecraftClient.world.getBlockState(adminsky2)
+                    .isSideSolidFullSquare((BlockView) Scaffold.minecraftClient.world, adminsky2, Direction.UP)) {
                 return adminsky2;
             }
         }
@@ -765,16 +886,22 @@ extends Module {
 
     private BlockPos getBlockAtOffset(Vec3d VanillaChestLootTableGenerator, int n) {
         float f = Scaffold.minecraftClient.player.getYaw();
-        return BlockPos.ofFloored((Position)VanillaChestLootTableGenerator).add((int)(-Math.sin(Math.toRadians(f)) * (double)n), 0, (int)(Math.cos(Math.toRadians(f)) * (double)n));
+        return BlockPos.ofFloored((Position) VanillaChestLootTableGenerator).add(
+                (int) (-Math.sin(Math.toRadians(f)) * (double) n), 0, (int) (Math.cos(Math.toRadians(f)) * (double) n));
     }
 
-    private Comparator<BlockPos> createPlacementComparator(Vec3d VanillaChestLootTableGenerator, MotionSnapshot motionSnapshot) {
+    private Comparator<BlockPos> createPlacementComparator(Vec3d VanillaChestLootTableGenerator,
+            MotionSnapshot motionSnapshot) {
         return (adminsky, adminsky2) -> {
             int n;
-            if (motionSnapshot != null && (n = Double.compare(motionSnapshot.getDistanceTo(this.getBlockCenter((BlockPos)adminsky)), motionSnapshot.getDistanceTo(this.getBlockCenter((BlockPos)adminsky2)))) != 0) {
+            if (motionSnapshot != null
+                    && (n = Double.compare(motionSnapshot.getDistanceTo(this.getBlockCenter((BlockPos) adminsky)),
+                            motionSnapshot.getDistanceTo(this.getBlockCenter((BlockPos) adminsky2)))) != 0) {
                 return n;
             }
-            return Double.compare(this.getBlockCenter((BlockPos)adminsky).squaredDistanceTo(VanillaChestLootTableGenerator), this.getBlockCenter((BlockPos)adminsky2).squaredDistanceTo(VanillaChestLootTableGenerator));
+            return Double.compare(
+                    this.getBlockCenter((BlockPos) adminsky).squaredDistanceTo(VanillaChestLootTableGenerator),
+                    this.getBlockCenter((BlockPos) adminsky2).squaredDistanceTo(VanillaChestLootTableGenerator));
         };
     }
 
@@ -799,35 +926,40 @@ extends Module {
     private HandSelection getFallbackHand() {
         HandSelection handSelection = null;
         HandSelection handSelection2 = null;
-        int n = (int)this.doNotUseBelow.getValue();
+        int n = (int) this.doNotUseBelow.getValue();
         for (int i = 0; i < 9; ++i) {
             ItemStack class_17992 = Scaffold.minecraftClient.player.getInventory().getStack(i);
-            if (!this.isBlockItemSelected(class_17992)) continue;
+            if (!this.isBlockItemSelected(class_17992))
+                continue;
             HandSelection handSelection3 = new HandSelection(Hand.MAIN_HAND, i, class_17992);
             if (handSelection2 == null || this.compareHands(handSelection3, handSelection2) > 0) {
                 handSelection2 = handSelection3;
             }
-            if (class_17992.getCount() <= n || handSelection != null && this.compareHands(handSelection3, handSelection) <= 0) continue;
+            if (class_17992.getCount() <= n
+                    || handSelection != null && this.compareHands(handSelection3, handSelection) <= 0)
+                continue;
             handSelection = handSelection3;
         }
         return handSelection != null ? handSelection : handSelection2;
     }
 
     private int compareHands(HandSelection handSelection, HandSelection handSelection2) {
-        return Integer.compare(this.getBlockCount(handSelection.getItemStack(), true), this.getBlockCount(handSelection2.getItemStack(), true));
+        return Integer.compare(this.getBlockCount(handSelection.getItemStack(), true),
+                this.getBlockCount(handSelection2.getItemStack(), true));
     }
 
     private int getBlockCount(ItemStack class_17992, boolean bl) {
-        Block class_22482 = ((BlockItem)class_17992.getItem()).getBlock();
+        Block class_22482 = ((BlockItem) class_17992.getItem()).getBlock();
         BlockState class_26802 = class_22482.getDefaultState();
         int n = 0;
         if (!this.isHeldBlockValid(class_17992)) {
             n += 1000000;
         }
-        if (class_26802.isSideSolidFullSquare((BlockView)Scaffold.minecraftClient.world, BlockPos.ORIGIN, Direction.UP)) {
+        if (class_26802.isSideSolidFullSquare((BlockView) Scaffold.minecraftClient.world, BlockPos.ORIGIN,
+                Direction.UP)) {
             n += 100000;
         }
-        if (!class_26802.getCollisionShape((BlockView)Scaffold.minecraftClient.world, BlockPos.ORIGIN).isEmpty()) {
+        if (!class_26802.getCollisionShape((BlockView) Scaffold.minecraftClient.world, BlockPos.ORIGIN).isEmpty()) {
             n += 10000;
         }
         return n += bl ? class_17992.getCount() : 64 - class_17992.getCount();
@@ -841,17 +973,21 @@ extends Module {
         if (!(class_17922 instanceof BlockItem)) {
             return false;
         }
-        BlockItem class_17472 = (BlockItem)class_17922;
+        BlockItem class_17472 = (BlockItem) class_17922;
         Block class_22482 = class_17472.getBlock();
         if (this.isBlockAllowed(class_22482)) {
             return false;
         }
         BlockState class_26802 = class_22482.getDefaultState();
-        return class_26802.isSideSolidFullSquare((BlockView)Scaffold.minecraftClient.world, BlockPos.ORIGIN, Direction.UP) && !class_26802.getCollisionShape((BlockView)Scaffold.minecraftClient.world, BlockPos.ORIGIN).isEmpty();
+        return class_26802.isSideSolidFullSquare((BlockView) Scaffold.minecraftClient.world, BlockPos.ORIGIN,
+                Direction.UP)
+                && !class_26802.getCollisionShape((BlockView) Scaffold.minecraftClient.world, BlockPos.ORIGIN)
+                        .isEmpty();
     }
 
     private boolean isBlockAllowed(Block class_22482) {
-        return class_22482 instanceof FallingBlock || class_22482 == Blocks.TNT || class_22482 == Blocks.COBWEB || class_22482 == Blocks.NETHER_PORTAL || class_22482 == Blocks.POWDER_SNOW;
+        return class_22482 instanceof FallingBlock || class_22482 == Blocks.TNT || class_22482 == Blocks.COBWEB
+                || class_22482 == Blocks.NETHER_PORTAL || class_22482 == Blocks.POWDER_SNOW;
     }
 
     private boolean isHeldBlockValid(ItemStack class_17992) {
@@ -859,22 +995,30 @@ extends Module {
         if (!(class_17922 instanceof BlockItem)) {
             return true;
         }
-        BlockItem class_17472 = (BlockItem)class_17922;
+        BlockItem class_17472 = (BlockItem) class_17922;
         Block heldBlock = class_17472.getBlock();
         BlockState class_26802 = heldBlock.getDefaultState();
-        return heldBlock.getSlipperiness() > 0.6f || heldBlock instanceof BlockWithEntity || class_26802.getCollisionShape((BlockView)Scaffold.minecraftClient.world, BlockPos.ORIGIN).isEmpty() || heldBlock == Blocks.CRAFTING_TABLE || heldBlock == Blocks.SMITHING_TABLE || heldBlock == Blocks.FLETCHING_TABLE || heldBlock == Blocks.ENCHANTING_TABLE || heldBlock == Blocks.CAULDRON || heldBlock == Blocks.MAGMA_BLOCK;
+        return heldBlock.getSlipperiness() > 0.6f || heldBlock instanceof BlockWithEntity
+                || class_26802.getCollisionShape((BlockView) Scaffold.minecraftClient.world, BlockPos.ORIGIN).isEmpty()
+                || heldBlock == Blocks.CRAFTING_TABLE || heldBlock == Blocks.SMITHING_TABLE
+                || heldBlock == Blocks.FLETCHING_TABLE || heldBlock == Blocks.ENCHANTING_TABLE
+                || heldBlock == Blocks.CAULDRON || heldBlock == Blocks.MAGMA_BLOCK;
     }
 
     private int getSelectedBlockCount() {
         int n;
-        int n2 = n = this.isBlockItemSelected(Scaffold.minecraftClient.player.getOffHandStack()) ? Scaffold.minecraftClient.player.getOffHandStack().getCount() : 0;
+        int n2 = n = this.isBlockItemSelected(Scaffold.minecraftClient.player.getOffHandStack())
+                ? Scaffold.minecraftClient.player.getOffHandStack().getCount()
+                : 0;
         if (!this.autoBlock.isEnabled()) {
-            ItemStack class_17992 = Scaffold.minecraftClient.player.getInventory().getStack(Scaffold.minecraftClient.player.getInventory().selectedSlot);
+            ItemStack class_17992 = Scaffold.minecraftClient.player.getInventory()
+                    .getStack(Scaffold.minecraftClient.player.getInventory().selectedSlot);
             return n + (this.isBlockItemSelected(class_17992) ? class_17992.getCount() : 0);
         }
         for (int i = 0; i < 9; ++i) {
             ItemStack class_17993 = Scaffold.minecraftClient.player.getInventory().getStack(i);
-            if (!this.isBlockItemSelected(class_17993)) continue;
+            if (!this.isBlockItemSelected(class_17993))
+                continue;
             n += class_17993.getCount();
         }
         return n;
@@ -882,22 +1026,33 @@ extends Module {
 
     private boolean isBlockPositionSelected(BlockPos adminsky) {
         BlockState class_26802 = Scaffold.minecraftClient.world.getBlockState(adminsky);
-        return class_26802.isAir() || class_26802.getCollisionShape((BlockView)Scaffold.minecraftClient.world, adminsky).isEmpty() && Scaffold.minecraftClient.world.getFluidState(adminsky).isEmpty();
+        return class_26802.isAir()
+                || class_26802.getCollisionShape((BlockView) Scaffold.minecraftClient.world, adminsky).isEmpty()
+                        && Scaffold.minecraftClient.world.getFluidState(adminsky).isEmpty();
     }
 
     private boolean isFaceSelected(BlockPos adminsky, Direction class_23502) {
         BlockState class_26802 = Scaffold.minecraftClient.world.getBlockState(adminsky);
-        return !class_26802.isAir() && !class_26802.getCollisionShape((BlockView)Scaffold.minecraftClient.world, adminsky).isEmpty() && class_26802.isSideSolidFullSquare((BlockView)Scaffold.minecraftClient.world, adminsky, class_23502);
+        return !class_26802.isAir()
+                && !class_26802.getCollisionShape((BlockView) Scaffold.minecraftClient.world, adminsky).isEmpty()
+                && class_26802.isSideSolidFullSquare((BlockView) Scaffold.minecraftClient.world, adminsky, class_23502);
     }
 
     private boolean isTargetSelected(PlacementTarget placementTarget) {
         double d = Scaffold.minecraftClient.player.getBlockInteractionRange();
-        return this.isBlockPositionSelected(placementTarget.getPlacedBlock()) && this.isFaceSelected(placementTarget.getSupportBlock(), placementTarget.getPlacementSide()) && placementTarget.getSupportBlock().offset(placementTarget.getPlacementSide()).equals(placementTarget.getPlacedBlock()) && Scaffold.minecraftClient.player.getEyePos().squaredDistanceTo(placementTarget.getHitPosition()) <= d * d;
+        return this.isBlockPositionSelected(placementTarget.getPlacedBlock())
+                && this.isFaceSelected(placementTarget.getSupportBlock(), placementTarget.getPlacementSide())
+                && placementTarget.getSupportBlock().offset(placementTarget.getPlacementSide())
+                        .equals(placementTarget.getPlacedBlock())
+                && Scaffold.minecraftClient.player.getEyePos().squaredDistanceTo(placementTarget.getHitPosition()) <= d
+                        * d;
     }
 
     private void applyFallbackRotation(Rotation rotation) {
         float f = this.rotationSpeed.getValue();
-        RockstarClient.create().getRotationManager().requestRotation(new Rotation(rotation.getYaw(), rotation.getPitch()), this.getAttackType(), f, f, f, RotationPriority.ITEM_USE_PRIORITY);
+        RockstarClient.create().getRotationManager().requestRotation(
+                new Rotation(rotation.getYaw(), rotation.getPitch()), this.getAttackType(), f, f, f,
+                RotationPriority.ITEM_USE_PRIORITY);
     }
 
     private RotationCorrectionMode getAttackType() {
@@ -915,7 +1070,7 @@ extends Module {
 
     private boolean isRotationValid(Rotation rotation) {
         Rotation rotation2 = RockstarClient.create().getRotationManager().getCurrentRotation();
-        float f = Math.abs(MathHelper.wrapDegrees((float)(rotation2.getYaw() - rotation.getYaw())));
+        float f = Math.abs(MathHelper.wrapDegrees((float) (rotation2.getYaw() - rotation.getYaw())));
         float f2 = Math.abs(rotation2.getPitch() - rotation.getPitch());
         float f3 = this.aimTolerance.getValue();
         return f <= f3 && f2 <= f3;
@@ -926,8 +1081,12 @@ extends Module {
     }
 
     private BlockHitResult raycastRotationFrom(Rotation rotation, Vec3d VanillaChestLootTableGenerator) {
-        Vec3d WallPlayerSkullBlock = VanillaChestLootTableGenerator.add(Scaffold.minecraftClient.player.getRotationVector(rotation.getPitch(), rotation.getYaw()).multiply(Scaffold.minecraftClient.player.getBlockInteractionRange()));
-        return Scaffold.minecraftClient.world.raycast(new RaycastContext(VanillaChestLootTableGenerator, WallPlayerSkullBlock, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, (Entity)Scaffold.minecraftClient.player));
+        Vec3d WallPlayerSkullBlock = VanillaChestLootTableGenerator
+                .add(Scaffold.minecraftClient.player.getRotationVector(rotation.getPitch(), rotation.getYaw())
+                        .multiply(Scaffold.minecraftClient.player.getBlockInteractionRange()));
+        return Scaffold.minecraftClient.world.raycast(new RaycastContext(VanillaChestLootTableGenerator,
+                WallPlayerSkullBlock, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE,
+                (Entity) Scaffold.minecraftClient.player));
     }
 
     private Rotation calculateRotationBetween(Vec3d VanillaChestLootTableGenerator, Vec3d WallPlayerSkullBlock) {
@@ -935,9 +1094,9 @@ extends Module {
         double d2 = WallPlayerSkullBlock.y - VanillaChestLootTableGenerator.y;
         double d3 = WallPlayerSkullBlock.z - VanillaChestLootTableGenerator.z;
         double d4 = Math.sqrt(d * d + d3 * d3);
-        float f = (float)Math.toDegrees(Math.atan2(d3, d)) - 90.0f;
-        float f2 = (float)(-Math.toDegrees(Math.atan2(d2, d4)));
-        return new Rotation(f, MathHelper.clamp((float)f2, (float)-90.0f, (float)90.0f));
+        float f = (float) Math.toDegrees(Math.atan2(d3, d)) - 90.0f;
+        float f2 = (float) (-Math.toDegrees(Math.atan2(d2, d4)));
+        return new Rotation(f, MathHelper.clamp((float) f2, (float) -90.0f, (float) 90.0f));
     }
 
     private boolean isHitResultValid(BlockHitResult class_39652, PlacementTarget placementTarget) {
@@ -947,19 +1106,24 @@ extends Module {
         BlockPos adminsky = class_39652.getBlockPos();
         Direction class_23502 = class_39652.getSide();
         BlockPos adminsky2 = adminsky.offset(class_23502);
-        if (!adminsky.equals(placementTarget.getSupportBlock()) || class_23502 != placementTarget.getPlacementSide() || !adminsky2.equals(placementTarget.getPlacedBlock())) {
+        if (!adminsky.equals(placementTarget.getSupportBlock()) || class_23502 != placementTarget.getPlacementSide()
+                || !adminsky2.equals(placementTarget.getPlacedBlock())) {
             return false;
         }
         return this.isBlockPositionSelected(adminsky2) && this.isFaceSelected(adminsky, class_23502);
     }
 
-    private List<Vec3d> collectPlacementCandidates(BlockPos adminsky, Direction class_23502, Vec3d VanillaChestLootTableGenerator) {
+    private List<Vec3d> collectPlacementCandidates(BlockPos adminsky, Direction class_23502,
+            Vec3d VanillaChestLootTableGenerator) {
         ArrayList<Vec3d> arrayList = new ArrayList<Vec3d>();
         double d = this.rotationMode.isSelected(this.edgePoint) ? 0.04 : 0.18;
         double d2 = this.rotationMode.isSelected(this.edgePoint) ? 0.96 : 0.82;
-        double d3 = MathHelper.clamp((double)(VanillaChestLootTableGenerator.x - (double)adminsky.getX()), (double)d, (double)d2);
-        double d4 = MathHelper.clamp((double)(VanillaChestLootTableGenerator.y - (double)adminsky.getY()), (double)d, (double)d2);
-        double d5 = MathHelper.clamp((double)(VanillaChestLootTableGenerator.z - (double)adminsky.getZ()), (double)d, (double)d2);
+        double d3 = MathHelper.clamp((double) (VanillaChestLootTableGenerator.x - (double) adminsky.getX()), (double) d,
+                (double) d2);
+        double d4 = MathHelper.clamp((double) (VanillaChestLootTableGenerator.y - (double) adminsky.getY()), (double) d,
+                (double) d2);
+        double d5 = MathHelper.clamp((double) (VanillaChestLootTableGenerator.z - (double) adminsky.getZ()), (double) d,
+                (double) d2);
         double d6 = 0.5;
         double d7 = 0.82;
         if (this.rotationMode.isSelected(this.center)) {
@@ -977,38 +1141,56 @@ extends Module {
             d3 = d3 < 0.5 ? d : d2;
             d5 = d5 < 0.5 ? d : d2;
         } else if (this.rotationMode.isSelected(this.angleYaw)) {
-            float f = MathHelper.wrapDegrees((float)Scaffold.minecraftClient.player.getYaw());
+            float f = MathHelper.wrapDegrees((float) Scaffold.minecraftClient.player.getYaw());
             d3 = Math.sin(Math.toRadians(f)) > 0.0 ? d2 : d;
             double d8 = d5 = Math.cos(Math.toRadians(f)) > 0.0 ? d2 : d;
         }
         if (class_23502.getAxis() == Direction.Axis.X) {
             double faceCoordinate = adminsky.getX() + (class_23502 == Direction.EAST ? 1 : 0);
-            this.updateCandidateRotations(arrayList, faceCoordinate, (double)adminsky.getY() + d4, (double)adminsky.getZ() + d5);
-            this.updateCandidateRotations(arrayList, faceCoordinate, (double)adminsky.getY() + d7, (double)adminsky.getZ() + d5);
-            this.updateCandidateRotations(arrayList, faceCoordinate, (double)adminsky.getY() + d4, (double)adminsky.getZ() + d6);
-            this.updateCandidateRotations(arrayList, faceCoordinate, (double)adminsky.getY() + d7, (double)adminsky.getZ() + d6);
-            this.updateCandidateRotations(arrayList, faceCoordinate, (double)adminsky.getY() + d6, (double)adminsky.getZ() + d6);
+            this.updateCandidateRotations(arrayList, faceCoordinate, (double) adminsky.getY() + d4,
+                    (double) adminsky.getZ() + d5);
+            this.updateCandidateRotations(arrayList, faceCoordinate, (double) adminsky.getY() + d7,
+                    (double) adminsky.getZ() + d5);
+            this.updateCandidateRotations(arrayList, faceCoordinate, (double) adminsky.getY() + d4,
+                    (double) adminsky.getZ() + d6);
+            this.updateCandidateRotations(arrayList, faceCoordinate, (double) adminsky.getY() + d7,
+                    (double) adminsky.getZ() + d6);
+            this.updateCandidateRotations(arrayList, faceCoordinate, (double) adminsky.getY() + d6,
+                    (double) adminsky.getZ() + d6);
         } else if (class_23502.getAxis() == Direction.Axis.Y) {
             double faceCoordinate = adminsky.getY() + (class_23502 == Direction.UP ? 1 : 0);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d3, faceCoordinate, (double)adminsky.getZ() + d5);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d3, faceCoordinate, (double)adminsky.getZ() + d6);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d6, faceCoordinate, (double)adminsky.getZ() + d5);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d6, faceCoordinate, (double)adminsky.getZ() + d6);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d3, faceCoordinate,
+                    (double) adminsky.getZ() + d5);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d3, faceCoordinate,
+                    (double) adminsky.getZ() + d6);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d6, faceCoordinate,
+                    (double) adminsky.getZ() + d5);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d6, faceCoordinate,
+                    (double) adminsky.getZ() + d6);
         } else {
             double faceCoordinate = adminsky.getZ() + (class_23502 == Direction.SOUTH ? 1 : 0);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d3, (double)adminsky.getY() + d4, faceCoordinate);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d3, (double)adminsky.getY() + d7, faceCoordinate);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d6, (double)adminsky.getY() + d4, faceCoordinate);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d6, (double)adminsky.getY() + d7, faceCoordinate);
-            this.updateCandidateRotations(arrayList, (double)adminsky.getX() + d6, (double)adminsky.getY() + d6, faceCoordinate);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d3, (double) adminsky.getY() + d4,
+                    faceCoordinate);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d3, (double) adminsky.getY() + d7,
+                    faceCoordinate);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d6, (double) adminsky.getY() + d4,
+                    faceCoordinate);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d6, (double) adminsky.getY() + d7,
+                    faceCoordinate);
+            this.updateCandidateRotations(arrayList, (double) adminsky.getX() + d6, (double) adminsky.getY() + d6,
+                    faceCoordinate);
         }
         if (this.rotationMode.isSelected(this.nearestRotation)) {
             Rotation rotation = RockstarClient.create().getRotationManager().getCurrentRotation();
-            arrayList.sort(Comparator.comparingDouble(WallPlayerSkullBlock -> this.calculateRotationDifference(rotation, this.calculateRotationBetween(VanillaChestLootTableGenerator, (Vec3d)WallPlayerSkullBlock))));
+            arrayList.sort(Comparator.comparingDouble(WallPlayerSkullBlock -> this.calculateRotationDifference(rotation,
+                    this.calculateRotationBetween(VanillaChestLootTableGenerator, (Vec3d) WallPlayerSkullBlock))));
         } else if (this.rotationMode.isSelected(this.stabilized) && this.motionSnapshot != null) {
-            arrayList.sort(Comparator.comparingDouble(WallPlayerSkullBlock -> this.motionSnapshot.getDistanceTo((Vec3d)WallPlayerSkullBlock) + WallPlayerSkullBlock.squaredDistanceTo(VanillaChestLootTableGenerator) * 0.05));
+            arrayList.sort(Comparator.comparingDouble(
+                    WallPlayerSkullBlock -> this.motionSnapshot.getDistanceTo((Vec3d) WallPlayerSkullBlock)
+                            + WallPlayerSkullBlock.squaredDistanceTo(VanillaChestLootTableGenerator) * 0.05));
         } else {
-            arrayList.sort(Comparator.comparingDouble(WallPlayerSkullBlock -> WallPlayerSkullBlock.squaredDistanceTo(VanillaChestLootTableGenerator)));
+            arrayList.sort(Comparator.comparingDouble(
+                    WallPlayerSkullBlock -> WallPlayerSkullBlock.squaredDistanceTo(VanillaChestLootTableGenerator)));
         }
         return arrayList;
     }
@@ -1021,14 +1203,17 @@ extends Module {
     }
 
     private double calculateRotationDifference(Rotation rotation, Rotation rotation2) {
-        return Math.abs(MathHelper.wrapDegrees((float)(rotation.getYaw() - rotation2.getYaw()))) + Math.abs(rotation.getPitch() - rotation2.getPitch());
+        return Math.abs(MathHelper.wrapDegrees((float) (rotation.getYaw() - rotation2.getYaw())))
+                + Math.abs(rotation.getPitch() - rotation2.getPitch());
     }
 
-    private void processPlacement(HandSelection handSelection, PlacementTarget placementTarget, BlockHitResult class_39652) {
+    private void processPlacement(HandSelection handSelection, PlacementTarget placementTarget,
+            BlockHitResult class_39652) {
         if (this.resetSprint.isEnabled()) {
             Scaffold.minecraftClient.options.sprintKey.setPressed(false);
             if (this.privilegedMode || Scaffold.minecraftClient.player.isSprinting()) {
-                TargetActionQueue.queueTargetAction((PlayerEntity)Scaffold.minecraftClient.player, () -> this.resetPlacementAttempt(handSelection, placementTarget, class_39652), true);
+                TargetActionQueue.queueTargetAction((PlayerEntity) Scaffold.minecraftClient.player,
+                        () -> this.resetPlacementAttempt(handSelection, placementTarget, class_39652), true);
                 this.privilegedMode = false;
                 return;
             }
@@ -1037,7 +1222,8 @@ extends Module {
         this.resetPlacementAttempt(handSelection, placementTarget, class_39652);
     }
 
-    private void resetPlacementAttempt(HandSelection handSelection, PlacementTarget placementTarget, BlockHitResult class_39652) {
+    private void resetPlacementAttempt(HandSelection handSelection, PlacementTarget placementTarget,
+            BlockHitResult class_39652) {
         ActionResult class_12692;
         if (!EntityUtils.isClientWorldReady()) {
             return;
@@ -1045,7 +1231,8 @@ extends Module {
         if (handSelection.isMainHandSelection()) {
             this.processPlacementSlot(handSelection.getHotbarSlot());
         }
-        if ((class_12692 = Scaffold.minecraftClient.interactionManager.interactBlock(Scaffold.minecraftClient.player, handSelection.getHand(), class_39652)).isAccepted()) {
+        if ((class_12692 = Scaffold.minecraftClient.interactionManager.interactBlock(Scaffold.minecraftClient.player,
+                handSelection.getHand(), class_39652)).isAccepted()) {
             Scaffold.minecraftClient.player.swingHand(handSelection.getHand());
             this.resetBlockState(placementTarget.getPlacedBlock());
         }
@@ -1053,14 +1240,16 @@ extends Module {
 
     private void resetBlockState(BlockPos adminsky) {
         this.processPlacementBlock(adminsky);
-        this.processMotion(this.motionSnapshot, this.motionSnapshot == null ? null : this.getPreviousMotionPosition(this.motionSnapshot));
+        this.processMotion(this.motionSnapshot,
+                this.motionSnapshot == null ? null : this.getPreviousMotionPosition(this.motionSnapshot));
         this.updateRotationState();
         this.cooldownTimer.reset();
         this.resetPlacementContext();
     }
 
     private void resetTargetHandState(PlacementTarget placementTarget, HandSelection handSelection) {
-        if (!this.simulatePlacementAttempts.isEnabled() || !this.isPlacementTargetReady() || handSelection == null || placementTarget == null) {
+        if (!this.simulatePlacementAttempts.isEnabled() || !this.isPlacementTargetReady() || handSelection == null
+                || placementTarget == null) {
             return;
         }
         if (this.failedOnly.isEnabled() && placementTarget.allowsFallbackHit()) {
@@ -1072,7 +1261,9 @@ extends Module {
     }
 
     private void resetPlacementTarget(PlacementTarget placementTarget) {
-        if (!placementTarget.getPlacedBlock().equals(this.targetBlock) || !placementTarget.getSupportBlock().equals(this.previousBlock) || placementTarget.getPlacementSide() != this.placementFace) {
+        if (!placementTarget.getPlacedBlock().equals(this.targetBlock)
+                || !placementTarget.getSupportBlock().equals(this.previousBlock)
+                || placementTarget.getPlacementSide() != this.placementFace) {
             this.currentSlot = 0;
         }
         this.currentPlacement = placementTarget;
@@ -1110,20 +1301,32 @@ extends Module {
     }
 
     private MotionSnapshot getMotionSnapshot(PlacementContext placementContext) {
-        Vec3d VanillaChestLootTableGenerator = this.getInterpolatedPosition(this.calculateContextWeight(placementContext));
+        Vec3d VanillaChestLootTableGenerator = this
+                .getInterpolatedPosition(this.calculateContextWeight(placementContext));
         BlockPositionData blockPositionData = this.getBlockPositionData();
         if (blockPositionData == null) {
             return null;
         }
         this.blockPositionData = blockPositionData;
         MotionSnapshot motionSnapshot = this.getCurrentMotion();
-        Vec3d WallPlayerSkullBlock = motionSnapshot != null && motionSnapshot.getPositionPrimary().dotProduct(VanillaChestLootTableGenerator) >= 0.5 ? motionSnapshot.interpolatePosition(Scaffold.minecraftClient.player.getPos()) : new Vec3d((double)blockPositionData.getBlockPosition().getX() + 0.5 + blockPositionData.getOffsetX(), Scaffold.minecraftClient.player.getY(), (double)blockPositionData.getBlockPosition().getZ() + 0.5 + blockPositionData.getOffsetZ());
-        return new MotionSnapshot(new Vec3d(WallPlayerSkullBlock.x, Scaffold.minecraftClient.player.getY(), WallPlayerSkullBlock.z), VanillaChestLootTableGenerator);
+        Vec3d WallPlayerSkullBlock = motionSnapshot != null
+                && motionSnapshot.getPositionPrimary().dotProduct(VanillaChestLootTableGenerator) >= 0.5
+                        ? motionSnapshot.interpolatePosition(Scaffold.minecraftClient.player.getPos())
+                        : new Vec3d(
+                                (double) blockPositionData.getBlockPosition().getX() + 0.5
+                                        + blockPositionData.getOffsetX(),
+                                Scaffold.minecraftClient.player.getY(),
+                                (double) blockPositionData.getBlockPosition().getZ() + 0.5
+                                        + blockPositionData.getOffsetZ());
+        return new MotionSnapshot(
+                new Vec3d(WallPlayerSkullBlock.x, Scaffold.minecraftClient.player.getY(), WallPlayerSkullBlock.z),
+                VanillaChestLootTableGenerator);
     }
 
     public void updateInputContext(PlacementContext context) {
         this.placementContext = context == null ? PlacementContext.NO_INPUT : context;
-        this.motionSnapshot = this.placementContext.hasMovementInput() ? this.getMotionSnapshot(this.placementContext) : null;
+        this.motionSnapshot = this.placementContext.hasMovementInput() ? this.getMotionSnapshot(this.placementContext)
+                : null;
     }
 
     public void processInput(InputEvent inputEvent) {
@@ -1197,17 +1400,24 @@ extends Module {
         BlockFaceCandidate blockFaceCandidate = list.getFirst();
         BlockFaceCandidate blockFaceCandidate2 = this.selectBlockFace(list, blockFaceCandidate);
         this.placedBlock = blockFaceCandidate2.getBlockPosition();
-        return new BlockPositionData(blockFaceCandidate2.getBlockPosition(), Scaffold.minecraftClient.player.getX() - ((double)blockFaceCandidate2.getBlockPosition().getX() + 0.5), Scaffold.minecraftClient.player.getZ() - ((double)blockFaceCandidate2.getBlockPosition().getZ() + 0.5));
+        return new BlockPositionData(blockFaceCandidate2.getBlockPosition(),
+                Scaffold.minecraftClient.player.getX() - ((double) blockFaceCandidate2.getBlockPosition().getX() + 0.5),
+                Scaffold.minecraftClient.player.getZ()
+                        - ((double) blockFaceCandidate2.getBlockPosition().getZ() + 0.5));
     }
 
     private List<BlockFaceCandidate> collectPendingBlocks() {
         double[] dArray;
         ArrayList<BlockFaceCandidate> arrayList = new ArrayList<BlockFaceCandidate>();
         LinkedHashSet<BlockPos> linkedHashSet = new LinkedHashSet<BlockPos>();
-        for (double d : dArray = new double[]{0.301, 0.0, -0.301}) {
+        for (double d : dArray = new double[] { 0.301, 0.0, -0.301 }) {
             for (double d2 : dArray) {
-                BlockPos adminsky = BlockPos.ofFloored((double)(Scaffold.minecraftClient.player.getX() + d), (double)(Scaffold.minecraftClient.player.getY() - 1.0), (double)(Scaffold.minecraftClient.player.getZ() + d2));
-                if (!linkedHashSet.add(adminsky) || Scaffold.minecraftClient.world.getBlockState(adminsky).getCollisionShape((BlockView)Scaffold.minecraftClient.world, adminsky).isEmpty()) continue;
+                BlockPos adminsky = BlockPos.ofFloored((double) (Scaffold.minecraftClient.player.getX() + d),
+                        (double) (Scaffold.minecraftClient.player.getY() - 1.0),
+                        (double) (Scaffold.minecraftClient.player.getZ() + d2));
+                if (!linkedHashSet.add(adminsky) || Scaffold.minecraftClient.world.getBlockState(adminsky)
+                        .getCollisionShape((BlockView) Scaffold.minecraftClient.world, adminsky).isEmpty())
+                    continue;
                 arrayList.add(this.createBlockFaceCandidate(adminsky));
             }
         }
@@ -1222,7 +1432,8 @@ extends Module {
             if (Objects.equals(blockFaceCandidate4.getBlockPosition(), adminsky)) {
                 blockFaceCandidate2 = blockFaceCandidate4;
             }
-            if (!Objects.equals(blockFaceCandidate4.getBlockPosition(), this.placedBlock)) continue;
+            if (!Objects.equals(blockFaceCandidate4.getBlockPosition(), this.placedBlock))
+                continue;
             blockFaceCandidate3 = blockFaceCandidate4;
         }
         if (blockFaceCandidate2 != null && blockFaceCandidate2.isWithinTolerance(blockFaceCandidate)) {
@@ -1236,14 +1447,18 @@ extends Module {
 
     private BlockFaceCandidate createBlockFaceCandidate(BlockPos adminsky) {
         Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox();
-        List<Box> collisionBoxes = Scaffold.minecraftClient.world.getBlockState(adminsky).getCollisionShape((BlockView)Scaffold.minecraftClient.world, adminsky).getBoundingBoxes();
+        List<Box> collisionBoxes = Scaffold.minecraftClient.world.getBlockState(adminsky)
+                .getCollisionShape((BlockView) Scaffold.minecraftClient.world, adminsky).getBoundingBoxes();
         double d = Double.POSITIVE_INFINITY;
         double d2 = 0.0;
         for (Box collisionBox : collisionBoxes) {
             Box offsetBox = collisionBox.offset(adminsky);
-            double d3 = Math.min(HorizontalFacingBlock.maxX, offsetBox.maxX) - Math.max(HorizontalFacingBlock.minX, offsetBox.minX);
-            double d4 = Math.min(HorizontalFacingBlock.maxZ, offsetBox.maxZ) - Math.max(HorizontalFacingBlock.minZ, offsetBox.minZ);
-            if (d3 <= 0.0 || d4 <= 0.0) continue;
+            double d3 = Math.min(HorizontalFacingBlock.maxX, offsetBox.maxX)
+                    - Math.max(HorizontalFacingBlock.minX, offsetBox.minX);
+            double d4 = Math.min(HorizontalFacingBlock.maxZ, offsetBox.maxZ)
+                    - Math.max(HorizontalFacingBlock.minZ, offsetBox.minZ);
+            if (d3 <= 0.0 || d4 <= 0.0)
+                continue;
             double d5 = Math.abs(HorizontalFacingBlock.minY - offsetBox.maxY);
             double d6 = d3 * d4;
             if (d5 + 0.001 < d) {
@@ -1251,20 +1466,23 @@ extends Module {
                 d2 = d6;
                 continue;
             }
-            if (!(Math.abs(d5 - d) <= 0.001)) continue;
+            if (!(Math.abs(d5 - d) <= 0.001))
+                continue;
             d2 += d6;
         }
-        return new BlockFaceCandidate(adminsky, d2, d, this.calculateDistanceBetween(this.getBlockCenter(adminsky), Scaffold.minecraftClient.player.getPos()));
+        return new BlockFaceCandidate(adminsky, d2, d,
+                this.calculateDistanceBetween(this.getBlockCenter(adminsky), Scaffold.minecraftClient.player.getPos()));
     }
 
     private Vec3d getInterpolatedPosition(float f) {
         float f2;
-        if (!Float.isNaN(this.rotationProgress) && MathHelper.angleBetween((float)f, (float)this.rotationProgress) <= 30.0f) {
+        if (!Float.isNaN(this.rotationProgress)
+                && MathHelper.angleBetween((float) f, (float) this.rotationProgress) <= 30.0f) {
             return this.getPredictedPosition(this.rotationProgress);
         }
         float f3 = f / 180.0f * 4.0f + 4.0f;
         float f4 = Math.round(f3);
-        this.rotationProgress = f2 = MathHelper.wrapDegrees((float)((f4 - 4.0f) / 4.0f * 180.0f));
+        this.rotationProgress = f2 = MathHelper.wrapDegrees((float) ((f4 - 4.0f) / 4.0f * 180.0f));
         return this.getPredictedPosition(f2);
     }
 
@@ -1288,25 +1506,30 @@ extends Module {
         }
         Vec3d WallPlayerSkullBlock = Scaffold.minecraftClient.player.getPos();
         Vec3d VanillaEntityLootTableGenerator = VanillaChestLootTableGenerator.subtract(WallPlayerSkullBlock);
-        Vec3d PlayerSkullBlock = this.interpolatePosition(VanillaChestLootTableGenerator, VanillaEntityLootTableGenerator);
+        Vec3d PlayerSkullBlock = this.interpolatePosition(VanillaChestLootTableGenerator,
+                VanillaEntityLootTableGenerator);
         Vec3d RedstoneBlock = this.getPlayerPosition();
         if (RedstoneBlock == null) {
             if (this.blockPositionData != null) {
-                return PlayerSkullBlock.add(this.blockPositionData.getOffsetX(), 0.0, this.blockPositionData.getOffsetZ());
+                return PlayerSkullBlock.add(this.blockPositionData.getOffsetX(), 0.0,
+                        this.blockPositionData.getOffsetZ());
             }
             return PlayerSkullBlock;
         }
-        float f = (float)Math.atan2(motionSnapshot.getPositionPrimary().z, motionSnapshot.getPositionPrimary().x);
-        Vec3d VanillaFishingLootTableGenerator = VanillaChestLootTableGenerator.add(this.offsetPosition(RedstoneBlock, -f));
-        return this.interpolateOffsetPosition(PlayerSkullBlock, VanillaFishingLootTableGenerator, this.getPlacementDistance());
+        float f = (float) Math.atan2(motionSnapshot.getPositionPrimary().z, motionSnapshot.getPositionPrimary().x);
+        Vec3d VanillaFishingLootTableGenerator = VanillaChestLootTableGenerator
+                .add(this.offsetPosition(RedstoneBlock, -f));
+        return this.interpolateOffsetPosition(PlayerSkullBlock, VanillaFishingLootTableGenerator,
+                this.getPlacementDistance());
     }
 
     private void processMotion(MotionSnapshot motionSnapshot, Vec3d VanillaChestLootTableGenerator) {
         if (motionSnapshot == null || VanillaChestLootTableGenerator == null) {
             return;
         }
-        float f = (float)Math.atan2(motionSnapshot.getPositionPrimary().z, motionSnapshot.getPositionPrimary().x);
-        Vec3d WallPlayerSkullBlock = this.offsetPosition(Scaffold.minecraftClient.player.getPos().subtract(VanillaChestLootTableGenerator), f);
+        float f = (float) Math.atan2(motionSnapshot.getPositionPrimary().z, motionSnapshot.getPositionPrimary().x);
+        Vec3d WallPlayerSkullBlock = this
+                .offsetPosition(Scaffold.minecraftClient.player.getPos().subtract(VanillaChestLootTableGenerator), f);
         this.queuedPlacements.addLast(WallPlayerSkullBlock);
         while (this.queuedPlacements.size() > 4) {
             this.queuedPlacements.removeFirst();
@@ -1330,13 +1553,15 @@ extends Module {
     }
 
     private Vec3d getPreviousMotionPosition(MotionSnapshot motionSnapshot) {
-        Vec3d VanillaChestLootTableGenerator = motionSnapshot.interpolatePosition(Scaffold.minecraftClient.player.getPos()).add(0.0, -0.1, 0.0);
+        Vec3d VanillaChestLootTableGenerator = motionSnapshot
+                .interpolatePosition(Scaffold.minecraftClient.player.getPos()).add(0.0, -0.1, 0.0);
         Vec3d WallPlayerSkullBlock = motionSnapshot.getPositionPrimary().normalize();
         Vec3d VanillaEntityLootTableGenerator = VanillaChestLootTableGenerator;
         for (double d = 0.0; d <= 3.0; d += 0.05) {
             Vec3d PlayerSkullBlock = VanillaChestLootTableGenerator.add(WallPlayerSkullBlock.multiply(d));
             if (!this.isDistanceRangeValid(PlayerSkullBlock.x, PlayerSkullBlock.z)) {
-                return new Vec3d(VanillaEntityLootTableGenerator.x, Scaffold.minecraftClient.player.getY(), VanillaEntityLootTableGenerator.z);
+                return new Vec3d(VanillaEntityLootTableGenerator.x, Scaffold.minecraftClient.player.getY(),
+                        VanillaEntityLootTableGenerator.z);
             }
             VanillaEntityLootTableGenerator = PlayerSkullBlock;
         }
@@ -1353,7 +1578,8 @@ extends Module {
 
     private double getPlacementDistance() {
         int n = 2;
-        return MathHelper.clamp((double)((double)this.queuedPlacements.size() / (double)n), (double)0.0, (double)1.0);
+        return MathHelper.clamp((double) ((double) this.queuedPlacements.size() / (double) n), (double) 0.0,
+                (double) 1.0);
     }
 
     PlacementSettings getPlacementSettings() {
@@ -1375,7 +1601,7 @@ extends Module {
             }
         }
         if (this.godBridge.isSelected() && this.isScaffoldReady()) {
-            if ((float)this.getSelectedBlockCount() < this.forceSneakBelow.getValue()) {
+            if ((float) this.getSelectedBlockCount() < this.forceSneakBelow.getValue()) {
                 return new PlacementSettings(false, this.getRangeValue(this.sneakTime), false, false);
             }
             n = ThreadLocalRandom.current().nextInt(4);
@@ -1393,12 +1619,13 @@ extends Module {
         Rotation rotation2 = RockstarClient.create().getRotationManager().getCurrentRotation();
         float f = Math.max(1.0f, this.rotationSpeed.getValue());
         double d = this.calculateRotationDifference(rotation2, rotation);
-        return (int)Math.ceil(d / (double)f);
+        return (int) Math.ceil(d / (double) f);
     }
 
     private boolean isScaffoldReady() {
         Vec3d VanillaChestLootTableGenerator = Scaffold.minecraftClient.player.getVelocity();
-        Vec3d WallPlayerSkullBlock = Scaffold.minecraftClient.player.getPos().add(VanillaChestLootTableGenerator.x, 0.0, VanillaChestLootTableGenerator.z);
+        Vec3d WallPlayerSkullBlock = Scaffold.minecraftClient.player.getPos().add(VanillaChestLootTableGenerator.x, 0.0,
+                VanillaChestLootTableGenerator.z);
         return !this.isDistanceRangeValid(WallPlayerSkullBlock.x, WallPlayerSkullBlock.z);
     }
 
@@ -1440,13 +1667,16 @@ extends Module {
         }
         Vec3d WallPlayerSkullBlock = this.motionSnapshot.interpolatePosition(Scaffold.minecraftClient.player.getPos());
         Vec3d VanillaEntityLootTableGenerator = WallPlayerSkullBlock.subtract(Scaffold.minecraftClient.player.getPos());
-        boolean bl = VanillaEntityLootTableGenerator.dotProduct(VanillaChestLootTableGenerator = new Vec3d(Scaffold.minecraftClient.player.getVelocity().x, 0.0, Scaffold.minecraftClient.player.getVelocity().z)) > 0.0;
+        boolean bl = VanillaEntityLootTableGenerator
+                .dotProduct(VanillaChestLootTableGenerator = new Vec3d(Scaffold.minecraftClient.player.getVelocity().x,
+                        0.0, Scaffold.minecraftClient.player.getVelocity().z)) > 0.0;
         double d2 = d = bl ? 0.075 : 0.2;
         if (WallPlayerSkullBlock.squaredDistanceTo(Scaffold.minecraftClient.player.getPos()) < d * d) {
             return;
         }
         PlacementContext placementContext = PlacementContext.fromInput(inputEvent);
-        PlacementContext placementContext2 = this.createPlacementContext(VanillaEntityLootTableGenerator, Scaffold.minecraftClient.player.getYaw());
+        PlacementContext placementContext2 = this.createPlacementContext(VanillaEntityLootTableGenerator,
+                Scaffold.minecraftClient.player.getYaw());
         boolean bl2 = placementContext.isMovingForward() || placementContext.isMovingBackward();
         boolean bl3 = placementContext.isStrafingLeft() || placementContext.isStrafingRight();
         inputEvent.setForward(bl2 ? inputEvent.getForward() : placementContext2.getForwardAxis());
@@ -1455,7 +1685,8 @@ extends Module {
 
     void handlePlacementInput(InputEvent inputEvent) {
         if (!inputEvent.isSneak() && inputEvent.getForward() > 0.0f) {
-            if (Scaffold.minecraftClient.world.getBlockState(Scaffold.minecraftClient.player.getBlockPos().down()).isAir()) {
+            if (Scaffold.minecraftClient.world.getBlockState(Scaffold.minecraftClient.player.getBlockPos().down())
+                    .isAir()) {
                 this.lastPlacementTick = System.currentTimeMillis();
             } else if (System.currentTimeMillis() - this.lastPlacementTick > 500L) {
                 return;
@@ -1504,21 +1735,26 @@ extends Module {
     }
 
     private boolean isPlacementFeatureReady() {
-        return this.down.isEnabled() && this.normal.isSelected() && Scaffold.minecraftClient.options.sneakKey.isPressed();
+        return this.down.isEnabled() && this.normal.isSelected()
+                && Scaffold.minecraftClient.options.sneakKey.isPressed();
     }
 
     boolean isRotationFeatureReady() {
         BlockPos adminsky = Scaffold.minecraftClient.player.getBlockPos().add(0, -2, 0);
-        return this.isPlacementFeatureReady() && Scaffold.minecraftClient.world.getBlockState(adminsky).isSideSolidFullSquare((BlockView)Scaffold.minecraftClient.world, adminsky, Direction.UP);
+        return this.isPlacementFeatureReady() && Scaffold.minecraftClient.world.getBlockState(adminsky)
+                .isSideSolidFullSquare((BlockView) Scaffold.minecraftClient.world, adminsky, Direction.UP);
     }
 
     private boolean isMovementFeatureReady() {
-        return !Scaffold.minecraftClient.world.getBlockState(Scaffold.minecraftClient.player.getBlockPos().down()).isAir();
+        return !Scaffold.minecraftClient.world.getBlockState(Scaffold.minecraftClient.player.getBlockPos().down())
+                .isAir();
     }
 
     private boolean isPlacementWorldReady() {
         BlockPos adminsky = Scaffold.minecraftClient.player.getBlockPos().up(2);
-        return !Scaffold.minecraftClient.world.getBlockState(adminsky).getCollisionShape((BlockView)Scaffold.minecraftClient.world, adminsky).isEmpty() && Scaffold.minecraftClient.player.isOnGround();
+        return !Scaffold.minecraftClient.world.getBlockState(adminsky)
+                .getCollisionShape((BlockView) Scaffold.minecraftClient.world, adminsky).isEmpty()
+                && Scaffold.minecraftClient.player.isOnGround();
     }
 
     private boolean isBlockFeatureReady() {
@@ -1535,7 +1771,8 @@ extends Module {
     }
 
     private boolean isPlacementPlayerReady() {
-        Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.05, 0.0);
+        Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0,
+                -1.05, 0.0);
         return this.isBoundingBoxValid(HorizontalFacingBlock);
     }
 
@@ -1544,29 +1781,43 @@ extends Module {
             return false;
         }
         Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox();
-        return !this.isBoundingBoxValid(HorizontalFacingBlock.offset(d, -0.05, 0.0)) || !this.isBoundingBoxValid(HorizontalFacingBlock.offset(-d, -0.05, 0.0)) || !this.isBoundingBoxValid(HorizontalFacingBlock.offset(0.0, -0.05, d)) || !this.isBoundingBoxValid(HorizontalFacingBlock.offset(0.0, -0.05, -d));
+        return !this.isBoundingBoxValid(HorizontalFacingBlock.offset(d, -0.05, 0.0))
+                || !this.isBoundingBoxValid(HorizontalFacingBlock.offset(-d, -0.05, 0.0))
+                || !this.isBoundingBoxValid(HorizontalFacingBlock.offset(0.0, -0.05, d))
+                || !this.isBoundingBoxValid(HorizontalFacingBlock.offset(0.0, -0.05, -d));
     }
 
     private boolean isContextDistanceValid(PlacementContext placementContext, double d) {
-        Vec3d VanillaChestLootTableGenerator = placementContext.getMovementDirection(Scaffold.minecraftClient.player.getYaw());
+        Vec3d VanillaChestLootTableGenerator = placementContext
+                .getMovementDirection(Scaffold.minecraftClient.player.getYaw());
         if (VanillaChestLootTableGenerator.lengthSquared() < 1.0E-6) {
             return this.isDistanceValid(d);
         }
-        Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox().offset(VanillaChestLootTableGenerator.x * d, -0.05, VanillaChestLootTableGenerator.z * d);
+        Box HorizontalFacingBlock = Scaffold.minecraftClient.player.getBoundingBox()
+                .offset(VanillaChestLootTableGenerator.x * d, -0.05, VanillaChestLootTableGenerator.z * d);
         return !this.isBoundingBoxValid(HorizontalFacingBlock);
     }
 
     private boolean isBoundingBoxValid(Box HorizontalFacingBlock) {
-        double d = (double)Scaffold.minecraftClient.player.getWidth() / 6.0;
+        double d = (double) Scaffold.minecraftClient.player.getWidth() / 6.0;
         double d2 = (HorizontalFacingBlock.minX + HorizontalFacingBlock.maxX) * 0.5;
         double d3 = (HorizontalFacingBlock.minZ + HorizontalFacingBlock.maxZ) * 0.5;
-        return this.isDistanceRangeValid(HorizontalFacingBlock.minX + d, HorizontalFacingBlock.minZ + d) || this.isDistanceRangeValid(d2, HorizontalFacingBlock.minZ + d) || this.isDistanceRangeValid(HorizontalFacingBlock.maxX - d, HorizontalFacingBlock.minZ + d) || this.isDistanceRangeValid(HorizontalFacingBlock.minX + d, d3) || this.isDistanceRangeValid(d2, d3) || this.isDistanceRangeValid(HorizontalFacingBlock.maxX - d, d3) || this.isDistanceRangeValid(HorizontalFacingBlock.minX + d, HorizontalFacingBlock.maxZ - d) || this.isDistanceRangeValid(d2, HorizontalFacingBlock.maxZ - d) || this.isDistanceRangeValid(HorizontalFacingBlock.maxX - d, HorizontalFacingBlock.maxZ - d);
+        return this.isDistanceRangeValid(HorizontalFacingBlock.minX + d, HorizontalFacingBlock.minZ + d)
+                || this.isDistanceRangeValid(d2, HorizontalFacingBlock.minZ + d)
+                || this.isDistanceRangeValid(HorizontalFacingBlock.maxX - d, HorizontalFacingBlock.minZ + d)
+                || this.isDistanceRangeValid(HorizontalFacingBlock.minX + d, d3) || this.isDistanceRangeValid(d2, d3)
+                || this.isDistanceRangeValid(HorizontalFacingBlock.maxX - d, d3)
+                || this.isDistanceRangeValid(HorizontalFacingBlock.minX + d, HorizontalFacingBlock.maxZ - d)
+                || this.isDistanceRangeValid(d2, HorizontalFacingBlock.maxZ - d)
+                || this.isDistanceRangeValid(HorizontalFacingBlock.maxX - d, HorizontalFacingBlock.maxZ - d);
     }
 
     private boolean isDistanceRangeValid(double d, double d2) {
-        BlockPos adminsky = BlockPos.ofFloored((double)d, (double)(Scaffold.minecraftClient.player.getBoundingBox().minY - 0.001), (double)d2);
+        BlockPos adminsky = BlockPos.ofFloored((double) d,
+                (double) (Scaffold.minecraftClient.player.getBoundingBox().minY - 0.001), (double) d2);
         BlockState class_26802 = Scaffold.minecraftClient.world.getBlockState(adminsky);
-        return !class_26802.isAir() && !class_26802.getCollisionShape((BlockView)Scaffold.minecraftClient.world, adminsky).isEmpty();
+        return !class_26802.isAir()
+                && !class_26802.getCollisionShape((BlockView) Scaffold.minecraftClient.world, adminsky).isEmpty();
     }
 
     private void updatePlacementDistance(double d) {
@@ -1588,15 +1839,16 @@ extends Module {
             d3 = 0.0;
             d2 = d2 > 0.0 ? 1.0 : -1.0;
         }
-        double d4 = Math.sin(Math.toRadians((double)f + 90.0));
-        double d5 = Math.cos(Math.toRadians((double)f + 90.0));
+        double d4 = Math.sin(Math.toRadians((double) f + 90.0));
+        double d5 = Math.cos(Math.toRadians((double) f + 90.0));
         double d6 = d2 * d * d5 + d3 * d * d4;
         double d7 = d2 * d * d4 - d3 * d * d5;
         Scaffold.minecraftClient.player.setVelocity(d6, Scaffold.minecraftClient.player.getVelocity().y, d7);
     }
 
     private boolean isPlacementTargetReady() {
-        return Scaffold.minecraftClient.player != null && (Scaffold.minecraftClient.player.input.movementForward != 0.0f || Scaffold.minecraftClient.player.input.movementSideways != 0.0f);
+        return Scaffold.minecraftClient.player != null && (Scaffold.minecraftClient.player.input.movementForward != 0.0f
+                || Scaffold.minecraftClient.player.input.movementSideways != 0.0f);
     }
 
     double getTargetDistance() {
@@ -1610,7 +1862,8 @@ extends Module {
         if (d == 0.0 && d2 == 0.0) {
             return Scaffold.minecraftClient.player.getYaw();
         }
-        return MathHelper.wrapDegrees((float)((float)Math.toDegrees(EntityUtils.getDirectionRadians(Scaffold.minecraftClient.player.getYaw(), d, d2))));
+        return MathHelper.wrapDegrees((float) ((float) Math
+                .toDegrees(EntityUtils.getDirectionRadians(Scaffold.minecraftClient.player.getYaw(), d, d2))));
     }
 
     private PlacementContext createPlacementContext(Vec3d VanillaChestLootTableGenerator, float f) {
@@ -1629,7 +1882,7 @@ extends Module {
             d6 /= d8;
             d7 /= d8;
         }
-        return PlacementContext.fromAxes((float)d6, (float)d7);
+        return PlacementContext.fromAxes((float) d6, (float) d7);
     }
 
     private Vec3d getPredictedPosition(float f) {
@@ -1638,7 +1891,7 @@ extends Module {
     }
 
     private Direction getPlacementDirection(float f) {
-        int n = MathHelper.floor((double)((double)(MathHelper.wrapDegrees((float)f) / 90.0f) + 0.5)) & 3;
+        int n = MathHelper.floor((double) ((double) (MathHelper.wrapDegrees((float) f) / 90.0f) + 0.5)) & 3;
         return switch (n) {
             case 0 -> Direction.SOUTH;
             case 1 -> Direction.WEST;
@@ -1648,7 +1901,7 @@ extends Module {
     }
 
     private float calculateMovementScale(float f) {
-        return (float)Math.round(f / 45.0f) * 45.0f;
+        return (float) Math.round(f / 45.0f) * 45.0f;
     }
 
     private void processPlacementSlot(int n) {
@@ -1658,7 +1911,7 @@ extends Module {
     }
 
     private long getLastRotationTime() {
-        return (long)this.getRangeValue(this.delay) * 50L;
+        return (long) this.getRangeValue(this.delay) * 50L;
     }
 
     private int getRangeValue(RangeSetting rangeSetting) {
@@ -1676,29 +1929,37 @@ extends Module {
         if (f2 <= f) {
             return f;
         }
-        return (float)this.calculateDistance(f, f2);
+        return (float) this.calculateDistance(f, f2);
     }
 
     private double calculateDistance(double d, double d2) {
         return ThreadLocalRandom.current().nextDouble(d, d2);
     }
 
-    private Vec3d interpolateOffsetPosition(Vec3d VanillaChestLootTableGenerator, Vec3d WallPlayerSkullBlock, double d) {
-        return new Vec3d(MathHelper.lerp((double)d, (double)VanillaChestLootTableGenerator.x, (double)WallPlayerSkullBlock.x), MathHelper.lerp((double)d, (double)VanillaChestLootTableGenerator.y, (double)WallPlayerSkullBlock.y), MathHelper.lerp((double)d, (double)VanillaChestLootTableGenerator.z, (double)WallPlayerSkullBlock.z));
+    private Vec3d interpolateOffsetPosition(Vec3d VanillaChestLootTableGenerator, Vec3d WallPlayerSkullBlock,
+            double d) {
+        return new Vec3d(
+                MathHelper.lerp((double) d, (double) VanillaChestLootTableGenerator.x, (double) WallPlayerSkullBlock.x),
+                MathHelper.lerp((double) d, (double) VanillaChestLootTableGenerator.y, (double) WallPlayerSkullBlock.y),
+                MathHelper.lerp((double) d, (double) VanillaChestLootTableGenerator.z,
+                        (double) WallPlayerSkullBlock.z));
     }
 
     private Vec3d offsetPosition(Vec3d VanillaChestLootTableGenerator, float f) {
         double d = Math.cos(f);
         double d2 = Math.sin(f);
-        return new Vec3d(VanillaChestLootTableGenerator.x * d + VanillaChestLootTableGenerator.z * d2, VanillaChestLootTableGenerator.y, VanillaChestLootTableGenerator.z * d - VanillaChestLootTableGenerator.x * d2);
+        return new Vec3d(VanillaChestLootTableGenerator.x * d + VanillaChestLootTableGenerator.z * d2,
+                VanillaChestLootTableGenerator.y,
+                VanillaChestLootTableGenerator.z * d - VanillaChestLootTableGenerator.x * d2);
     }
 
     private Vec3d getBlockCenter(BlockPos adminsky) {
-        return new Vec3d((double)adminsky.getX() + 0.5, (double)adminsky.getY() + 0.5, (double)adminsky.getZ() + 0.5);
+        return new Vec3d((double) adminsky.getX() + 0.5, (double) adminsky.getY() + 0.5,
+                (double) adminsky.getZ() + 0.5);
     }
 
     private Vec3d getBlockEdgePosition(BlockPos adminsky) {
-        return new Vec3d((double)adminsky.getX() + 0.5, (double)adminsky.getY(), (double)adminsky.getZ() + 0.5);
+        return new Vec3d((double) adminsky.getX() + 0.5, (double) adminsky.getY(), (double) adminsky.getZ() + 0.5);
     }
 
     private double calculateDistanceBetween(Vec3d VanillaChestLootTableGenerator, Vec3d WallPlayerSkullBlock) {
@@ -1707,10 +1968,4 @@ extends Module {
         return d * d + d2 * d2;
     }
 
-
-
-
-
-
 }
-

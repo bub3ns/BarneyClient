@@ -73,7 +73,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 public final class RotationEngine
-implements ScreenStateService {
+        implements ScreenStateService {
     private static final double GRAVITY_ACCELERATION = 0.08;
     private final int targetBlockX;
     private final int targetBlockY;
@@ -153,7 +153,7 @@ implements ScreenStateService {
         if (this.landingRecoveryActive) {
             return "\u043f\u043e\u0441\u0430\u0434\u043a\u0430";
         }
-        int n = (int)Math.round(Math.sqrt(Math.max(0.0, this.targetDistanceSquared)));
+        int n = (int) Math.round(Math.sqrt(Math.max(0.0, this.targetDistanceSquared)));
         if (!this.navigationStarted) {
             return "\u0441\u0442\u0430\u0440\u0442";
         }
@@ -163,7 +163,9 @@ implements ScreenStateService {
         if (this.altitudeRecoveryActive) {
             return "\u043e\u0431\u0445\u043e\u0434 \u043f\u043e \u0432\u044b\u0441\u043e\u0442\u0435";
         }
-        return (this.flightPathValid ? "\u0430\u0432\u0430\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u0430\u0431\u043e\u0440 \u0432\u044b\u0441\u043e\u0442\u044b, " : "") + "\u0434\u043e \u0446\u0435\u043b\u0438 " + n + "\u043c";
+        return (this.flightPathValid
+                ? "\u0430\u0432\u0430\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u0430\u0431\u043e\u0440 \u0432\u044b\u0441\u043e\u0442\u044b, "
+                : "") + "\u0434\u043e \u0446\u0435\u043b\u0438 " + n + "\u043c";
     }
 
     public List<Vec3d> getTrajectoryPoints() {
@@ -171,7 +173,9 @@ implements ScreenStateService {
     }
 
     public Vec3d getDestinationPosition() {
-        return new Vec3d((double)this.targetBlockX + 0.5, this.targetHasFixedHeight ? (double)this.targetBlockY + 0.5 : this.getTargetHeight(), (double)this.targetBlockZ + 0.5);
+        return new Vec3d((double) this.targetBlockX + 0.5,
+                this.targetHasFixedHeight ? (double) this.targetBlockY + 0.5 : this.getTargetHeight(),
+                (double) this.targetBlockZ + 0.5);
     }
 
     /*
@@ -194,19 +198,26 @@ implements ScreenStateService {
         ++this.navigationTick;
         RotationRequestHelper.refreshRotation();
         if (!this.hasElytraEquipped(player)) {
-            NotificationBridge.showPersistentMessage("\u042d\u043b\u0438\u0442\u0440\u0430 \u043d\u0435 \u043d\u0430\u0434\u0435\u0442\u0430");
+            NotificationBridge.showPersistentMessage(
+                    "\u042d\u043b\u0438\u0442\u0440\u0430 \u043d\u0435 \u043d\u0430\u0434\u0435\u0442\u0430");
             this.errorMessage = "\u044d\u043b\u0438\u0442\u0440\u0430 \u043d\u0435 \u043d\u0430\u0434\u0435\u0442\u0430";
             this.stopNavigation();
             return true;
         }
         if (!this.landingRecoveryActive && this.hasUsableFirework(player)) {
-            this.beginLandingRecovery("\u042d\u043b\u0438\u0442\u0440\u0430 \u043f\u043e\u0447\u0442\u0438 \u0441\u043b\u043e\u043c\u0430\u043d\u0430");
+            this.beginLandingRecovery(
+                    "\u042d\u043b\u0438\u0442\u0440\u0430 \u043f\u043e\u0447\u0442\u0438 \u0441\u043b\u043e\u043c\u0430\u043d\u0430");
         }
         if (!this.navigationStarted) {
             this.currentYaw = player.getYaw();
-            this.currentPitch = MathHelper.clamp((float)player.getPitch(), (float)(-this.navigationTuning.MAX_PITCH_ANGLE), (float)this.navigationTuning.MAX_PITCH_ANGLE);
+            this.currentPitch = MathHelper.clamp((float) player.getPitch(),
+                    (float) (-this.navigationTuning.MAX_PITCH_ANGLE), (float) this.navigationTuning.MAX_PITCH_ANGLE);
             boolean flatWorld = world.getDimension().hasSkyLight();
-            this.initialHeight = flatWorld ? MathHelper.clamp(player.getY(), this.navigationTuning.MIN_FLAT_WORLD_HEIGHT, this.navigationTuning.MAX_FLAT_WORLD_HEIGHT) : MathHelper.clamp(player.getY(), this.navigationTuning.MIN_WORLD_HEIGHT, this.navigationTuning.MAX_WORLD_HEIGHT);
+            this.initialHeight = flatWorld
+                    ? MathHelper.clamp(player.getY(), this.navigationTuning.MIN_FLAT_WORLD_HEIGHT,
+                            this.navigationTuning.MAX_FLAT_WORLD_HEIGHT)
+                    : MathHelper.clamp(player.getY(), this.navigationTuning.MIN_WORLD_HEIGHT,
+                            this.navigationTuning.MAX_WORLD_HEIGHT);
             this.navigationStarted = true;
         }
         if (this.landingRecoveryActive) {
@@ -214,7 +225,8 @@ implements ScreenStateService {
         }
         double distanceSquared = this.getDistanceSquaredToTarget(player);
         if (this.isWithinApproachRange(player)) {
-            NotificationBridge.showMessage("\u0414\u043e\u043b\u0435\u0442\u0435\u043b\u0438 \u0434\u043e \u0446\u0435\u043b\u0438");
+            NotificationBridge.showMessage(
+                    "\u0414\u043e\u043b\u0435\u0442\u0435\u043b\u0438 \u0434\u043e \u0446\u0435\u043b\u0438");
             this.targetReached = true;
             this.resetNavigation();
             return true;
@@ -237,7 +249,8 @@ implements ScreenStateService {
         rotationState.setJumpPressed(false);
         this.updateDistanceProgress(distanceSquared);
         if (this.progressStallTicks >= this.navigationTuning.MAX_NAVIGATION_TICKS) {
-            this.beginLandingRecovery("\u041d\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u0435\u0442\u0441\u044f \u043f\u0440\u0438\u0431\u043b\u0438\u0437\u0438\u0442\u044c\u0441\u044f \u043a \u0446\u0435\u043b\u0438");
+            this.beginLandingRecovery(
+                    "\u041d\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u0435\u0442\u0441\u044f \u043f\u0440\u0438\u0431\u043b\u0438\u0437\u0438\u0442\u044c\u0441\u044f \u043a \u0446\u0435\u043b\u0438");
             return this.updateLandingRecovery(client, player, world);
         }
         this.requestCandidatePath(world, player);
@@ -252,39 +265,46 @@ implements ScreenStateService {
         }
         Objects.requireNonNull(this.navigationTuning);
         if (this.pathStallTicks > 12) {
-            this.beginLandingRecovery("\u0417\u0430\u0436\u0430\u0442 \u0432 \u0443\u0437\u043a\u043e\u043c \u043f\u0440\u043e\u0441\u0442\u0440\u0430\u043d\u0441\u0442\u0432\u0435");
+            this.beginLandingRecovery(
+                    "\u0417\u0430\u0436\u0430\u0442 \u0432 \u0443\u0437\u043a\u043e\u043c \u043f\u0440\u043e\u0441\u0442\u0440\u0430\u043d\u0441\u0442\u0432\u0435");
             return this.updateLandingRecovery(client, player, world);
         }
         float yawStep = this.flightPathValid ? this.navigationTuning.MAX_YAW_ROTATION_STEP : 11.0f;
         float pitchStep = this.flightPathValid ? 11.0f : 6.0f;
         this.currentYaw = RotationEngine.stepAngleTowards(this.currentYaw, desiredRotation.getYaw(), yawStep);
         this.currentPitch = RotationEngine.stepAngleTowards(this.currentPitch, desiredRotation.getPitch(), pitchStep);
-        this.currentPitch = MathHelper.clamp((float)this.currentPitch, (float)(-this.navigationTuning.MAX_PITCH_ANGLE), (float)this.navigationTuning.MAX_PITCH_ANGLE);
+        this.currentPitch = MathHelper.clamp((float) this.currentPitch,
+                (float) (-this.navigationTuning.MAX_PITCH_ANGLE), (float) this.navigationTuning.MAX_PITCH_ANGLE);
         Rotation rotation = new Rotation(this.currentYaw, this.currentPitch);
         RotationRequestHelper.requestDirectRotation(rotation, 45.0f, this.navigationTuning.ROTATION_PITCH_LIMIT, 45.0f);
         this.handleFlightResult(client, player, desiredRotation);
         return false;
     }
 
-    private void handleElytraTakeoff(MinecraftClient client, ClientPlayerEntity class_7462, World class_19372, RotationState rotationState) {
+    private void handleElytraTakeoff(MinecraftClient client, ClientPlayerEntity class_7462, World class_19372,
+            RotationState rotationState) {
         float f;
         boolean bl;
         ++this.takeoffPhaseTicks;
         if (!this.takeoffStarted) {
-            NotificationBridge.showMessage("\u0412\u0437\u043b\u0435\u0442\u0430\u044e \u043d\u0430 \u044d\u043b\u0438\u0442\u0440\u0435...");
+            NotificationBridge.showMessage(
+                    "\u0412\u0437\u043b\u0435\u0442\u0430\u044e \u043d\u0430 \u044d\u043b\u0438\u0442\u0440\u0435...");
             this.takeoffStarted = true;
         }
         if (this.takeoffPhaseTicks > this.navigationTuning.TAKEOFF_WINDOW_TICKS) {
             if (class_7462.isOnGround()) {
-                NotificationBridge.showPersistentMessage("\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0432\u0437\u043b\u0435\u0442\u0435\u0442\u044c (\u043d\u0435\u0442 \u043c\u0435\u0441\u0442\u0430 \u043d\u0430\u0434 \u0433\u043e\u043b\u043e\u0432\u043e\u0439 \u0438\u043b\u0438 \u0444\u0435\u0439\u0435\u0440\u0432\u0435\u0440\u043a\u043e\u0432)");
+                NotificationBridge.showPersistentMessage(
+                        "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0432\u0437\u043b\u0435\u0442\u0435\u0442\u044c (\u043d\u0435\u0442 \u043c\u0435\u0441\u0442\u0430 \u043d\u0430\u0434 \u0433\u043e\u043b\u043e\u0432\u043e\u0439 \u0438\u043b\u0438 \u0444\u0435\u0439\u0435\u0440\u0432\u0435\u0440\u043a\u043e\u0432)");
                 this.stopNavigation();
             } else {
-                this.beginLandingRecovery("\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0440\u0430\u0437\u043e\u0433\u043d\u0430\u0442\u044c\u0441\u044f \u043d\u0430 \u044d\u043b\u0438\u0442\u0440\u0435");
+                this.beginLandingRecovery(
+                        "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0440\u0430\u0437\u043e\u0433\u043d\u0430\u0442\u044c\u0441\u044f \u043d\u0430 \u044d\u043b\u0438\u0442\u0440\u0435");
             }
             return;
         }
         if (class_7462.isOnGround() && !this.hasTakeoffClearance(class_19372, class_7462)) {
-            NotificationBridge.showPersistentMessage("\u041d\u0430\u0434 \u0433\u043e\u043b\u043e\u0432\u043e\u0439 \u043d\u0435\u0442 \u043c\u0435\u0441\u0442\u0430 \u0434\u043b\u044f \u0432\u0437\u043b\u0451\u0442\u0430 \u043d\u0430 \u044d\u043b\u0438\u0442\u0440\u0435");
+            NotificationBridge.showPersistentMessage(
+                    "\u041d\u0430\u0434 \u0433\u043e\u043b\u043e\u0432\u043e\u0439 \u043d\u0435\u0442 \u043c\u0435\u0441\u0442\u0430 \u0434\u043b\u044f \u0432\u0437\u043b\u0451\u0442\u0430 \u043d\u0430 \u044d\u043b\u0438\u0442\u0440\u0435");
             this.stopNavigation();
             return;
         }
@@ -306,7 +326,8 @@ implements ScreenStateService {
                     ++this.takeoffPhaseIndex;
                     bl = false;
                     Objects.requireNonNull(this.navigationTuning);
-                    if (this.takeoffPhaseIndex < 2) break;
+                    if (this.takeoffPhaseIndex < 2)
+                        break;
                     this.navigationState = NavigationState.GLIDING;
                     this.takeoffPhaseIndex = 0;
                     break;
@@ -314,11 +335,13 @@ implements ScreenStateService {
                 case 2: {
                     bl = true;
                     if (client.getNetworkHandler() != null && this.navigationTick - this.lastTakeoffPacketTick >= 2) {
-                        client.getNetworkHandler().sendPacket((Packet)new ClientCommandC2SPacket((Entity)class_7462, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                        client.getNetworkHandler().sendPacket((Packet) new ClientCommandC2SPacket((Entity) class_7462,
+                                ClientCommandC2SPacket.Mode.START_FALL_FLYING));
                         this.lastTakeoffPacketTick = this.navigationTick;
                     }
                     ++this.takeoffPhaseIndex;
-                    if (this.takeoffPhaseIndex < this.navigationTuning.JUMP_HOLD_TICKS) break;
+                    if (this.takeoffPhaseIndex < this.navigationTuning.JUMP_HOLD_TICKS)
+                        break;
                     this.navigationState = NavigationState.TAKEOFF;
                     this.takeoffPhaseIndex = 0;
                     bl = false;
@@ -342,18 +365,21 @@ implements ScreenStateService {
 
     private boolean hasTakeoffClearance(World class_19372, ClientPlayerEntity class_7462) {
         BlockPos.Mutable class_23392 = new BlockPos.Mutable();
-        int n = MathHelper.floor((double)class_7462.getX());
-        int n2 = MathHelper.floor((double)class_7462.getZ());
-        int n3 = MathHelper.floor((double)class_7462.getY());
+        int n = MathHelper.floor((double) class_7462.getX());
+        int n2 = MathHelper.floor((double) class_7462.getZ());
+        int n3 = MathHelper.floor((double) class_7462.getY());
         for (int i = 2; i <= 3; ++i) {
             class_23392.set(n, n3 + i, n2);
-            if (class_19372.getBlockState((BlockPos)class_23392).getCollisionShape((BlockView)class_19372, (BlockPos)class_23392).isEmpty()) continue;
+            if (class_19372.getBlockState((BlockPos) class_23392)
+                    .getCollisionShape((BlockView) class_19372, (BlockPos) class_23392).isEmpty())
+                continue;
             return false;
         }
         return true;
     }
 
-    private void handleFlightResult(MinecraftClient client, ClientPlayerEntity class_7462, RotationResult rotationResult) {
+    private void handleFlightResult(MinecraftClient client, ClientPlayerEntity class_7462,
+            RotationResult rotationResult) {
         block13: {
             block12: {
                 if (this.landingRecoveryActive) {
@@ -367,7 +393,8 @@ implements ScreenStateService {
                     return;
                 }
                 if (this.altitudeRecoveryActive && this.recoveryAltitude > class_7462.getY() + 4.0) {
-                    if (rotationResult.getFlightTicks() >= this.navigationTuning.MAX_ROTATION_SAMPLES || rotationResult.getPitch() < -this.navigationTuning.MAX_APPROACH_SPEED) {
+                    if (rotationResult.getFlightTicks() >= this.navigationTuning.MAX_ROTATION_SAMPLES
+                            || rotationResult.getPitch() < -this.navigationTuning.MAX_APPROACH_SPEED) {
                         this.useFirework(client, class_7462);
                     }
                     return;
@@ -386,9 +413,11 @@ implements ScreenStateService {
                 }
                 double d = this.getHorizontalSpeed(class_7462);
                 Objects.requireNonNull(this.navigationTuning);
-                if (d < (double)1.05f) break block12;
+                if (d < (double) 1.05f)
+                    break block12;
                 Objects.requireNonNull(this.navigationTuning);
-                if (!(this.currentPitch < -6.0f)) break block13;
+                if (!(this.currentPitch < -6.0f))
+                    break block13;
             }
             this.useFirework(client, class_7462);
         }
@@ -406,7 +435,7 @@ implements ScreenStateService {
         } else {
             return;
         }
-        client.interactionManager.interactItem((PlayerEntity)class_7462, class_12682);
+        client.interactionManager.interactItem((PlayerEntity) class_7462, class_12682);
         this.lastFireworkTick = this.navigationTick;
     }
 
@@ -416,7 +445,8 @@ implements ScreenStateService {
         }
         PlayerInventory class_16612 = class_7462.getInventory();
         for (int i = 0; i < 9; ++i) {
-            if (!class_16612.getStack(i).isOf(Items.FIREWORK_ROCKET)) continue;
+            if (!class_16612.getStack(i).isOf(Items.FIREWORK_ROCKET))
+                continue;
             BlockDropResolver.setSelectedToolSlot(i);
             return true;
         }
@@ -441,23 +471,30 @@ implements ScreenStateService {
             }
             return;
         }
-        boolean bl2 = bl = this.candidatePath.isEmpty() || this.candidatePathIndex >= this.candidatePath.size() || this.navigationTick - this.candidatePathTick > this.navigationTuning.CANDIDATE_REFRESH_TICKS || this.candidatePath.get(this.candidatePathIndex).distanceTo(class_7462.getPos()) > this.navigationTuning.CANDIDATE_MAX_DISTANCE;
+        boolean bl2 = bl = this.candidatePath.isEmpty() || this.candidatePathIndex >= this.candidatePath.size()
+                || this.navigationTick - this.candidatePathTick > this.navigationTuning.CANDIDATE_REFRESH_TICKS
+                || this.candidatePath.get(this.candidatePathIndex)
+                        .distanceTo(class_7462.getPos()) > this.navigationTuning.CANDIDATE_MAX_DISTANCE;
         if (!bl) {
             return;
         }
         this.candidatePathTick = this.navigationTick;
-            this.candidatePathFuture = FlightPathPlanner.plan(class_19372, class_7462.getPos(), this.getDestinationPosition());
+        this.candidatePathFuture = FlightPathPlanner.plan(class_19372, class_7462.getPos(),
+                this.getDestinationPosition());
     }
 
     @Nullable
     private Vec3d selectNextCandidatePoint(World class_19372, ClientPlayerEntity class_7462) {
-        while (this.candidatePathIndex < this.candidatePath.size() && this.candidatePath.get(this.candidatePathIndex).distanceTo(class_7462.getPos()) < this.navigationTuning.CANDIDATE_MIN_DISTANCE) {
+        while (this.candidatePathIndex < this.candidatePath.size() && this.candidatePath.get(this.candidatePathIndex)
+                .distanceTo(class_7462.getPos()) < this.navigationTuning.CANDIDATE_MIN_DISTANCE) {
             ++this.candidatePathIndex;
         }
         if (this.candidatePathIndex + 1 < this.candidatePath.size()) {
             Vec3d VanillaChestLootTableGenerator = this.candidatePath.get(this.candidatePathIndex + 1);
             Vec3d WallPlayerSkullBlock = class_7462.getEyePos();
-            BlockHitResult class_39652 = class_19372.raycast(new RaycastContext(WallPlayerSkullBlock, VanillaChestLootTableGenerator, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, (Entity)class_7462));
+            BlockHitResult class_39652 = class_19372
+                    .raycast(new RaycastContext(WallPlayerSkullBlock, VanillaChestLootTableGenerator,
+                            RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, (Entity) class_7462));
             if (class_39652.getType() == HitResult.Type.MISS) {
                 ++this.candidatePathIndex;
             }
@@ -482,7 +519,8 @@ implements ScreenStateService {
         Vec3d PlayerSkullBlock = null;
         float f = this.navigationTuning.TAKEOFF_PITCH_LIMIT;
         if (!(this.landingRecoveryActive || this.altitudeRecoveryActive || this.turningAroundObstacle)) {
-            Vec3d RedstoneBlock = VanillaChestLootTableGenerator = this.candidatePath.isEmpty() ? null : this.selectNextCandidatePoint(class_19372, class_7462);
+            Vec3d RedstoneBlock = VanillaChestLootTableGenerator = this.candidatePath.isEmpty() ? null
+                    : this.selectNextCandidatePoint(class_19372, class_7462);
             if (VanillaChestLootTableGenerator != null) {
                 PlayerSkullBlock = VanillaChestLootTableGenerator;
                 if (VanillaChestLootTableGenerator.y > class_7462.getY() + 2.0) {
@@ -495,13 +533,17 @@ implements ScreenStateService {
         }
         VanillaChestLootTableGenerator = PlayerSkullBlock.subtract(class_7462.getEyePos());
         double d4 = Math.hypot(VanillaChestLootTableGenerator.x, VanillaChestLootTableGenerator.z);
-        float f2 = (float)Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
-        float f3 = MathHelper.clamp((float)((float)(-Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.y, Math.max(0.001, d4))))), (float)(-f), (float)f);
+        float f2 = (float) Math
+                .toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
+        float f3 = MathHelper.clamp(
+                (float) ((float) (-Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.y, Math.max(0.001, d4))))),
+                (float) (-f), (float) f);
         if (this.turningAroundObstacle) {
             f2 += this.turnLeft ? 90.0f : -90.0f;
-            f3 = MathHelper.clamp((float)f3, (float)(-this.navigationTuning.TAKEOFF_PITCH_LIMIT), (float)0.0f);
+            f3 = MathHelper.clamp((float) f3, (float) (-this.navigationTuning.TAKEOFF_PITCH_LIMIT), (float) 0.0f);
         }
-        if (class_19372.getDimension().hasSkyLight() && class_7462.getY() > (double)this.navigationTuning.HIGH_ALTITUDE_THRESHOLD) {
+        if (class_19372.getDimension().hasSkyLight()
+                && class_7462.getY() > (double) this.navigationTuning.HIGH_ALTITUDE_THRESHOLD) {
             f3 = Math.max(f3, 8.0f);
         }
         if (this.landingRecoveryActive && this.recoveryTarget != null) {
@@ -514,7 +556,7 @@ implements ScreenStateService {
                 f4 = this.navigationTuning.RECOVERY_YAW_ANGLE;
             }
             float f5 = f4;
-            f3 = MathHelper.clamp((float)f3, (float)(-this.navigationTuning.MAX_PITCH_ANGLE), (float)f5);
+            f3 = MathHelper.clamp((float) f3, (float) (-this.navigationTuning.MAX_PITCH_ANGLE), (float) f5);
         }
         if (this.isWithinCooldownWindow()) {
             Objects.requireNonNull(this.navigationTuning);
@@ -530,19 +572,30 @@ implements ScreenStateService {
             for (float f6 : this.navigationTuning.YAW_SAMPLE_OFFSETS) {
                 double d5;
                 float f7 = f2 + f5;
-                float f8 = MathHelper.clamp((float)(f3 + f6), (float)(-this.navigationTuning.MAX_PITCH_ANGLE), (float)this.navigationTuning.MAX_PITCH_ANGLE);
-                PathProbeResult pathProbeResult2 = this.simulateFlightPath(class_19372, WallPlayerSkullBlock, VanillaEntityLootTableGenerator, this.currentYaw, this.currentPitch, f7, f8, this.navigationTuning.NORMAL_YAW_STEP, this.navigationTuning.NORMAL_PITCH_STEP, n2, this.navigationTuning.PATH_SIMULATION_STEPS);
+                float f8 = MathHelper.clamp((float) (f3 + f6), (float) (-this.navigationTuning.MAX_PITCH_ANGLE),
+                        (float) this.navigationTuning.MAX_PITCH_ANGLE);
+                PathProbeResult pathProbeResult2 = this.simulateFlightPath(class_19372, WallPlayerSkullBlock,
+                        VanillaEntityLootTableGenerator, this.currentYaw, this.currentPitch, f7, f8,
+                        this.navigationTuning.NORMAL_YAW_STEP, this.navigationTuning.NORMAL_PITCH_STEP, n2,
+                        this.navigationTuning.PATH_SIMULATION_STEPS);
                 if (!pathProbeResult2.collisionDetected) {
-                    d5 = (double)this.navigationTuning.PATH_SIMULATION_STEPS * 1000.0;
+                    d5 = (double) this.navigationTuning.PATH_SIMULATION_STEPS * 1000.0;
                 } else {
                     int n3 = this.navigationTuning.PATH_SIMULATION_STEPS - pathProbeResult2.stepsCompleted;
-                    d5 = (double)pathProbeResult2.stepsCompleted * 100.0 - (double)(n3 * n3) * 5.0;
+                    d5 = (double) pathProbeResult2.stepsCompleted * 100.0 - (double) (n3 * n3) * 5.0;
                 }
-                double d7 = (double)Math.abs(AimRotationMath.getWrappedAngleDifference(f7, f2)) * this.navigationTuning.YAW_ERROR_WEIGHT + (double)Math.abs(f8 - f3) * this.navigationTuning.PITCH_ERROR_WEIGHT;
-                d3 = (double)Math.abs(AimRotationMath.getWrappedAngleDifference(this.currentYaw, f7)) * this.navigationTuning.CURRENT_ROTATION_WEIGHT + (double)Math.abs(this.currentPitch - f8) * this.navigationTuning.CURRENT_ROTATION_WEIGHT;
-                d2 = (Math.sqrt(this.targetDistanceSquared) - pathProbeResult2.finalPosition.distanceTo(this.getDestinationPosition())) * this.navigationTuning.DISTANCE_WEIGHT;
+                double d7 = (double) Math.abs(AimRotationMath.getWrappedAngleDifference(f7, f2))
+                        * this.navigationTuning.YAW_ERROR_WEIGHT
+                        + (double) Math.abs(f8 - f3) * this.navigationTuning.PITCH_ERROR_WEIGHT;
+                d3 = (double) Math.abs(AimRotationMath.getWrappedAngleDifference(this.currentYaw, f7))
+                        * this.navigationTuning.CURRENT_ROTATION_WEIGHT
+                        + (double) Math.abs(this.currentPitch - f8) * this.navigationTuning.CURRENT_ROTATION_WEIGHT;
+                d2 = (Math.sqrt(this.targetDistanceSquared)
+                        - pathProbeResult2.finalPosition.distanceTo(this.getDestinationPosition()))
+                        * this.navigationTuning.DISTANCE_WEIGHT;
                 d = d5 - d7 - d3 + d2;
-                if (rotationResult != null && !(d > d6)) continue;
+                if (rotationResult != null && !(d > d6))
+                    continue;
                 d6 = d;
                 rotationResult = new RotationResult(f7, f8, pathProbeResult2.stepsCompleted, false);
                 pathProbeResult = pathProbeResult2;
@@ -559,12 +612,17 @@ implements ScreenStateService {
             for (float f6 : this.navigationTuning.EMERGENCY_YAW_OFFSETS) {
                 for (float f9 : this.navigationTuning.EMERGENCY_PITCH_OFFSETS) {
                     float f10 = f2 + f6;
-                    PathProbeResult pathProbeResult4 = this.simulateFlightPath(class_19372, WallPlayerSkullBlock, VanillaEntityLootTableGenerator, this.currentYaw, this.currentPitch, f10, f9, this.navigationTuning.EMERGENCY_YAW_STEP, this.navigationTuning.EMERGENCY_PITCH_STEP, n2, this.navigationTuning.PATH_SIMULATION_STEPS);
-                    int n4 = pathProbeResult4.collisionDetected ? pathProbeResult4.stepsCompleted : this.navigationTuning.PATH_SIMULATION_STEPS;
+                    PathProbeResult pathProbeResult4 = this.simulateFlightPath(class_19372, WallPlayerSkullBlock,
+                            VanillaEntityLootTableGenerator, this.currentYaw, this.currentPitch, f10, f9,
+                            this.navigationTuning.EMERGENCY_YAW_STEP, this.navigationTuning.EMERGENCY_PITCH_STEP, n2,
+                            this.navigationTuning.PATH_SIMULATION_STEPS);
+                    int n4 = pathProbeResult4.collisionDetected ? pathProbeResult4.stepsCompleted
+                            : this.navigationTuning.PATH_SIMULATION_STEPS;
                     d3 = Math.abs(AimRotationMath.getWrappedAngleDifference(this.currentYaw, f10));
                     d2 = Math.abs(AimRotationMath.getWrappedAngleDifference(f10, f2));
-                    d = (double)n4 * 10000.0 - d3 * 10.0 - d2;
-                    if (emergencyRotation != null && !(d > d8)) continue;
+                    d = (double) n4 * 10000.0 - d3 * 10.0 - d2;
+                    if (emergencyRotation != null && !(d > d8))
+                        continue;
                     d8 = d;
                     emergencyRotation = new RotationResult(f10, f9, n4, true);
                     pathProbeResult3 = pathProbeResult4;
@@ -581,7 +639,8 @@ implements ScreenStateService {
                 return emergencyRotation;
             }
             this.trajectoryPoints = List.copyOf(pathProbeResult.trajectoryPoints);
-            return new RotationResult(rotationResult.getYaw(), Math.min(rotationResult.getPitch(), -25.0f), rotationResult.getFlightTicks(), true);
+            return new RotationResult(rotationResult.getYaw(), Math.min(rotationResult.getPitch(), -25.0f),
+                    rotationResult.getFlightTicks(), true);
         }
         this.trajectoryPoints = List.copyOf(pathProbeResult.trajectoryPoints);
         return rotationResult;
@@ -606,7 +665,8 @@ implements ScreenStateService {
             }
             return;
         }
-        this.initializationTicks = this.flightPathValid ? ++this.initializationTicks : Math.max(0, this.initializationTicks - 2);
+        this.initializationTicks = this.flightPathValid ? ++this.initializationTicks
+                : Math.max(0, this.initializationTicks - 2);
         if (this.initializationTicks < this.navigationTuning.INITIALIZATION_TICKS) {
             return;
         }
@@ -614,25 +674,38 @@ implements ScreenStateService {
             Objects.requireNonNull(this.navigationTuning);
             if (this.altitudeRecoveryAttempts < 2) {
                 boolean bl = class_19372.getDimension().hasSkyLight();
-                this.recoveryAltitude = bl ? Math.max((double)this.navigationTuning.MIN_FLAT_WORLD_HEIGHT, class_7462.getY() - 24.0) : Math.min((double)this.navigationTuning.MAX_WORLD_HEIGHT, Math.max(class_7462.getY() + 24.0, this.estimateTerrainHeight(class_19372, class_7462) + 18.0));
+                this.recoveryAltitude = bl
+                        ? Math.max((double) this.navigationTuning.MIN_FLAT_WORLD_HEIGHT, class_7462.getY() - 24.0)
+                        : Math.min((double) this.navigationTuning.MAX_WORLD_HEIGHT, Math.max(class_7462.getY() + 24.0,
+                                this.estimateTerrainHeight(class_19372, class_7462) + 18.0));
                 this.altitudeRecoveryActive = true;
                 this.altitudeRecoveryTicks = this.navigationTuning.RECOVERY_PITCH_TICKS;
                 ++this.altitudeRecoveryAttempts;
                 this.recoveryNavigationTick = 0;
                 this.initializationTicks = 0;
-                NotificationBridge.showMessage("\u041e\u0431\u0445\u043e\u0434 \u043d\u0435 \u043f\u043e\u043c\u043e\u0433 \u2014 \u043c\u0435\u043d\u044f\u044e \u0432\u044b\u0441\u043e\u0442\u0443 (" + (int)this.recoveryAltitude + ")");
+                NotificationBridge.showMessage(
+                        "\u041e\u0431\u0445\u043e\u0434 \u043d\u0435 \u043f\u043e\u043c\u043e\u0433 \u2014 \u043c\u0435\u043d\u044f\u044e \u0432\u044b\u0441\u043e\u0442\u0443 ("
+                                + (int) this.recoveryAltitude + ")");
                 return;
             }
-            this.beginLandingRecovery("\u041d\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u0435\u0442\u0441\u044f \u043d\u0430\u0439\u0442\u0438 \u043f\u0440\u043e\u0445\u043e\u0434");
+            this.beginLandingRecovery(
+                    "\u041d\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u0435\u0442\u0441\u044f \u043d\u0430\u0439\u0442\u0438 \u043f\u0440\u043e\u0445\u043e\u0434");
             return;
         }
         if (this.navigationTick > 0) {
             this.turnLeft = !this.previousTurnLeft;
         } else {
             Vec3d VanillaChestLootTableGenerator = this.getDestinationPosition().subtract(class_7462.getEyePos());
-            float f = (float)Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
-            PathProbeResult pathProbeResult = this.simulateFlightPath(class_19372, class_7462.getPos(), class_7462.getVelocity(), this.currentYaw, this.currentPitch, f + 90.0f, 0.0f, this.navigationTuning.EMERGENCY_YAW_STEP, this.navigationTuning.EMERGENCY_PITCH_STEP, 0, this.navigationTuning.PATH_SIMULATION_STEPS);
-            PathProbeResult pathProbeResult2 = this.simulateFlightPath(class_19372, class_7462.getPos(), class_7462.getVelocity(), this.currentYaw, this.currentPitch, f - 90.0f, 0.0f, this.navigationTuning.EMERGENCY_YAW_STEP, this.navigationTuning.EMERGENCY_PITCH_STEP, 0, this.navigationTuning.PATH_SIMULATION_STEPS);
+            float f = (float) Math
+                    .toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
+            PathProbeResult pathProbeResult = this.simulateFlightPath(class_19372, class_7462.getPos(),
+                    class_7462.getVelocity(), this.currentYaw, this.currentPitch, f + 90.0f, 0.0f,
+                    this.navigationTuning.EMERGENCY_YAW_STEP, this.navigationTuning.EMERGENCY_PITCH_STEP, 0,
+                    this.navigationTuning.PATH_SIMULATION_STEPS);
+            PathProbeResult pathProbeResult2 = this.simulateFlightPath(class_19372, class_7462.getPos(),
+                    class_7462.getVelocity(), this.currentYaw, this.currentPitch, f - 90.0f, 0.0f,
+                    this.navigationTuning.EMERGENCY_YAW_STEP, this.navigationTuning.EMERGENCY_PITCH_STEP, 0,
+                    this.navigationTuning.PATH_SIMULATION_STEPS);
             this.turnLeft = pathProbeResult.stepsCompleted >= pathProbeResult2.stepsCompleted;
         }
         this.previousTurnLeft = this.turnLeft;
@@ -640,10 +713,12 @@ implements ScreenStateService {
         Objects.requireNonNull(this.navigationTuning);
         this.turnaroundTicksRemaining = 30;
         ++this.navigationTick;
-        NotificationBridge.showMessage("\u041a\u0440\u0443\u0436\u0443 \u0432 \u0442\u0443\u043f\u0438\u043a\u0435 \u2014 \u043b\u0435\u0447\u0443 \u043f\u0435\u0440\u043f\u0435\u043d\u0434\u0438\u043a\u0443\u043b\u044f\u0440\u043d\u043e \u0446\u0435\u043b\u0438");
+        NotificationBridge.showMessage(
+                "\u041a\u0440\u0443\u0436\u0443 \u0432 \u0442\u0443\u043f\u0438\u043a\u0435 \u2014 \u043b\u0435\u0447\u0443 \u043f\u0435\u0440\u043f\u0435\u043d\u0434\u0438\u043a\u0443\u043b\u044f\u0440\u043d\u043e \u0446\u0435\u043b\u0438");
     }
 
-    private Vec3d adjustFlightTarget(World class_19372, ClientPlayerEntity class_7462, Vec3d VanillaChestLootTableGenerator) {
+    private Vec3d adjustFlightTarget(World class_19372, ClientPlayerEntity class_7462,
+            Vec3d VanillaChestLootTableGenerator) {
         if (this.landingRecoveryActive) {
             return VanillaChestLootTableGenerator;
         }
@@ -654,7 +729,8 @@ implements ScreenStateService {
         double d5 = Math.hypot(d3, d4);
         if (this.altitudeRecoveryActive) {
             if (d5 < 1.0) {
-                return new Vec3d(VanillaChestLootTableGenerator.x, this.recoveryAltitude, VanillaChestLootTableGenerator.z);
+                return new Vec3d(VanillaChestLootTableGenerator.x, this.recoveryAltitude,
+                        VanillaChestLootTableGenerator.z);
             }
             double d6 = d3 / d5;
             double d7 = d4 / d5;
@@ -663,7 +739,9 @@ implements ScreenStateService {
         boolean bl = class_19372.getDimension().hasSkyLight();
         if (bl) {
             if (d5 > 32.0) {
-                double d8 = MathHelper.clamp((double)VanillaChestLootTableGenerator.y, (double)this.navigationTuning.MIN_FLAT_WORLD_HEIGHT, (double)this.navigationTuning.MAX_FLAT_WORLD_HEIGHT);
+                double d8 = MathHelper.clamp((double) VanillaChestLootTableGenerator.y,
+                        (double) this.navigationTuning.MIN_FLAT_WORLD_HEIGHT,
+                        (double) this.navigationTuning.MAX_FLAT_WORLD_HEIGHT);
                 return new Vec3d(VanillaChestLootTableGenerator.x, d8, VanillaChestLootTableGenerator.z);
             }
             return VanillaChestLootTableGenerator;
@@ -672,7 +750,8 @@ implements ScreenStateService {
             double d9 = this.estimateTerrainHeight(class_19372, class_7462);
             Objects.requireNonNull(this.navigationTuning);
             double d10 = d9 + 14.0;
-            d10 = MathHelper.clamp((double)d10, (double)this.navigationTuning.MIN_WORLD_HEIGHT, (double)this.navigationTuning.MAX_WORLD_HEIGHT);
+            d10 = MathHelper.clamp((double) d10, (double) this.navigationTuning.MIN_WORLD_HEIGHT,
+                    (double) this.navigationTuning.MAX_WORLD_HEIGHT);
             if (VanillaChestLootTableGenerator.y < d10) {
                 return new Vec3d(VanillaChestLootTableGenerator.x, d10, VanillaChestLootTableGenerator.z);
             }
@@ -689,14 +768,17 @@ implements ScreenStateService {
         for (int n : this.navigationTuning.ALTITUDE_CORRECTION_THRESHOLDS) {
             int n2;
             int n3;
-            int n4 = MathHelper.floor((double)(class_7462.getX() + d2 * (double)n));
-            if (!class_19372.isPosLoaded(n4, n3 = MathHelper.floor((double)(class_7462.getZ() + d3 * (double)n))) || !((double)(n2 = class_19372.getTopY(Heightmap.Type.MOTION_BLOCKING, n4, n3)) > d4)) continue;
+            int n4 = MathHelper.floor((double) (class_7462.getX() + d2 * (double) n));
+            if (!class_19372.isPosLoaded(n4, n3 = MathHelper.floor((double) (class_7462.getZ() + d3 * (double) n)))
+                    || !((double) (n2 = class_19372.getTopY(Heightmap.Type.MOTION_BLOCKING, n4, n3)) > d4))
+                continue;
             d4 = n2;
         }
         return d4;
     }
 
-    private RotationResult applyObstacleAvoidance(World class_19372, ClientPlayerEntity class_7462, RotationResult rotationResult) {
+    private RotationResult applyObstacleAvoidance(World class_19372, ClientPlayerEntity class_7462,
+            RotationResult rotationResult) {
         double d;
         Vec3d VanillaChestLootTableGenerator = class_7462.getVelocity();
         double d2 = VanillaChestLootTableGenerator.length();
@@ -709,7 +791,10 @@ implements ScreenStateService {
             return rotationResult;
         }
         Vec3d VanillaEntityLootTableGenerator = class_7462.getEyePos();
-        BlockHitResult class_39652 = class_19372.raycast(new RaycastContext(VanillaEntityLootTableGenerator, VanillaEntityLootTableGenerator.add(VanillaChestLootTableGenerator.multiply((d = Math.min(48.0, d2 * 28.0 + 4.0)) / d2)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, (Entity)class_7462));
+        BlockHitResult class_39652 = class_19372.raycast(new RaycastContext(VanillaEntityLootTableGenerator,
+                VanillaEntityLootTableGenerator
+                        .add(VanillaChestLootTableGenerator.multiply((d = Math.min(48.0, d2 * 28.0 + 4.0)) / d2)),
+                RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, (Entity) class_7462));
         if (class_39652.getType() != HitResult.Type.BLOCK) {
             return rotationResult;
         }
@@ -719,20 +804,23 @@ implements ScreenStateService {
         double d4 = class_39652.getPos().distanceTo(VanillaEntityLootTableGenerator) / Math.max(0.1, d2);
         Objects.requireNonNull(this.navigationTuning);
         if (d4 < 14.0) {
-            return new RotationResult(rotationResult.getYaw(), Math.min(rotationResult.getPitch(), -35.0f), (int)d4, true);
+            return new RotationResult(rotationResult.getYaw(), Math.min(rotationResult.getPitch(), -35.0f), (int) d4,
+                    true);
         }
         return rotationResult;
     }
 
     private Vec3d getActiveNavigationTarget() {
-        return this.landingRecoveryActive && this.recoveryTarget != null ? this.recoveryTarget : this.getDestinationPosition();
+        return this.landingRecoveryActive && this.recoveryTarget != null ? this.recoveryTarget
+                : this.getDestinationPosition();
     }
 
     private void beginLandingRecovery(String string) {
         if (this.landingRecoveryActive || this.targetReached) {
             return;
         }
-        NotificationBridge.showPersistentMessage(string + " \u2014 \u0437\u0430\u0445\u043e\u0436\u0443 \u043d\u0430 \u043f\u043e\u0441\u0430\u0434\u043a\u0443");
+        NotificationBridge.showPersistentMessage(string
+                + " \u2014 \u0437\u0430\u0445\u043e\u0436\u0443 \u043d\u0430 \u043f\u043e\u0441\u0430\u0434\u043a\u0443");
         this.landingRecoveryActive = true;
         this.landingRecoveryTicks = 0;
         this.recoveryTarget = null;
@@ -755,15 +843,18 @@ implements ScreenStateService {
                     return true;
                 }
                 if (this.landingRecoveryTicks > this.navigationTuning.MAX_RECOVERY_TICKS) {
-                    NotificationBridge.showPersistentMessage("\u041f\u043e\u0441\u0430\u0434\u043a\u0430 \u043d\u0435 \u0443\u0434\u0430\u043b\u0430\u0441\u044c \u0437\u0430 \u043b\u0438\u043c\u0438\u0442 \u2014 \u043e\u0442\u043c\u0435\u043d\u044f\u044e");
+                    NotificationBridge.showPersistentMessage(
+                            "\u041f\u043e\u0441\u0430\u0434\u043a\u0430 \u043d\u0435 \u0443\u0434\u0430\u043b\u0430\u0441\u044c \u0437\u0430 \u043b\u0438\u043c\u0438\u0442 \u2014 \u043e\u0442\u043c\u0435\u043d\u044f\u044e");
                     this.errorMessage = "\u043f\u043e\u0441\u0430\u0434\u043a\u0430 \u043d\u0435 \u0443\u0434\u0430\u043b\u0430\u0441\u044c";
                     this.stopNavigation();
                     return true;
                 }
-                if (this.recoveryTarget == null) break block11;
-                long l = (long)this.navigationTick - this.recoveryTargetTick;
+                if (this.recoveryTarget == null)
+                    break block11;
+                long l = (long) this.navigationTick - this.recoveryTargetTick;
                 Objects.requireNonNull(this.navigationTuning);
-                if (l <= 20L) break block12;
+                if (l <= 20L)
+                    break block12;
             }
             Vec3d landingPosition = this.findSafeLandingPosition(class_19372, class_7462);
             if (landingPosition != null) {
@@ -801,8 +892,9 @@ implements ScreenStateService {
         rotationState.setSprintPressed(true);
         Vec3d VanillaChestLootTableGenerator = this.recoveryTarget.subtract(class_7462.getEyePos());
         double d = Math.hypot(VanillaChestLootTableGenerator.x, VanillaChestLootTableGenerator.z);
-        float f4 = (float)Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
-        float f5 = (float)(-Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.y, Math.max(0.001, d))));
+        float f4 = (float) Math
+                .toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
+        float f5 = (float) (-Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.y, Math.max(0.001, d))));
         double d2 = class_7462.getY() - this.recoveryTarget.y;
         if (d2 < this.navigationTuning.MIN_CLEARANCE_DISTANCE) {
             Objects.requireNonNull(this.navigationTuning);
@@ -811,7 +903,7 @@ implements ScreenStateService {
             f = this.navigationTuning.RECOVERY_YAW_ANGLE;
         }
         float f6 = f;
-        f5 = MathHelper.clamp((float)f5, (float)(-this.navigationTuning.MAX_PITCH_ANGLE), (float)f6);
+        f5 = MathHelper.clamp((float) f5, (float) (-this.navigationTuning.MAX_PITCH_ANGLE), (float) f6);
         if (d2 < this.navigationTuning.MIN_CLEARANCE_DISTANCE && d < 2.5) {
             rotationState.setForwardPressed(false);
             rotationState.setSprintPressed(false);
@@ -821,7 +913,8 @@ implements ScreenStateService {
         this.currentYaw = RotationEngine.stepAngleTowards(this.currentYaw, f4, 11.0f);
         Objects.requireNonNull(this.navigationTuning);
         this.currentPitch = RotationEngine.stepAngleTowards(this.currentPitch, f5, 6.0f);
-        this.currentPitch = MathHelper.clamp((float)this.currentPitch, (float)(-this.navigationTuning.MAX_PITCH_ANGLE), (float)this.navigationTuning.MAX_PITCH_ANGLE);
+        this.currentPitch = MathHelper.clamp((float) this.currentPitch,
+                (float) (-this.navigationTuning.MAX_PITCH_ANGLE), (float) this.navigationTuning.MAX_PITCH_ANGLE);
         Rotation rotation = new Rotation(this.currentYaw, this.currentPitch);
         Objects.requireNonNull(this.navigationTuning);
         float f7 = this.navigationTuning.ROTATION_PITCH_LIMIT;
@@ -834,9 +927,9 @@ implements ScreenStateService {
     @Nullable
     private Vec3d findSafeLandingPosition(World class_19372, ClientPlayerEntity class_7462) {
         BlockPos.Mutable class_23392 = new BlockPos.Mutable();
-        int n = MathHelper.floor((double)class_7462.getX());
-        int n2 = MathHelper.floor((double)class_7462.getZ());
-        int n3 = Math.min(class_19372.getTopYInclusive() - 1, MathHelper.floor((double)class_7462.getY()));
+        int n = MathHelper.floor((double) class_7462.getX());
+        int n2 = MathHelper.floor((double) class_7462.getZ());
+        int n3 = Math.min(class_19372.getTopYInclusive() - 1, MathHelper.floor((double) class_7462.getY()));
         Vec3d VanillaChestLootTableGenerator = null;
         double d = Double.NEGATIVE_INFINITY;
         Objects.requireNonNull(this.navigationTuning);
@@ -850,37 +943,48 @@ implements ScreenStateService {
                     double d2;
                     double d3;
                     class_23392.set(n5, k, n6);
-                    if (!class_19372.isPosLoaded((BlockPos)class_23392)) {
+                    if (!class_19372.isPosLoaded((BlockPos) class_23392)) {
                         bl = true;
                         break;
                     }
-                    BlockState class_26802 = class_19372.getBlockState((BlockPos)class_23392);
+                    BlockState class_26802 = class_19372.getBlockState((BlockPos) class_23392);
                     FluidState class_36102 = class_26802.getFluidState();
                     if (class_36102.isIn(FluidTags.LAVA) || RotationEngine.isHazardousBlock(class_26802)) {
                         bl = true;
                         break;
                     }
-                    if (class_26802.isAir() || class_26802.isReplaceable() || class_26802.getCollisionShape((BlockView)class_19372, (BlockPos)class_23392).isEmpty()) continue;
+                    if (class_26802.isAir() || class_26802.isReplaceable()
+                            || class_26802.getCollisionShape((BlockView) class_19372, (BlockPos) class_23392).isEmpty())
+                        continue;
                     BlockPos adminsky = new BlockPos(n5, k + 1, n6);
                     BlockPos adminsky2 = new BlockPos(n5, k + 2, n6);
-                    if (!class_19372.getBlockState(adminsky).getCollisionShape((BlockView)class_19372, adminsky).isEmpty() || !class_19372.getBlockState(adminsky2).getCollisionShape((BlockView)class_19372, adminsky2).isEmpty()) break;
-                    double d4 = (double)n5 + 0.5;
-                    double d5 = (double)k + 1.1;
-                    double d6 = (double)n6 + 0.5;
+                    if (!class_19372.getBlockState(adminsky).getCollisionShape((BlockView) class_19372, adminsky)
+                            .isEmpty()
+                            || !class_19372.getBlockState(adminsky2)
+                                    .getCollisionShape((BlockView) class_19372, adminsky2).isEmpty())
+                        break;
+                    double d4 = (double) n5 + 0.5;
+                    double d5 = (double) k + 1.1;
+                    double d6 = (double) n6 + 0.5;
                     double d7 = Math.hypot(d4 - class_7462.getX(), d6 - class_7462.getZ());
                     double d8 = class_7462.getY() - d5;
-                    if (d8 < 2.0 || !((d3 = -Math.abs((d2 = Math.toDegrees(Math.atan2(d8, Math.max(0.5, d7)))) - 20.0) * 2.0 - d7 * 0.3 - d8 * 0.1) > d)) break;
+                    if (d8 < 2.0
+                            || !((d3 = -Math.abs((d2 = Math.toDegrees(Math.atan2(d8, Math.max(0.5, d7)))) - 20.0) * 2.0
+                                    - d7 * 0.3 - d8 * 0.1) > d))
+                        break;
                     d = d3;
                     VanillaChestLootTableGenerator = new Vec3d(d4, d5, d6);
                     break;
                 }
-                if (!bl) continue;
+                if (!bl)
+                    continue;
             }
         }
         return VanillaChestLootTableGenerator;
     }
 
-    private PathProbeResult simulateFlightPath(World class_19372, Vec3d VanillaChestLootTableGenerator, Vec3d WallPlayerSkullBlock, float f, float f2, float f3, float f4, float f5, float f6, int n, int n2) {
+    private PathProbeResult simulateFlightPath(World class_19372, Vec3d VanillaChestLootTableGenerator,
+            Vec3d WallPlayerSkullBlock, float f, float f2, float f3, float f4, float f5, float f6, int n, int n2) {
         Vec3d VanillaEntityLootTableGenerator = VanillaChestLootTableGenerator;
         Vec3d PlayerSkullBlock = WallPlayerSkullBlock;
         float f7 = f;
@@ -908,27 +1012,36 @@ implements ScreenStateService {
                 PlayerSkullBlock = PlayerSkullBlock.add(-RedstoneBlock.x * d / d3, d * 3.2, -RedstoneBlock.z * d / d3);
             }
             if (d3 > 0.0) {
-                PlayerSkullBlock = PlayerSkullBlock.add((RedstoneBlock.x / d3 * d4 - PlayerSkullBlock.x) * 0.1, 0.0, (RedstoneBlock.z / d3 * d4 - PlayerSkullBlock.z) * 0.1);
+                PlayerSkullBlock = PlayerSkullBlock.add((RedstoneBlock.x / d3 * d4 - PlayerSkullBlock.x) * 0.1, 0.0,
+                        (RedstoneBlock.z / d3 * d4 - PlayerSkullBlock.z) * 0.1);
             }
             if (n3 > 0) {
                 d = 1.5;
-                PlayerSkullBlock = PlayerSkullBlock.add(RedstoneBlock.x * 0.1 + (RedstoneBlock.x * d - PlayerSkullBlock.x) * 0.5, RedstoneBlock.y * 0.1 + (RedstoneBlock.y * d - PlayerSkullBlock.y) * 0.5, RedstoneBlock.z * 0.1 + (RedstoneBlock.z * d - PlayerSkullBlock.z) * 0.5);
+                PlayerSkullBlock = PlayerSkullBlock.add(
+                        RedstoneBlock.x * 0.1 + (RedstoneBlock.x * d - PlayerSkullBlock.x) * 0.5,
+                        RedstoneBlock.y * 0.1 + (RedstoneBlock.y * d - PlayerSkullBlock.y) * 0.5,
+                        RedstoneBlock.z * 0.1 + (RedstoneBlock.z * d - PlayerSkullBlock.z) * 0.5);
                 --n3;
             }
-            PlayerSkullBlock = new Vec3d(PlayerSkullBlock.x * 0.99, PlayerSkullBlock.y * 0.98, PlayerSkullBlock.z * 0.99);
+            PlayerSkullBlock = new Vec3d(PlayerSkullBlock.x * 0.99, PlayerSkullBlock.y * 0.98,
+                    PlayerSkullBlock.z * 0.99);
             Vec3d VanillaFishingLootTableGenerator = VanillaEntityLootTableGenerator;
             VanillaEntityLootTableGenerator = VanillaEntityLootTableGenerator.add(PlayerSkullBlock);
             arrayList.add(VanillaEntityLootTableGenerator);
             double d7 = PlayerSkullBlock.length();
-            int n4 = Math.max(1, (int)Math.ceil(d7 / 0.6));
+            int n4 = Math.max(1, (int) Math.ceil(d7 / 0.6));
             for (int j = 1; j <= n4; ++j) {
                 CollisionResult collisionResult;
-                Vec3d LootTableProvider = VanillaFishingLootTableGenerator.add(PlayerSkullBlock.multiply((double)j / (double)n4));
-                CollisionResult collisionResult2 = collisionResult = j == n4 ? this.checkFlightCollision(class_19372, LootTableProvider, false) : this.checkFlightCollision(class_19372, LootTableProvider, true);
+                Vec3d LootTableProvider = VanillaFishingLootTableGenerator
+                        .add(PlayerSkullBlock.multiply((double) j / (double) n4));
+                CollisionResult collisionResult2 = collisionResult = j == n4
+                        ? this.checkFlightCollision(class_19372, LootTableProvider, false)
+                        : this.checkFlightCollision(class_19372, LootTableProvider, true);
                 if (collisionResult == CollisionResult.COLLISION) {
                     return new PathProbeResult(i, true, VanillaEntityLootTableGenerator, arrayList);
                 }
-                if (collisionResult != CollisionResult.UNKNOWN) continue;
+                if (collisionResult != CollisionResult.UNKNOWN)
+                    continue;
                 return new PathProbeResult(i, true, VanillaEntityLootTableGenerator, arrayList);
             }
         }
@@ -939,19 +1052,20 @@ implements ScreenStateService {
         double[][] dArray;
         BlockPos.Mutable class_23392 = new BlockPos.Mutable();
         boolean bl2 = false;
-        for (double[] dArray2 : dArray = bl ? this.navigationTuning.TIGHT_COLLISION_OFFSETS : this.navigationTuning.NORMAL_COLLISION_OFFSETS) {
-            int n = MathHelper.floor((double)(VanillaChestLootTableGenerator.x + dArray2[0]));
-            int n2 = MathHelper.floor((double)(VanillaChestLootTableGenerator.y + dArray2[1]));
-            int n3 = MathHelper.floor((double)(VanillaChestLootTableGenerator.z + dArray2[2]));
+        for (double[] dArray2 : dArray = bl ? this.navigationTuning.TIGHT_COLLISION_OFFSETS
+                : this.navigationTuning.NORMAL_COLLISION_OFFSETS) {
+            int n = MathHelper.floor((double) (VanillaChestLootTableGenerator.x + dArray2[0]));
+            int n2 = MathHelper.floor((double) (VanillaChestLootTableGenerator.y + dArray2[1]));
+            int n3 = MathHelper.floor((double) (VanillaChestLootTableGenerator.z + dArray2[2]));
             if (n2 <= class_19372.getBottomY() + 2 || n2 >= class_19372.getTopYInclusive() - 2) {
                 return CollisionResult.COLLISION;
             }
             class_23392.set(n, n2, n3);
-            if (!class_19372.isPosLoaded((BlockPos)class_23392)) {
+            if (!class_19372.isPosLoaded((BlockPos) class_23392)) {
                 bl2 = true;
                 continue;
             }
-            BlockState class_26802 = class_19372.getBlockState((BlockPos)class_23392);
+            BlockState class_26802 = class_19372.getBlockState((BlockPos) class_23392);
             if (RotationEngine.isHazardousBlock(class_26802)) {
                 return CollisionResult.COLLISION;
             }
@@ -959,14 +1073,18 @@ implements ScreenStateService {
             if (class_36102.isIn(FluidTags.LAVA)) {
                 return CollisionResult.COLLISION;
             }
-            if (class_26802.isAir() || class_26802.isReplaceable() || class_26802.getCollisionShape((BlockView)class_19372, (BlockPos)class_23392).isEmpty()) continue;
+            if (class_26802.isAir() || class_26802.isReplaceable()
+                    || class_26802.getCollisionShape((BlockView) class_19372, (BlockPos) class_23392).isEmpty())
+                continue;
             return CollisionResult.COLLISION;
         }
         return bl2 ? CollisionResult.UNKNOWN : CollisionResult.CLEAR;
     }
 
     private static boolean isHazardousBlock(BlockState class_26802) {
-        return class_26802.isOf(Blocks.LAVA) || class_26802.isOf(Blocks.FIRE) || class_26802.isOf(Blocks.SOUL_FIRE) || class_26802.isOf(Blocks.MAGMA_BLOCK) || class_26802.isOf(Blocks.CAMPFIRE) || class_26802.isOf(Blocks.SOUL_CAMPFIRE);
+        return class_26802.isOf(Blocks.LAVA) || class_26802.isOf(Blocks.FIRE) || class_26802.isOf(Blocks.SOUL_FIRE)
+                || class_26802.isOf(Blocks.MAGMA_BLOCK) || class_26802.isOf(Blocks.CAMPFIRE)
+                || class_26802.isOf(Blocks.SOUL_CAMPFIRE);
     }
 
     private boolean hasElytraEquipped(ClientPlayerEntity class_7462) {
@@ -1009,36 +1127,40 @@ implements ScreenStateService {
 
     private float getTargetYaw(ClientPlayerEntity class_7462) {
         Vec3d VanillaChestLootTableGenerator = this.getDestinationPosition().subtract(class_7462.getEyePos());
-        return (float)Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x)) - 90.0f;
+        return (float) Math.toDegrees(Math.atan2(VanillaChestLootTableGenerator.z, VanillaChestLootTableGenerator.x))
+                - 90.0f;
     }
 
     private double getDistanceSquaredToTarget(ClientPlayerEntity class_7462) {
-        double d = class_7462.getX() - ((double)this.targetBlockX + 0.5);
-        double d2 = class_7462.getZ() - ((double)this.targetBlockZ + 0.5);
+        double d = class_7462.getX() - ((double) this.targetBlockX + 0.5);
+        double d2 = class_7462.getZ() - ((double) this.targetBlockZ + 0.5);
         if (!this.targetHasFixedHeight) {
             return d * d + d2 * d2;
         }
-        double d3 = class_7462.getY() - ((double)this.targetBlockY + 0.5);
+        double d3 = class_7462.getY() - ((double) this.targetBlockY + 0.5);
         return d * d + d3 * d3 + d2 * d2;
     }
 
     private boolean isWithinApproachRange(ClientPlayerEntity class_7462) {
         double d;
         double d2;
-        double d3 = class_7462.getX() - ((double)this.targetBlockX + 0.5);
-        double d4 = Math.hypot(d3, d2 = class_7462.getZ() - ((double)this.targetBlockZ + 0.5));
-        return d4 <= (d = MathHelper.clamp((double)(this.getHorizontalSpeed(class_7462) * 5.0 + 3.0), (double)this.navigationTuning.MIN_APPROACH_DISTANCE, (double)this.navigationTuning.MAX_APPROACH_DISTANCE));
+        double d3 = class_7462.getX() - ((double) this.targetBlockX + 0.5);
+        double d4 = Math.hypot(d3, d2 = class_7462.getZ() - ((double) this.targetBlockZ + 0.5));
+        return d4 <= (d = MathHelper.clamp((double) (this.getHorizontalSpeed(class_7462) * 5.0 + 3.0),
+                (double) this.navigationTuning.MIN_APPROACH_DISTANCE,
+                (double) this.navigationTuning.MAX_APPROACH_DISTANCE));
     }
 
     private double getTargetHeight() {
-        return this.targetHasFixedHeight ? (double)this.targetBlockY + 0.5 : this.initialHeight;
+        return this.targetHasFixedHeight ? (double) this.targetBlockY + 0.5 : this.initialHeight;
     }
 
     private static Vec3d directionFromRotation(float f, float f2) {
-        float f3 = (float)Math.toRadians(f);
-        float f4 = (float)Math.toRadians(f2);
-        float f5 = MathHelper.cos((float)f4);
-        return new Vec3d((double)(-MathHelper.sin((float)f3) * f5), (double)(-MathHelper.sin((float)f4)), (double)(MathHelper.cos((float)f3) * f5)).normalize();
+        float f3 = (float) Math.toRadians(f);
+        float f4 = (float) Math.toRadians(f2);
+        float f5 = MathHelper.cos((float) f4);
+        return new Vec3d((double) (-MathHelper.sin((float) f3) * f5), (double) (-MathHelper.sin((float) f4)),
+                (double) (MathHelper.cos((float) f3) * f5)).normalize();
     }
 
     private static float stepAngleTowards(float f, float f2, float f3) {
@@ -1107,10 +1229,11 @@ implements ScreenStateService {
         final int MAX_FIREWORK_DAMAGE = 10;
         final float MAX_PITCH_ANGLE = 50.0f;
         final float TAKEOFF_PITCH_LIMIT = 20.0f;
-        final float[] PITCH_SAMPLE_OFFSETS = new float[]{-65.0f, -38.0f, -18.0f, 0.0f, 18.0f, 38.0f, 65.0f};
-        final float[] YAW_SAMPLE_OFFSETS = new float[]{-38.0f, -25.0f, -14.0f, -5.0f, 6.0f, 16.0f};
-        final float[] EMERGENCY_YAW_OFFSETS = new float[]{0.0f, -35.0f, 35.0f, -70.0f, 70.0f, -110.0f, 110.0f, -150.0f, 150.0f, 180.0f};
-        final float[] EMERGENCY_PITCH_OFFSETS = new float[]{-50.0f, -35.0f, -20.0f, -8.0f, 6.0f};
+        final float[] PITCH_SAMPLE_OFFSETS = new float[] { -65.0f, -38.0f, -18.0f, 0.0f, 18.0f, 38.0f, 65.0f };
+        final float[] YAW_SAMPLE_OFFSETS = new float[] { -38.0f, -25.0f, -14.0f, -5.0f, 6.0f, 16.0f };
+        final float[] EMERGENCY_YAW_OFFSETS = new float[] { 0.0f, -35.0f, 35.0f, -70.0f, 70.0f, -110.0f, 110.0f,
+                -150.0f, 150.0f, 180.0f };
+        final float[] EMERGENCY_PITCH_OFFSETS = new float[] { -50.0f, -35.0f, -20.0f, -8.0f, 6.0f };
         final float MIN_SAFE_ALTITUDE = 11.0f;
         final float MIN_GLIDE_ALTITUDE = 6.0f;
         final float BRAKE_PITCH_ANGLE = 18.0f;
@@ -1134,7 +1257,7 @@ implements ScreenStateService {
         final int HIGH_ALTITUDE_THRESHOLD = 112;
         final double MAX_OBSTACLE_DISTANCE = 40.0;
         final double EMERGENCY_DISTANCE_THRESHOLD = 14.0;
-        final int[] ALTITUDE_CORRECTION_THRESHOLDS = new int[]{0, 8, 20, 36, 56};
+        final int[] ALTITUDE_CORRECTION_THRESHOLDS = new int[] { 0, 8, 20, 36, 56 };
         final double RECOVERY_DISTANCE_THRESHOLD = 14.0;
         final int CANDIDATE_REFRESH_TICKS = 40;
         final double CANDIDATE_MAX_DISTANCE = 28.0;
@@ -1153,8 +1276,18 @@ implements ScreenStateService {
         final float RECOVERY_YAW_ANGLE = 22.0f;
         final float RECOVERY_PITCH_ANGLE = 6.0f;
         final double MIN_CLEARANCE_DISTANCE = 5.0;
-        final double[][] NORMAL_COLLISION_OFFSETS = new double[][]{{0.0, 0.1, 0.0}, {0.0, 0.9, 0.0}, {0.0, 1.7, 0.0}, {0.0, 2.3, 0.0}, {0.0, -0.5, 0.0}, {0.8, 0.1, 0.0}, {0.8, 0.9, 0.0}, {0.8, 1.7, 0.0}, {-0.8, 0.1, 0.0}, {-0.8, 0.9, 0.0}, {-0.8, 1.7, 0.0}, {0.0, 0.1, 0.8}, {0.0, 0.9, 0.8}, {0.0, 1.7, 0.8}, {0.0, 0.1, -0.8}, {0.0, 0.9, -0.8}, {0.0, 1.7, -0.8}, {0.6, 0.1, 0.6}, {-0.6, 0.1, 0.6}, {0.6, 0.1, -0.6}, {-0.6, 0.1, -0.6}, {0.6, 0.9, 0.6}, {-0.6, 0.9, 0.6}, {0.6, 0.9, -0.6}, {-0.6, 0.9, -0.6}, {0.6, 1.7, 0.6}, {-0.6, 1.7, 0.6}, {0.6, 1.7, -0.6}, {-0.6, 1.7, -0.6}};
-        final double[][] TIGHT_COLLISION_OFFSETS = new double[][]{{0.0, 0.1, 0.0}, {0.0, 0.9, 0.0}, {0.0, 1.7, 0.0}, {0.7, 0.9, 0.0}, {-0.7, 0.9, 0.0}, {0.0, 0.9, 0.7}, {0.0, 0.9, -0.7}, {0.7, 0.1, 0.0}, {-0.7, 0.1, 0.0}, {0.0, 0.1, 0.7}, {0.0, 0.1, -0.7}, {0.7, 1.7, 0.0}, {-0.7, 1.7, 0.0}, {0.0, 1.7, 0.7}, {0.0, 1.7, -0.7}, {0.5, 0.9, 0.5}, {-0.5, 0.9, 0.5}, {0.5, 0.9, -0.5}, {-0.5, 0.9, -0.5}};
+        final double[][] NORMAL_COLLISION_OFFSETS = new double[][] { { 0.0, 0.1, 0.0 }, { 0.0, 0.9, 0.0 },
+                { 0.0, 1.7, 0.0 }, { 0.0, 2.3, 0.0 }, { 0.0, -0.5, 0.0 }, { 0.8, 0.1, 0.0 }, { 0.8, 0.9, 0.0 },
+                { 0.8, 1.7, 0.0 }, { -0.8, 0.1, 0.0 }, { -0.8, 0.9, 0.0 }, { -0.8, 1.7, 0.0 }, { 0.0, 0.1, 0.8 },
+                { 0.0, 0.9, 0.8 }, { 0.0, 1.7, 0.8 }, { 0.0, 0.1, -0.8 }, { 0.0, 0.9, -0.8 }, { 0.0, 1.7, -0.8 },
+                { 0.6, 0.1, 0.6 }, { -0.6, 0.1, 0.6 }, { 0.6, 0.1, -0.6 }, { -0.6, 0.1, -0.6 }, { 0.6, 0.9, 0.6 },
+                { -0.6, 0.9, 0.6 }, { 0.6, 0.9, -0.6 }, { -0.6, 0.9, -0.6 }, { 0.6, 1.7, 0.6 }, { -0.6, 1.7, 0.6 },
+                { 0.6, 1.7, -0.6 }, { -0.6, 1.7, -0.6 } };
+        final double[][] TIGHT_COLLISION_OFFSETS = new double[][] { { 0.0, 0.1, 0.0 }, { 0.0, 0.9, 0.0 },
+                { 0.0, 1.7, 0.0 }, { 0.7, 0.9, 0.0 }, { -0.7, 0.9, 0.0 }, { 0.0, 0.9, 0.7 }, { 0.0, 0.9, -0.7 },
+                { 0.7, 0.1, 0.0 }, { -0.7, 0.1, 0.0 }, { 0.0, 0.1, 0.7 }, { 0.0, 0.1, -0.7 }, { 0.7, 1.7, 0.0 },
+                { -0.7, 1.7, 0.0 }, { 0.0, 1.7, 0.7 }, { 0.0, 1.7, -0.7 }, { 0.5, 0.9, 0.5 }, { -0.5, 0.9, 0.5 },
+                { 0.5, 0.9, -0.5 }, { -0.5, 0.9, -0.5 } };
 
         NavigationTuning() {
         }
@@ -1164,7 +1297,7 @@ implements ScreenStateService {
         GROUNDED,
         TAKEOFF,
         GLIDING;
-}
+    }
 
     static final class RotationResult {
         private final float yaw;
@@ -1229,5 +1362,5 @@ implements ScreenStateService {
         CLEAR,
         COLLISION,
         UNKNOWN;
-}
+    }
 }

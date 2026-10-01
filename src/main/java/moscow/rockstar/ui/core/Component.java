@@ -32,7 +32,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import pyrock.utility.render.ColorRGBA;
 
 public class Component
-extends UiNode {
+        extends UiNode {
     private final List<UiNode> children = new ArrayList<UiNode>();
     private Layout layout = Layout.COLUMN;
     private float gap = 0.0f;
@@ -574,13 +574,15 @@ extends UiNode {
         ArrayList arrayList = new ArrayList();
         boolean n = false;
         for (UiNode uiNode : this.children) {
-            if (uiNode.phase() == UiNode.LifecyclePhase.DISCARDED || identityHashMap.containsKey(uiNode)) continue;
+            if (uiNode.phase() == UiNode.LifecyclePhase.DISCARDED || identityHashMap.containsKey(uiNode))
+                continue;
             ++var4_6;
         }
         int n2 = 0;
         for (UiNode uiNode : this.children) {
-            if (uiNode.phase() == UiNode.LifecyclePhase.DISCARDED || identityHashMap.containsKey(uiNode)) continue;
-            uiNode.beginExit(this.exitProgress(n2++, (int)var4_6));
+            if (uiNode.phase() == UiNode.LifecyclePhase.DISCARDED || identityHashMap.containsKey(uiNode))
+                continue;
+            uiNode.beginExit(this.exitProgress(n2++, (int) var4_6));
             arrayList.add(uiNode);
         }
         IdentityHashMap<UiNode, Boolean> identityHashMap2 = new IdentityHashMap<UiNode, Boolean>();
@@ -591,7 +593,8 @@ extends UiNode {
         for (int i = 0; i < n3; ++i) {
             UiNode uiNode = list.get(i);
             if (identityHashMap2.containsKey(uiNode)) {
-                if (uiNode.phase() == UiNode.LifecyclePhase.DISCARDED || uiNode.phase() == UiNode.LifecyclePhase.HIDDEN) {
+                if (uiNode.phase() == UiNode.LifecyclePhase.DISCARDED
+                        || uiNode.phase() == UiNode.LifecyclePhase.HIDDEN) {
                     uiNode.parent = this;
                     uiNode.beginEnter(this.exitProgress(i, n3));
                 } else if (uiNode.phase() == UiNode.LifecyclePhase.EXITING) {
@@ -614,12 +617,13 @@ extends UiNode {
         if (this.exitStagger <= 0.0f || n2 <= 1) {
             return 0.0f;
         }
-        return this.exitStagger * ((float)n / (float)(n2 - 1));
+        return this.exitStagger * ((float) n / (float) (n2 - 1));
     }
 
     @Override
     public float desiredW() {
-        return this.explicitW ? this.clampW(this.prefW) : this.clampW(this.contentHeight >= 0.0f ? this.contentWidth() : this.prefW);
+        return this.explicitW ? this.clampW(this.prefW)
+                : this.clampW(this.contentHeight >= 0.0f ? this.contentWidth() : this.prefW);
     }
 
     @Override
@@ -645,9 +649,11 @@ extends UiNode {
         int n2 = Math.max(1, this.columns);
         ArrayList<UiNode> arrayList = new ArrayList<UiNode>(this.children.size());
         for (UiNode uiNode : this.children) {
-            if (uiNode.phase() == UiNode.LifecyclePhase.HIDDEN) continue;
+            if (uiNode.phase() == UiNode.LifecyclePhase.HIDDEN)
+                continue;
             uiNode.measure();
-            if (!uiNode.inFlow()) continue;
+            if (!uiNode.inFlow())
+                continue;
             arrayList.add(uiNode);
         }
         int n3 = arrayList.size();
@@ -658,7 +664,8 @@ extends UiNode {
         }
         if (this.wrapContent) {
             float f;
-            float f2 = f = bl ? this.h.getCurrent() - this.padding.verticalSize() : this.w.getCurrent() - this.padding.horizontalSize();
+            float f2 = f = bl ? this.h.getCurrent() - this.padding.verticalSize()
+                    : this.w.getCurrent() - this.padding.horizontalSize();
             if (f <= 0.0f) {
                 f = Float.MAX_VALUE;
             }
@@ -676,12 +683,12 @@ extends UiNode {
             fArray[row] = Math.max(fArray[row], mainSize);
             f = Math.max(f, crossSize);
         }
-        float f4 = (float)(n4 - 1) * this.gap;
+        float f4 = (float) (n4 - 1) * this.gap;
         for (float rowSize : fArray) {
             f4 += rowSize;
         }
         this.contentHeight = f4;
-        this.contentWidth = (float)n2 * f + (float)(n2 - 1) * this.gap;
+        this.contentWidth = (float) n2 * f + (float) (n2 - 1) * this.gap;
     }
 
     @Override
@@ -727,7 +734,8 @@ extends UiNode {
         if (this.scrollEnabled) {
             f4 = Math.max(0.0f, this.contentHeight - this.viewportSize);
             this.targetScrollOffset = Math.max(0.0f, Math.min(this.targetScrollOffset, f4));
-            this.scrollOffset = bl ? this.targetScrollOffset : (this.scrollOffset += (this.targetScrollOffset - this.scrollOffset) * Math.min(1.0f, f * 0.02f));
+            this.scrollOffset = bl ? this.targetScrollOffset
+                    : (this.scrollOffset += (this.targetScrollOffset - this.scrollOffset) * Math.min(1.0f, f * 0.02f));
             if (Math.abs(this.targetScrollOffset - this.scrollOffset) < 0.05f) {
                 this.scrollOffset = this.targetScrollOffset;
             }
@@ -738,7 +746,8 @@ extends UiNode {
         boolean bl2 = this.layout.isVertical();
         float f6 = 0.0f;
         for (UiNode f8 : this.children) {
-            if (!f8.inFlow() || !f8.isSticky()) continue;
+            if (!f8.inFlow() || !f8.isSticky())
+                continue;
             f6 += bl2 ? f8.h() : f8.w();
         }
         this.stickySpace = f6;
@@ -766,7 +775,8 @@ extends UiNode {
     private int modalIndex() {
         for (int i = this.children.size() - 1; i >= 0; --i) {
             UiNode uiNode = this.children.get(i);
-            if (!uiNode.isModal() || !uiNode.inFlow()) continue;
+            if (!uiNode.isModal() || !uiNode.inFlow())
+                continue;
             return i;
         }
         return 0;
@@ -866,9 +876,11 @@ extends UiNode {
         float f = 0.0f;
         float f2 = 0.0f;
         for (UiNode uiNode : this.children) {
-            if (uiNode.phase() == UiNode.LifecyclePhase.HIDDEN) continue;
+            if (uiNode.phase() == UiNode.LifecyclePhase.HIDDEN)
+                continue;
             uiNode.measure();
-            if (!uiNode.inFlow()) continue;
+            if (!uiNode.inFlow())
+                continue;
             f = Math.max(f, uiNode.desiredH());
             f2 = Math.max(f2, uiNode.desiredW());
         }
@@ -891,8 +903,10 @@ extends UiNode {
         float f5 = 0.0f;
         float f6 = 0.0f;
         for (UiNode uiNode : this.children) {
-            if (!uiNode.inFlow()) continue;
-            float f7 = uiNode.fillW || this.alignment == Alignment.STRETCH ? f4 : (bl ? uiNode.desiredW() : Math.min(f4, uiNode.desiredW()));
+            if (!uiNode.inFlow())
+                continue;
+            float f7 = uiNode.fillW || this.alignment == Alignment.STRETCH ? f4
+                    : (bl ? uiNode.desiredW() : Math.min(f4, uiNode.desiredW()));
             float f8 = uiNode.fillH ? f : (bl2 ? uiNode.desiredH() : Math.min(f, uiNode.desiredH()));
             if (this.snappedThisFrame()) {
                 uiNode.forceSnap();
@@ -906,11 +920,13 @@ extends UiNode {
     }
 
     private boolean isAutoSize(boolean bl) {
-        return bl ? !this.explicitW && !this.fillW && this.maxW == Float.MAX_VALUE : !this.explicitH && !this.fillH && this.maxH == Float.MAX_VALUE;
+        return bl ? !this.explicitW && !this.fillW && this.maxW == Float.MAX_VALUE
+                : !this.explicitH && !this.fillH && this.maxH == Float.MAX_VALUE;
     }
 
     private boolean isAutoCrossSize(boolean bl) {
-        return bl ? !this.explicitH && !this.fillH && this.maxH == Float.MAX_VALUE : !this.explicitW && !this.fillW && this.maxW == Float.MAX_VALUE;
+        return bl ? !this.explicitH && !this.fillH && this.maxH == Float.MAX_VALUE
+                : !this.explicitW && !this.fillW && this.maxW == Float.MAX_VALUE;
     }
 
     private void layoutChildren() {
@@ -934,13 +950,14 @@ extends UiNode {
         this.viewportWidth = f6;
         this.viewportHeight = f7;
         int n2 = Math.max(1, this.columns);
-        float f10 = (f9 - (float)(n2 - 1) * this.gap) / (float)n2;
+        float f10 = (f9 - (float) (n2 - 1) * this.gap) / (float) n2;
         if (f10 < 0.0f) {
             f10 = 0.0f;
         }
         ArrayList<UiNode> arrayList = new ArrayList<UiNode>(this.children.size());
         for (UiNode uiNode : this.children) {
-            if (!uiNode.inFlow()) continue;
+            if (!uiNode.inFlow())
+                continue;
             arrayList.add(uiNode);
         }
         int n3 = arrayList.size();
@@ -964,24 +981,26 @@ extends UiNode {
             fArray[row] = Math.max(fArray[row], mainSize);
             f11 = Math.max(f11, crossSize);
         }
-        float f13 = (float)(n4 - 1) * this.gap;
+        float f13 = (float) (n4 - 1) * this.gap;
         for (float rowSize : fArray) {
             f13 += rowSize;
         }
         this.contentHeight = f13;
-        this.contentWidth = (float)n2 * (this.alignment == Alignment.STRETCH ? f10 : f11) + (float)(n2 - 1) * this.gap;
+        this.contentWidth = (float) n2 * (this.alignment == Alignment.STRETCH ? f10 : f11)
+                + (float) (n2 - 1) * this.gap;
         if (!(this.explicitW || this.fillW || this.explicitH || this.fillH)) {
-            this.contentWidth = (float)n2 * f11 + (float)(n2 - 1) * this.gap;
+            this.contentWidth = (float) n2 * f11 + (float) (n2 - 1) * this.gap;
         }
         float f14 = Math.max(0.0f, f8 - f13);
         int fillChildCount = 0;
         if (n2 == 1) {
             for (UiNode uiNode : arrayList) {
-                if (!(bl ? uiNode.fillH : uiNode.fillW)) continue;
+                if (!(bl ? uiNode.fillH : uiNode.fillW))
+                    continue;
                 ++fillChildCount;
             }
         }
-        float f15 = f3 = fillChildCount > 0 && f14 > 0.0f ? f14 / (float)fillChildCount : 0.0f;
+        float f15 = f3 = fillChildCount > 0 && f14 > 0.0f ? f14 / (float) fillChildCount : 0.0f;
         if (f3 > 0.0f) {
             f14 = 0.0f;
         }
@@ -989,7 +1008,8 @@ extends UiNode {
         if (n2 == 1 && fillChildCount > 0 && f13 > f8 && !this.isAutoCrossSize(bl)) {
             f2 = 0.0f;
             for (UiNode uiNode : arrayList) {
-                if (!(bl ? uiNode.fillH : uiNode.fillW)) continue;
+                if (!(bl ? uiNode.fillH : uiNode.fillW))
+                    continue;
                 f2 += bl ? uiNode.desiredH() : uiNode.desiredW();
             }
             f = f13 - f8;
@@ -1010,16 +1030,16 @@ extends UiNode {
                 break;
             }
             case SPACE_BETWEEN: {
-                f = n4 > 1 ? f14 / (float)(n4 - 1) : 0.0f;
+                f = n4 > 1 ? f14 / (float) (n4 - 1) : 0.0f;
                 break;
             }
             case SPACE_AROUND: {
-                f = f14 / (float)n4;
+                f = f14 / (float) n4;
                 f2 = f / 2.0f;
                 break;
             }
             case SPACE_EVENLY: {
-                f2 = f = f14 / (float)(n4 + 1);
+                f2 = f = f14 / (float) (n4 + 1);
                 break;
             }
         }
@@ -1031,13 +1051,13 @@ extends UiNode {
             float f20;
             float f21;
             float f22;
-            UiNode uiNode = (UiNode)arrayList.get(i);
+            UiNode uiNode = (UiNode) arrayList.get(i);
             int n5 = i / n2;
             int n6 = i % n2;
             boolean bl3 = bl ? uiNode.fillW : uiNode.fillH;
             boolean bl4 = bl ? uiNode.fillH : uiNode.fillW;
             float f23 = bl ? uiNode.desiredW() : uiNode.desiredH();
-            float f24 = (float)n6 * (f10 + this.gap);
+            float f24 = (float) n6 * (f10 + this.gap);
             float f25 = bl3 || this.alignment == Alignment.STRETCH ? f10 : (bl2 ? f23 : Math.min(f10, f23));
             float f26 = switch (this.alignment) {
                 case Alignment.CENTER -> (f10 - f25) / 2.0f;
@@ -1067,7 +1087,8 @@ extends UiNode {
                 uiNode.forceSnap();
             }
             uiNode.setSlot(f21, f20, f19, f18);
-            if (n6 != n2 - 1 && i != n3 - 1) continue;
+            if (n6 != n2 - 1 && i != n3 - 1)
+                continue;
             f17 += f22 + f28 + this.gap + f;
         }
     }
@@ -1122,11 +1143,14 @@ extends UiNode {
     @Override
     protected void drawSelf(RockstarDrawContext drawContext, float f) {
         ColorRGBA colorRGBA;
-        if (this.backgroundColor != null && (colorRGBA = this.backgroundColor.apply(this)) != null && colorRGBA.getAlpha() > 0.0f) {
+        if (this.backgroundColor != null && (colorRGBA = this.backgroundColor.apply(this)) != null
+                && colorRGBA.getAlpha() > 0.0f) {
             if (this.squircleRadius > 0.0f) {
-                drawContext.drawSquircle(this.x.getCurrent(), this.y.getCurrent(), this.w.getCurrent(), this.h.getCurrent(), this.squircleRadius, this.cornerRadius, colorRGBA);
+                drawContext.drawSquircle(this.x.getCurrent(), this.y.getCurrent(), this.w.getCurrent(),
+                        this.h.getCurrent(), this.squircleRadius, this.cornerRadius, colorRGBA);
             } else {
-                drawContext.drawRoundedRect(this.x.getCurrent(), this.y.getCurrent(), this.w.getCurrent(), this.h.getCurrent(), this.cornerRadius, colorRGBA);
+                drawContext.drawRoundedRect(this.x.getCurrent(), this.y.getCurrent(), this.w.getCurrent(),
+                        this.h.getCurrent(), this.cornerRadius, colorRGBA);
             }
         }
         if (this.renderHook != null) {
@@ -1148,7 +1172,8 @@ extends UiNode {
         float f8 = 0.0f;
         boolean bl3 = false;
         for (UiNode uiNode2 : this.children) {
-            if (!uiNode2.inFlow() || !uiNode2.isSticky()) continue;
+            if (!uiNode2.inFlow() || !uiNode2.isSticky())
+                continue;
             bl3 = true;
             f8 += bl2 ? uiNode2.h() : uiNode2.w();
         }
@@ -1159,7 +1184,7 @@ extends UiNode {
             f3 = f5 + (bl2 ? f8 : 0.0f);
             f2 = Math.max(0.0f, f6 - (bl2 ? 0.0f : f8));
             float f10 = Math.max(0.0f, f7 - (bl2 ? f8 : 0.0f));
-            moscow.rockstar.render.state.UiScissorStack.push(matrices, (float)f9, (float)f3, (float)f2, (float)f10);
+            moscow.rockstar.render.state.UiScissorStack.push(matrices, (float) f9, (float) f3, (float) f2, (float) f10);
         }
         boolean bl5 = bl = this.scrollOffset != 0.0f;
         if (bl) {
@@ -1179,10 +1204,12 @@ extends UiNode {
         }
         for (UiNode uiNode3 : this.children) {
             float f13;
-            if (uiNode3.isSticky()) continue;
+            if (uiNode3.isSticky())
+                continue;
             float f14 = bl2 ? uiNode3.y() - f5 : uiNode3.x() - f4;
             float f15 = f13 = bl2 ? uiNode3.h() : uiNode3.w();
-            if (this.scrollEnabled && (f14 + f13 < f3 || f14 > f2)) continue;
+            if (this.scrollEnabled && (f14 + f13 < f3 || f14 > f2))
+                continue;
             uiNode3.draw(drawContext, f);
         }
         if (bl6) {
@@ -1198,10 +1225,12 @@ extends UiNode {
         }
         if (bl3) {
             if (bl4) {
-                moscow.rockstar.render.state.UiScissorStack.push(matrices, (float)f4, (float)f5, (float)f6, (float)f7);
+                moscow.rockstar.render.state.UiScissorStack.push(matrices, (float) f4, (float) f5, (float) f6,
+                        (float) f7);
             }
             for (UiNode uiNode3 : this.children) {
-                if (!uiNode3.isSticky()) continue;
+                if (!uiNode3.isSticky())
+                    continue;
                 uiNode3.draw(drawContext, f);
             }
             if (bl4) {
@@ -1225,7 +1254,9 @@ extends UiNode {
         int n = this.modalIndex();
         for (int i = this.children.size() - 1; i >= n; --i) {
             UiNode uiNode = this.children.get(i);
-            if (!uiNode.inFlow() || !uiNode.isSticky() || !this.isWithinViewport(uiNode, f, f2) || !uiNode.mouseClicked(f, f2, pointerAction)) continue;
+            if (!uiNode.inFlow() || !uiNode.isSticky() || !this.isWithinViewport(uiNode, f, f2)
+                    || !uiNode.mouseClicked(f, f2, pointerAction))
+                continue;
             return true;
         }
         float f3 = f2;
@@ -1237,7 +1268,9 @@ extends UiNode {
         }
         for (int i = this.children.size() - 1; i >= n; --i) {
             UiNode uiNode = this.children.get(i);
-            if (!uiNode.inFlow() || uiNode.isSticky() || !this.isWithinViewport(uiNode, f, f2) || !uiNode.mouseClicked(f4, f3, pointerAction)) continue;
+            if (!uiNode.inFlow() || uiNode.isSticky() || !this.isWithinViewport(uiNode, f, f2)
+                    || !uiNode.mouseClicked(f4, f3, pointerAction))
+                continue;
             return true;
         }
         return super.mouseClicked(f, f2, pointerAction);
@@ -1270,7 +1303,8 @@ extends UiNode {
         }
         int n4 = this.modalIndex();
         for (int i = this.children.size() - 1; i >= n4; --i) {
-            if (!this.children.get(i).keyPressed(n, n2, n3)) continue;
+            if (!this.children.get(i).keyPressed(n, n2, n3))
+                continue;
             return true;
         }
         return false;
@@ -1283,7 +1317,8 @@ extends UiNode {
         }
         int n4 = this.modalIndex();
         for (int i = this.children.size() - 1; i >= n4; --i) {
-            if (!this.children.get(i).keyReleased(n, n2, n3)) continue;
+            if (!this.children.get(i).keyReleased(n, n2, n3))
+                continue;
             return true;
         }
         return false;
@@ -1296,7 +1331,8 @@ extends UiNode {
         }
         int n2 = this.modalIndex();
         for (int i = this.children.size() - 1; i >= n2; --i) {
-            if (!this.children.get(i).charTyped(c, n)) continue;
+            if (!this.children.get(i).charTyped(c, n))
+                continue;
             return true;
         }
         return false;
@@ -1320,7 +1356,8 @@ extends UiNode {
             UiNode uiNode = this.children.get(i);
             float f8 = uiNode.isSticky() ? f : f6;
             float f9 = f7 = uiNode.isSticky() ? f2 : f5;
-            if (!uiNode.mouseScrolled(f8, f7, f3, f4)) continue;
+            if (!uiNode.mouseScrolled(f8, f7, f3, f4))
+                continue;
             return true;
         }
         if (n > 0) {

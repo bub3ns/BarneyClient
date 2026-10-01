@@ -150,7 +150,7 @@ import pyrock.utility.render.ColorRGBA;
 import pyrock.utility.render.CustomDrawContext;
 
 public class MiningFarmMode
-extends FarmModeBase {
+        extends FarmModeBase {
     private static final BlockPos MINE_REGION_MIN_CORNER = new BlockPos(-75, 84, 29);
     private static final BlockPos MINE_REGION_MAX_CORNER = new BlockPos(-54, 93, 50);
     private static final double MAX_INTERACTION_DISTANCE = 12.0;
@@ -190,9 +190,16 @@ extends FarmModeBase {
     private final NumberSetting repairBottleTargetSetting;
     private BooleanSetting showHudSetting;
     private NumberSetting hudMineCountSetting;
-    private static final Set<Item> sellableMineItems = Set.of(Items.DIAMOND, Items.EMERALD, Items.ANCIENT_DEBRIS, Items.NETHERITE_SCRAP, Items.RAW_GOLD, Items.RAW_IRON, Items.RAW_COPPER, Items.GOLD_INGOT, Items.IRON_INGOT, Items.COPPER_INGOT, Items.LAPIS_LAZULI, Items.REDSTONE, Items.COAL, Items.QUARTZ);
-    private static final Set<Item> protectedMineItems = Set.of(Items.DIAMOND, Items.EMERALD, Items.ANCIENT_DEBRIS, Items.NETHERITE_SCRAP, Items.NETHERITE_INGOT, Items.RAW_GOLD, Items.RAW_IRON, Items.RAW_COPPER, Items.GOLD_INGOT, Items.IRON_INGOT, Items.COPPER_INGOT, Items.GOLD_NUGGET, Items.IRON_NUGGET, Items.LAPIS_LAZULI, Items.REDSTONE, Items.COAL, Items.QUARTZ, Items.DIAMOND_BLOCK, Items.EMERALD_BLOCK, Items.NETHERITE_BLOCK, Items.GOLD_BLOCK, Items.IRON_BLOCK);
-    private static final Pattern RUSSIAN_QUANTITY_PATTERN = Pattern.compile("\u0437\u0430\\s+(\\d+)\\s*\u0448\u0442", 66);
+    private static final Set<Item> sellableMineItems = Set.of(Items.DIAMOND, Items.EMERALD, Items.ANCIENT_DEBRIS,
+            Items.NETHERITE_SCRAP, Items.RAW_GOLD, Items.RAW_IRON, Items.RAW_COPPER, Items.GOLD_INGOT, Items.IRON_INGOT,
+            Items.COPPER_INGOT, Items.LAPIS_LAZULI, Items.REDSTONE, Items.COAL, Items.QUARTZ);
+    private static final Set<Item> protectedMineItems = Set.of(Items.DIAMOND, Items.EMERALD, Items.ANCIENT_DEBRIS,
+            Items.NETHERITE_SCRAP, Items.NETHERITE_INGOT, Items.RAW_GOLD, Items.RAW_IRON, Items.RAW_COPPER,
+            Items.GOLD_INGOT, Items.IRON_INGOT, Items.COPPER_INGOT, Items.GOLD_NUGGET, Items.IRON_NUGGET,
+            Items.LAPIS_LAZULI, Items.REDSTONE, Items.COAL, Items.QUARTZ, Items.DIAMOND_BLOCK, Items.EMERALD_BLOCK,
+            Items.NETHERITE_BLOCK, Items.GOLD_BLOCK, Items.IRON_BLOCK);
+    private static final Pattern RUSSIAN_QUANTITY_PATTERN = Pattern.compile("\u0437\u0430\\s+(\\d+)\\s*\u0448\u0442",
+            66);
     private MiningOperationState operationState = MiningOperationState.LOCATING_RESOURCE;
     private volatile List<MineLocation> availableMineLocations = new ArrayList<MineLocation>();
     private volatile long mineDataFetchedAt;
@@ -327,20 +334,22 @@ extends FarmModeBase {
         if (!(object instanceof GameMessageS2CPacket)) {
             return;
         }
-        GameMessageS2CPacket class_74392 = (GameMessageS2CPacket)object;
+        GameMessageS2CPacket class_74392 = (GameMessageS2CPacket) object;
         object = class_74392.content().getString().toLowerCase();
-        if (((String)object).contains("\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u043e\u0432")) {
+        if (((String) object).contains(
+                "\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u043e\u0432")) {
             this.saleItemSelected = false;
             this.inventoryItemActionPending = false;
             return;
         }
-        if (!((String)object).contains("\u043f\u0440\u043e\u0434\u0430\u0432\u0430\u0442\u044c")) {
+        if (!((String) object).contains("\u043f\u0440\u043e\u0434\u0430\u0432\u0430\u0442\u044c")) {
             return;
         }
-        if (((String)object).contains("\u0432\u0441\u0435 \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u044b") || ((String)object).contains("\u0432\u0441\u0451 \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u044b")) {
+        if (((String) object).contains("\u0432\u0441\u0435 \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u044b")
+                || ((String) object).contains("\u0432\u0441\u0451 \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u044b")) {
             this.saleItemSelected = true;
             this.inventoryItemActionPending = false;
-        } else if (((String)object).contains("\u043f\u0440\u043e\u0434\u0430\u0432\u0430\u0442\u044c \u043f\u043e")) {
+        } else if (((String) object).contains("\u043f\u0440\u043e\u0434\u0430\u0432\u0430\u0442\u044c \u043f\u043e")) {
             this.saleItemSelected = false;
             this.inventoryItemActionPending = false;
         }
@@ -350,23 +359,31 @@ extends FarmModeBase {
         if (MiningFarmMode.minecraftClient.world == null || MiningFarmMode.minecraftClient.player == null) {
             return;
         }
-        if (this.operationState != MiningOperationState.WAITING_FOR_SERVER_DATA && this.operationState != MiningOperationState.MINING_RESOURCE) {
+        if (this.operationState != MiningOperationState.WAITING_FOR_SERVER_DATA
+                && this.operationState != MiningOperationState.MINING_RESOURCE) {
             return;
         }
         MatrixStack class_45872 = render3DEvent.getMatrices();
         Camera class_41842 = MiningFarmMode.minecraftClient.gameRenderer.getCamera();
         Vec3d VanillaChestLootTableGenerator = class_41842.getPos();
-        Box HorizontalFacingBlock = new Box((double)MINE_REGION_MIN_CORNER.getX(), (double)MINE_REGION_MIN_CORNER.getY(), (double)MINE_REGION_MIN_CORNER.getZ(), (double)(MINE_REGION_MAX_CORNER.getX() + 1), (double)(MINE_REGION_MAX_CORNER.getY() + 1), (double)(MINE_REGION_MAX_CORNER.getZ() + 1)).offset(-VanillaChestLootTableGenerator.x, -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z);
+        Box HorizontalFacingBlock = new Box((double) MINE_REGION_MIN_CORNER.getX(),
+                (double) MINE_REGION_MIN_CORNER.getY(), (double) MINE_REGION_MIN_CORNER.getZ(),
+                (double) (MINE_REGION_MAX_CORNER.getX() + 1), (double) (MINE_REGION_MAX_CORNER.getY() + 1),
+                (double) (MINE_REGION_MAX_CORNER.getZ() + 1)).offset(-VanillaChestLootTableGenerator.x,
+                        -VanillaChestLootTableGenerator.y, -VanillaChestLootTableGenerator.z);
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShader((ShaderProgramKey)ShaderProgramKeys.POSITION_COLOR);
-        BufferBuilder class_2872 = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader((ShaderProgramKey) ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder class_2872 = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS,
+                VertexFormats.POSITION_COLOR);
         RenderUtils.drawFilledBox(class_45872, class_2872, HorizontalFacingBlock, mineHighlightColor.mulAlpha(0.1f));
         ItemRenderUtils.flushVertexConsumer(class_2872);
-        BufferBuilder CreativeInventoryActionC2SPacket = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        RenderUtils.drawBoxOutline(class_45872, CreativeInventoryActionC2SPacket, HorizontalFacingBlock, mineHighlightColor.mulAlpha(0.7f));
+        BufferBuilder CreativeInventoryActionC2SPacket = RenderSystem.renderThreadTesselator()
+                .begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderUtils.drawBoxOutline(class_45872, CreativeInventoryActionC2SPacket, HorizontalFacingBlock,
+                mineHighlightColor.mulAlpha(0.7f));
         ItemRenderUtils.flushVertexConsumer(CreativeInventoryActionC2SPacket);
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableCull();
@@ -385,7 +402,7 @@ extends FarmModeBase {
         FontMetrics fontMetrics2 = Font.MEDIUM.metrics(7.0f);
         ArrayList<MineLocation> arrayList = new ArrayList<MineLocation>(this.availableMineLocations);
         arrayList.sort(Comparator.comparingLong(this::getRemainingMineSeconds));
-        int n = Math.min(arrayList.size(), (int)this.hudMineCountSetting.getValue());
+        int n = Math.min(arrayList.size(), (int) this.hudMineCountSetting.getValue());
         float f = 6.0f;
         float f2 = 44.0f;
         float f3 = 5.0f;
@@ -393,54 +410,96 @@ extends FarmModeBase {
         float f5 = 188.0f;
         float f6 = 13.0f;
         float f7 = 11.0f;
-        float f8 = f3 * 2.0f + f6 + f7 + (float)n * f4;
-        customDrawContext.drawRoundedRect(f, f2, f5, f8, WidgetState.uniform(5.0f), new ColorRGBA(14.0f, 14.0f, 16.0f).mulAlpha(0.78f));
+        float f8 = f3 * 2.0f + f6 + f7 + (float) n * f4;
+        customDrawContext.drawRoundedRect(f, f2, f5, f8, WidgetState.uniform(5.0f),
+                new ColorRGBA(14.0f, 14.0f, 16.0f).mulAlpha(0.78f));
         float f9 = f2 + f3;
         customDrawContext.drawText(fontMetrics, "Mine Farm", f + f3, f9, ColorPalette.getPrimaryTextColor());
         String string = this.getMiningStatusText();
         customDrawContext.drawText(fontMetrics2, string, f + f3, f9 += f6, ColorPalette.getAccentColor());
         f9 += f7;
         for (int i = 0; i < n; ++i) {
-            MineLocation mineLocation = (MineLocation)arrayList.get(i);
-            boolean bl = this.selectedMineLocation != null && MiningFarmMode.parseMineIndex(mineLocation.getServerId()) == this.selectedMineServerIndex;
+            MineLocation mineLocation = (MineLocation) arrayList.get(i);
+            boolean bl = this.selectedMineLocation != null
+                    && MiningFarmMode.parseMineIndex(mineLocation.getServerId()) == this.selectedMineServerIndex;
             ColorRGBA colorRGBA = bl ? ColorPalette.getAccentColor() : ColorPalette.getPrimaryTextColor();
-            String string2 = mineLocation.getServerName() + "  " + MiningFarmMode.formatRarityLabel(mineLocation.getMineRarity()) + "\u2192" + MiningFarmMode.formatRarityLabel(mineLocation.getNextMineRarity());
+            String string2 = mineLocation.getServerName() + "  "
+                    + MiningFarmMode.formatRarityLabel(mineLocation.getMineRarity()) + "\u2192"
+                    + MiningFarmMode.formatRarityLabel(mineLocation.getNextMineRarity());
             customDrawContext.drawText(fontMetrics2, string2, f + f3, f9, colorRGBA);
-            customDrawContext.drawRightText(fontMetrics2, MiningFarmMode.formatDuration(this.getRemainingMineSeconds(mineLocation)), f + f5 - f3, f9, colorRGBA);
+            customDrawContext.drawRightText(fontMetrics2,
+                    MiningFarmMode.formatDuration(this.getRemainingMineSeconds(mineLocation)), f + f5 - f3, f9,
+                    colorRGBA);
             f9 += f4;
         }
     };
 
     public MiningFarmMode(AutoFarm autoFarm, ModeSetting modeSetting) {
         super(autoFarm, modeSetting, "modules.settings.auto_farm.modes.mine");
-        this.raritySetting = new MultiBooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.rarities", () -> !this.isSelected());
-        this.commonRarityOption = new MultiBooleanSetting.Option(this.raritySetting, "modules.settings.mine_farm.rarities.default").select();
-        this.legendaryRarityOption = new MultiBooleanSetting.Option(this.raritySetting, "modules.settings.mine_farm.rarities.legendary").select();
-        this.mythicalRarityOption = new MultiBooleanSetting.Option(this.raritySetting, "modules.settings.mine_farm.rarities.mythical").select();
-        this.digAllSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.dig_all", () -> !this.isSelected());
-        this.oreTypeFilter = new MultiBooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.ore_types", () -> !this.isSelected() || this.digAllSetting.isEnabled());
-        this.diamondOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.diamond").select();
-        this.lapisOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.lapis");
-        this.redstoneOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.redstone");
+        this.raritySetting = new MultiBooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.rarities",
+                () -> !this.isSelected());
+        this.commonRarityOption = new MultiBooleanSetting.Option(this.raritySetting,
+                "modules.settings.mine_farm.rarities.default").select();
+        this.legendaryRarityOption = new MultiBooleanSetting.Option(this.raritySetting,
+                "modules.settings.mine_farm.rarities.legendary").select();
+        this.mythicalRarityOption = new MultiBooleanSetting.Option(this.raritySetting,
+                "modules.settings.mine_farm.rarities.mythical").select();
+        this.digAllSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.dig_all",
+                () -> !this.isSelected());
+        this.oreTypeFilter = new MultiBooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.ore_types",
+                () -> !this.isSelected() || this.digAllSetting.isEnabled());
+        this.diamondOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter,
+                "modules.settings.mine_farm.ore.diamond").select();
+        this.lapisOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter,
+                "modules.settings.mine_farm.ore.lapis");
+        this.redstoneOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter,
+                "modules.settings.mine_farm.ore.redstone");
         this.ironOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.iron");
-        this.goldOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.gold").select();
-        this.debrisOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.debris").select();
-        this.cleanInventorySetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.clean_inventory", () -> !this.isSelected()).enable();
-        this.dropExceptSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.drop_except", () -> !this.isSelected());
-        this.keepOnlySetting = new MultiBooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.keep_only", () -> !this.isSelected() || !this.dropExceptSetting.isEnabled());
-        this.diamondKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting, "modules.settings.mine_farm.keep.diamond").select();
-        this.debrisKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting, "modules.settings.mine_farm.keep.debris").select();
-        this.ironKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting, "modules.settings.mine_farm.keep.iron").select();
-        this.goldKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting, "modules.settings.mine_farm.keep.gold").select();
-        this.autoSellSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.auto_sell", () -> !this.isSelected());
-        this.sellServerSetting = new StringSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.sell_anarchy", () -> !this.isSelected() || !this.autoSellSetting.isEnabled()).setNumericOnly(true).setValue("");
-        this.sellThresholdSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.sell_threshold", () -> !this.isSelected() || !this.autoSellSetting.isEnabled()).setStep(1.0f).setMinValue(1.0f).setMaxValue(36.0f).setValue(10.0f).setUnit(" st");
-        this.autoRepairSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.auto_repair", () -> !this.isSelected()).enable();
-        this.repairThresholdSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.repair_threshold", () -> !this.isSelected() || !this.autoRepairSetting.isEnabled()).setStep(1.0f).setMinValue(1.0f).setMaxValue(50.0f).setValue(10.0f).setUnit("%");
-        this.repairTargetPercentageSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.repair_until", () -> !this.isSelected() || !this.autoRepairSetting.isEnabled()).setStep(1.0f).setMinValue(20.0f).setMaxValue(100.0f).setValue(90.0f).setUnit("%");
-        this.repairBottleTargetSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.bottle_target", () -> !this.isSelected() || !this.autoRepairSetting.isEnabled()).setStep(1.0f).setMinValue(1.0f).setMaxValue(128.0f).setValue(64.0f).setUnit(" pcs");
-        this.showHudSetting = new BooleanSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.show_hud", () -> !this.isSelected()).enable();
-        this.hudMineCountSetting = new NumberSetting((SettingOwner)autoFarm, "modules.settings.mine_farm.hud_count", () -> !this.isSelected() || !this.showHudSetting.isEnabled()).setStep(1.0f).setMinValue(3.0f).setMaxValue(15.0f).setValue(8.0f);
+        this.goldOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter, "modules.settings.mine_farm.ore.gold")
+                .select();
+        this.debrisOreOption = new MultiBooleanSetting.Option(this.oreTypeFilter,
+                "modules.settings.mine_farm.ore.debris").select();
+        this.cleanInventorySetting = new BooleanSetting((SettingOwner) autoFarm,
+                "modules.settings.mine_farm.clean_inventory", () -> !this.isSelected()).enable();
+        this.dropExceptSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.drop_except",
+                () -> !this.isSelected());
+        this.keepOnlySetting = new MultiBooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.keep_only",
+                () -> !this.isSelected() || !this.dropExceptSetting.isEnabled());
+        this.diamondKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting,
+                "modules.settings.mine_farm.keep.diamond").select();
+        this.debrisKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting,
+                "modules.settings.mine_farm.keep.debris").select();
+        this.ironKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting,
+                "modules.settings.mine_farm.keep.iron").select();
+        this.goldKeepOption = new MultiBooleanSetting.Option(this.keepOnlySetting,
+                "modules.settings.mine_farm.keep.gold").select();
+        this.autoSellSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.auto_sell",
+                () -> !this.isSelected());
+        this.sellServerSetting = new StringSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.sell_anarchy",
+                () -> !this.isSelected() || !this.autoSellSetting.isEnabled()).setNumericOnly(true).setValue("");
+        this.sellThresholdSetting = new NumberSetting((SettingOwner) autoFarm,
+                "modules.settings.mine_farm.sell_threshold",
+                () -> !this.isSelected() || !this.autoSellSetting.isEnabled()).setStep(1.0f).setMinValue(1.0f)
+                .setMaxValue(36.0f).setValue(10.0f).setUnit(" st");
+        this.autoRepairSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.auto_repair",
+                () -> !this.isSelected()).enable();
+        this.repairThresholdSetting = new NumberSetting((SettingOwner) autoFarm,
+                "modules.settings.mine_farm.repair_threshold",
+                () -> !this.isSelected() || !this.autoRepairSetting.isEnabled()).setStep(1.0f).setMinValue(1.0f)
+                .setMaxValue(50.0f).setValue(10.0f).setUnit("%");
+        this.repairTargetPercentageSetting = new NumberSetting((SettingOwner) autoFarm,
+                "modules.settings.mine_farm.repair_until",
+                () -> !this.isSelected() || !this.autoRepairSetting.isEnabled()).setStep(1.0f).setMinValue(20.0f)
+                .setMaxValue(100.0f).setValue(90.0f).setUnit("%");
+        this.repairBottleTargetSetting = new NumberSetting((SettingOwner) autoFarm,
+                "modules.settings.mine_farm.bottle_target",
+                () -> !this.isSelected() || !this.autoRepairSetting.isEnabled()).setStep(1.0f).setMinValue(1.0f)
+                .setMaxValue(128.0f).setValue(64.0f).setUnit(" pcs");
+        this.showHudSetting = new BooleanSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.show_hud",
+                () -> !this.isSelected()).enable();
+        this.hudMineCountSetting = new NumberSetting((SettingOwner) autoFarm, "modules.settings.mine_farm.hud_count",
+                () -> !this.isSelected() || !this.showHudSetting.isEnabled()).setStep(1.0f).setMinValue(3.0f)
+                .setMaxValue(15.0f).setValue(8.0f);
     }
 
     @Override
@@ -527,8 +586,7 @@ extends FarmModeBase {
         }
         try {
             return Integer.parseInt(string2);
-        }
-        catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException numberFormatException) {
             return -1;
         }
     }
@@ -540,7 +598,10 @@ extends FarmModeBase {
         long l = 10L;
         for (MineLocation mineLocation : arrayList) {
             int n2;
-            if (!this.matchesMineRarity(mineLocation.getNextMineRarity()) || (n2 = MiningFarmMode.parseMineIndex(mineLocation.getServerId())) <= 0 || n2 > 1000 || n2 != n && this.getRemainingMineSeconds(mineLocation) < l) continue;
+            if (!this.matchesMineRarity(mineLocation.getNextMineRarity())
+                    || (n2 = MiningFarmMode.parseMineIndex(mineLocation.getServerId())) <= 0 || n2 > 1000
+                    || n2 != n && this.getRemainingMineSeconds(mineLocation) < l)
+                continue;
             return mineLocation;
         }
         return null;
@@ -694,13 +755,15 @@ extends FarmModeBase {
         double d2 = (d + 0.6) * (d + 0.6);
         int n2 = MiningFarmMode.minecraftClient.player.getBlockY();
         BlockPos adminsky = null;
-        if (this.currentMiningBlock != null && !this.visitedMiningBlocks.contains(this.currentMiningBlock) && this.isMineableTargetBlock(this.currentMiningBlock)) {
+        if (this.currentMiningBlock != null && !this.visitedMiningBlocks.contains(this.currentMiningBlock)
+                && this.isMineableTargetBlock(this.currentMiningBlock)) {
             adminsky = this.currentMiningBlock;
         } else {
             blockIterator = list.iterator();
             while (blockIterator.hasNext()) {
                 BlockPos adminsky2 = blockIterator.next();
-                if (this.visitedMiningBlocks.contains(adminsky2)) continue;
+                if (this.visitedMiningBlocks.contains(adminsky2))
+                    continue;
                 adminsky = adminsky2;
                 break;
             }
@@ -724,7 +787,7 @@ extends FarmModeBase {
         }
         int n3 = adminsky.getY() - n2;
         if (n3 > 1) {
-            if ((double)n3 > d) {
+            if ((double) n3 > d) {
                 this.visitedMiningBlocks.add(adminsky);
                 this.currentMiningBlock = null;
                 this.processInventoryCleanup();
@@ -749,7 +812,13 @@ extends FarmModeBase {
         double d2;
         Vec3d VanillaEntityLootTableGenerator;
         Vec3d PlayerSkullBlock = MiningFarmMode.minecraftClient.player.getEyePos();
-        BlockHitResult class_39652 = MiningFarmMode.minecraftClient.world.raycast(new RaycastContext(PlayerSkullBlock, VanillaEntityLootTableGenerator = (d2 = (WallPlayerSkullBlock = (VanillaChestLootTableGenerator = Vec3d.ofCenter((Vec3i)adminsky)).subtract(PlayerSkullBlock)).length()) <= d ? VanillaChestLootTableGenerator : PlayerSkullBlock.add(WallPlayerSkullBlock.multiply(d / Math.max(d2, 1.0E-4))), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, (Entity)MiningFarmMode.minecraftClient.player));
+        BlockHitResult class_39652 = MiningFarmMode.minecraftClient.world.raycast(new RaycastContext(PlayerSkullBlock,
+                VanillaEntityLootTableGenerator = (d2 = (WallPlayerSkullBlock = (VanillaChestLootTableGenerator = Vec3d
+                        .ofCenter((Vec3i) adminsky)).subtract(PlayerSkullBlock)).length()) <= d
+                                ? VanillaChestLootTableGenerator
+                                : PlayerSkullBlock.add(WallPlayerSkullBlock.multiply(d / Math.max(d2, 1.0E-4))),
+                RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE,
+                (Entity) MiningFarmMode.minecraftClient.player));
         if (class_39652.getType() != HitResult.Type.BLOCK) {
             return false;
         }
@@ -761,7 +830,8 @@ extends FarmModeBase {
             return false;
         }
         if (this.isRotationAligned(adminsky2, class_39652.getPos())) {
-            MiningFarmMode.minecraftClient.interactionManager.updateBlockBreakingProgress(adminsky2, class_39652.getSide());
+            MiningFarmMode.minecraftClient.interactionManager.updateBlockBreakingProgress(adminsky2,
+                    class_39652.getSide());
             MiningFarmMode.minecraftClient.player.swingHand(Hand.MAIN_HAND);
             this.blockActionTimer.reset();
         }
@@ -776,10 +846,10 @@ extends FarmModeBase {
         BlockPos adminsky2;
         Vec3d WallPlayerSkullBlock = MiningFarmMode.minecraftClient.player.getEyePos();
         int n = MiningFarmMode.minecraftClient.player.getBlockY();
-        double d4 = (double)adminsky.getX() + 0.5 - MiningFarmMode.minecraftClient.player.getX();
-        double d5 = (double)adminsky.getZ() + 0.5 - MiningFarmMode.minecraftClient.player.getZ();
+        double d4 = (double) adminsky.getX() + 0.5 - MiningFarmMode.minecraftClient.player.getX();
+        double d5 = (double) adminsky.getZ() + 0.5 - MiningFarmMode.minecraftClient.player.getZ();
         double d6 = Math.sqrt(d4 * d4 + d5 * d5);
-        float f = (float)(Math.toDegrees(Math.atan2(d5, d4)) - 90.0);
+        float f = (float) (Math.toDegrees(Math.atan2(d5, d4)) - 90.0);
         double d7 = (d + 0.6) * (d + 0.6);
         BlockPos adminsky3 = null;
         Direction class_23502 = null;
@@ -787,24 +857,25 @@ extends FarmModeBase {
         if (d6 > 1.0E-4) {
             VanillaChestLootTableGenerator = new Vec3d(d4 / d6, 0.0, d5 / d6);
             BlockHitResult raycastHit = MiningFarmMode.minecraftClient.world.raycast(new RaycastContext(
-                WallPlayerSkullBlock,
-                WallPlayerSkullBlock.add(VanillaChestLootTableGenerator.multiply(d)),
-                RaycastContext.ShapeType.OUTLINE,
-                RaycastContext.FluidHandling.NONE,
-                MiningFarmMode.minecraftClient.player));
+                    WallPlayerSkullBlock,
+                    WallPlayerSkullBlock.add(VanillaChestLootTableGenerator.multiply(d)),
+                    RaycastContext.ShapeType.OUTLINE,
+                    RaycastContext.FluidHandling.NONE,
+                    MiningFarmMode.minecraftClient.player));
             if (raycastHit.getType() == HitResult.Type.BLOCK
-                && this.isMineableBlock(raycastHit.getBlockPos())
-                && WallPlayerSkullBlock.squaredDistanceTo(Vec3d.ofCenter(raycastHit.getBlockPos())) <= d7) {
+                    && this.isMineableBlock(raycastHit.getBlockPos())
+                    && WallPlayerSkullBlock.squaredDistanceTo(Vec3d.ofCenter(raycastHit.getBlockPos())) <= d7) {
                 adminsky3 = raycastHit.getBlockPos();
                 class_23502 = raycastHit.getSide();
                 VanillaEntityLootTableGenerator = raycastHit.getPos();
             }
         }
         boolean bl = false;
-        if (adminsky3 == null && adminsky.getY() < n - 1 && d6 < 1.4 && this.isMineableBlock(adminsky2 = MiningFarmMode.minecraftClient.player.getBlockPos().down())) {
+        if (adminsky3 == null && adminsky.getY() < n - 1 && d6 < 1.4
+                && this.isMineableBlock(adminsky2 = MiningFarmMode.minecraftClient.player.getBlockPos().down())) {
             adminsky3 = adminsky2;
             class_23502 = Direction.UP;
-            VanillaEntityLootTableGenerator = Vec3d.ofCenter((Vec3i)adminsky2);
+            VanillaEntityLootTableGenerator = Vec3d.ofCenter((Vec3i) adminsky2);
             bl = true;
         }
         if (VanillaEntityLootTableGenerator == null && d6 > 0.5) {
@@ -822,14 +893,17 @@ extends FarmModeBase {
             MiningFarmMode.minecraftClient.player.swingHand(Hand.MAIN_HAND);
             this.blockActionTimer.reset();
         }
-        if (((d3 = MiningFarmMode.minecraftClient.player.getX()) - this.lastPlayerX) * (d3 - this.lastPlayerX) + ((d2 = MiningFarmMode.minecraftClient.player.getZ()) - this.lastPlayerZ) * (d2 - this.lastPlayerZ) > 0.0225) {
+        if (((d3 = MiningFarmMode.minecraftClient.player.getX()) - this.lastPlayerX) * (d3 - this.lastPlayerX)
+                + ((d2 = MiningFarmMode.minecraftClient.player.getZ()) - this.lastPlayerZ)
+                        * (d2 - this.lastPlayerZ) > 0.0225) {
             this.lastPlayerX = d3;
             this.lastPlayerZ = d2;
             this.miningMovementStallTicks = 0;
         } else {
             ++this.miningMovementStallTicks;
         }
-        if (this.miningMovementStallTicks >= 8 && adminsky3 == null && MiningFarmMode.minecraftClient.player.isOnGround()) {
+        if (this.miningMovementStallTicks >= 8 && adminsky3 == null
+                && MiningFarmMode.minecraftClient.player.isOnGround()) {
             MiningFarmMode.minecraftClient.options.jumpKey.setPressed(true);
             this.miningMovementStallTicks = 0;
         }
@@ -841,18 +915,19 @@ extends FarmModeBase {
         if (MiningFarmMode.minecraftClient.player == null || MiningFarmMode.minecraftClient.world == null) {
             return false;
         }
-        BlockPos adminsky = BlockPos.ofFloored((Position)MiningFarmMode.minecraftClient.player.getEyePos());
+        BlockPos adminsky = BlockPos.ofFloored((Position) MiningFarmMode.minecraftClient.player.getEyePos());
         BlockState class_26802 = MiningFarmMode.minecraftClient.world.getBlockState(adminsky);
-        if (!class_26802.shouldSuffocate((BlockView)MiningFarmMode.minecraftClient.world, adminsky)) {
+        if (!class_26802.shouldSuffocate((BlockView) MiningFarmMode.minecraftClient.world, adminsky)) {
             this.spawnCommandTimer.reset();
             return false;
         }
         this.releaseMovementKeys();
         this.equipBestMiningTool();
         Block class_22482 = class_26802.getBlock();
-        boolean bl2 = bl = class_22482 != Blocks.BEDROCK && class_22482 != Blocks.BARRIER && class_26802.getFluidState().isEmpty();
+        boolean bl2 = bl = class_22482 != Blocks.BEDROCK && class_22482 != Blocks.BARRIER
+                && class_26802.getFluidState().isEmpty();
         if (bl) {
-            this.rotateToward(Vec3d.ofCenter((Vec3i)adminsky));
+            this.rotateToward(Vec3d.ofCenter((Vec3i) adminsky));
             MiningFarmMode.minecraftClient.interactionManager.updateBlockBreakingProgress(adminsky, Direction.UP);
             MiningFarmMode.minecraftClient.player.swingHand(Hand.MAIN_HAND);
         }
@@ -898,7 +973,7 @@ extends FarmModeBase {
         if (!this.autoSellSetting.isEnabled()) {
             return false;
         }
-        boolean bl2 = bl = this.countInventoryItem(Items.DIAMOND) >= (int)this.sellThresholdSetting.getValue() * 64;
+        boolean bl2 = bl = this.countInventoryItem(Items.DIAMOND) >= (int) this.sellThresholdSetting.getValue() * 64;
         if (bl) {
             return this.beginInventoryProcessing(false);
         }
@@ -912,7 +987,8 @@ extends FarmModeBase {
         PlayerInventory class_16612 = MiningFarmMode.minecraftClient.player.getInventory();
         for (int i = 0; i < class_16612.size(); ++i) {
             Item class_17922 = class_16612.getStack(i).getItem();
-            if (class_17922 == Items.DIAMOND || !sellableMineItems.contains(class_17922)) continue;
+            if (class_17922 == Items.DIAMOND || !sellableMineItems.contains(class_17922))
+                continue;
             return true;
         }
         return false;
@@ -1008,7 +1084,8 @@ extends FarmModeBase {
         }
         if (this.isAuctionSectionOpen()) {
             Slot class_17352;
-            if (this.inventorySlotActionTimer.hasElapsed(350L) && (class_17352 = this.findContainerSlotForItem(Items.LAPIS_LAZULI)) != null) {
+            if (this.inventorySlotActionTimer.hasElapsed(350L)
+                    && (class_17352 = this.findContainerSlotForItem(Items.LAPIS_LAZULI)) != null) {
                 this.clickInventorySlot(class_17352.id, 0);
                 this.inventorySlotActionTimer.reset();
             }
@@ -1101,7 +1178,8 @@ extends FarmModeBase {
     }
 
     private void closeInventoryScreen() {
-        if (MiningFarmMode.minecraftClient.player != null && MiningFarmMode.minecraftClient.player.currentScreenHandler != MiningFarmMode.minecraftClient.player.playerScreenHandler) {
+        if (MiningFarmMode.minecraftClient.player != null
+                && MiningFarmMode.minecraftClient.player.currentScreenHandler != MiningFarmMode.minecraftClient.player.playerScreenHandler) {
             MiningFarmMode.minecraftClient.player.closeHandledScreen();
         }
     }
@@ -1110,7 +1188,7 @@ extends FarmModeBase {
         String string;
         Screen class_4372 = MiningFarmMode.minecraftClient.currentScreen;
         if (class_4372 instanceof HandledScreen) {
-            HandledScreen BlockStateProviderType = (HandledScreen)class_4372;
+            HandledScreen BlockStateProviderType = (HandledScreen) class_4372;
             string = BlockStateProviderType.getTitle().getString().toLowerCase();
         } else {
             string = "";
@@ -1131,9 +1209,11 @@ extends FarmModeBase {
         if (!(class_17032 instanceof GenericContainerScreenHandler)) {
             return null;
         }
-        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler)class_17032;
+        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler) class_17032;
         for (Slot class_17352 : class_17072.slots) {
-            if (class_17352.inventory == MiningFarmMode.minecraftClient.player.getInventory() || class_17352.getStack().getItem() != class_17922) continue;
+            if (class_17352.inventory == MiningFarmMode.minecraftClient.player.getInventory()
+                    || class_17352.getStack().getItem() != class_17922)
+                continue;
             return class_17352;
         }
         return null;
@@ -1144,24 +1224,31 @@ extends FarmModeBase {
         if (!(class_17032 instanceof GenericContainerScreenHandler)) {
             return null;
         }
-        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler)class_17032;
+        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler) class_17032;
         for (Slot class_17352 : class_17072.slots) {
-            if (class_17352.inventory == MiningFarmMode.minecraftClient.player.getInventory() || !class_17352.hasStack()) continue;
+            if (class_17352.inventory == MiningFarmMode.minecraftClient.player.getInventory()
+                    || !class_17352.hasStack())
+                continue;
             ItemStack class_17992 = class_17352.getStack();
-            if (this.preserveConfiguredItems && class_17992.getItem() == Items.DIAMOND || this.skippedInventoryItems.contains(class_17992.getItem()) || this.countInventoryItem(class_17992.getItem()) <= 0 || !this.isSellableItemStack(class_17992)) continue;
+            if (this.preserveConfiguredItems && class_17992.getItem() == Items.DIAMOND
+                    || this.skippedInventoryItems.contains(class_17992.getItem())
+                    || this.countInventoryItem(class_17992.getItem()) <= 0 || !this.isSellableItemStack(class_17992))
+                continue;
             return class_17352;
         }
         return null;
     }
 
     private boolean isSellableItemStack(ItemStack class_17992) {
-        LoreComponent class_92902 = (LoreComponent)class_17992.get(DataComponentTypes.LORE);
+        LoreComponent class_92902 = (LoreComponent) class_17992.get(DataComponentTypes.LORE);
         if (class_92902 == null) {
             return false;
         }
         for (Text class_25612 : class_92902.lines()) {
             String string = class_25612.getString().toLowerCase();
-            if (!string.contains("\u043f\u0440\u043e\u0434\u0430\u0442\u044c") && !string.contains("\u0446\u0435\u043d\u0430 \u0437\u0430")) continue;
+            if (!string.contains("\u043f\u0440\u043e\u0434\u0430\u0442\u044c")
+                    && !string.contains("\u0446\u0435\u043d\u0430 \u0437\u0430"))
+                continue;
             return true;
         }
         return false;
@@ -1172,13 +1259,16 @@ extends FarmModeBase {
         if (!(currentScreenHandler instanceof GenericContainerScreenHandler)) {
             return 0;
         }
-        GenericContainerScreenHandler containerHandler = (GenericContainerScreenHandler)currentScreenHandler;
+        GenericContainerScreenHandler containerHandler = (GenericContainerScreenHandler) currentScreenHandler;
         Set<Item> sellableInventoryItems = new HashSet<>();
         for (Slot slot : containerHandler.slots) {
-            if (slot.inventory == MiningFarmMode.minecraftClient.player.getInventory() || !slot.hasStack()) continue;
+            if (slot.inventory == MiningFarmMode.minecraftClient.player.getInventory() || !slot.hasStack())
+                continue;
             ItemStack stack = slot.getStack();
             Item item = stack.getItem();
-            if (this.preserveConfiguredItems && item == Items.DIAMOND || this.skippedInventoryItems.contains(item) || !this.isSellableItemStack(stack)) continue;
+            if (this.preserveConfiguredItems && item == Items.DIAMOND || this.skippedInventoryItems.contains(item)
+                    || !this.isSellableItemStack(stack))
+                continue;
             sellableInventoryItems.add(item);
         }
         int n = 0;
@@ -1189,10 +1279,13 @@ extends FarmModeBase {
     }
 
     private void clickInventorySlot(int n, int n2) {
-        if (MiningFarmMode.minecraftClient.player.currentScreenHandler == null || MiningFarmMode.minecraftClient.interactionManager == null) {
+        if (MiningFarmMode.minecraftClient.player.currentScreenHandler == null
+                || MiningFarmMode.minecraftClient.interactionManager == null) {
             return;
         }
-        MiningFarmMode.minecraftClient.interactionManager.clickSlot(MiningFarmMode.minecraftClient.player.currentScreenHandler.syncId, n, n2, SlotActionType.PICKUP, (PlayerEntity)MiningFarmMode.minecraftClient.player);
+        MiningFarmMode.minecraftClient.interactionManager.clickSlot(
+                MiningFarmMode.minecraftClient.player.currentScreenHandler.syncId, n, n2, SlotActionType.PICKUP,
+                (PlayerEntity) MiningFarmMode.minecraftClient.player);
     }
 
     private int countInventoryItem(Item class_17922) {
@@ -1200,7 +1293,8 @@ extends FarmModeBase {
         PlayerInventory class_16612 = MiningFarmMode.minecraftClient.player.getInventory();
         for (int i = 0; i < class_16612.size(); ++i) {
             ItemStack class_17992 = class_16612.getStack(i);
-            if (class_17992.getItem() != class_17922) continue;
+            if (class_17992.getItem() != class_17922)
+                continue;
             n += class_17992.getCount();
         }
         return n;
@@ -1211,28 +1305,30 @@ extends FarmModeBase {
         PlayerInventory class_16612 = MiningFarmMode.minecraftClient.player.getInventory();
         for (int i = 0; i < class_16612.size(); ++i) {
             ItemStack class_17992 = class_16612.getStack(i);
-            if (!sellableMineItems.contains(class_17992.getItem())) continue;
+            if (!sellableMineItems.contains(class_17992.getItem()))
+                continue;
             n += class_17992.getCount();
         }
         return n;
     }
 
     private int readSaleQuantity(ItemStack class_17992) {
-        LoreComponent class_92902 = (LoreComponent)class_17992.get(DataComponentTypes.LORE);
+        LoreComponent class_92902 = (LoreComponent) class_17992.get(DataComponentTypes.LORE);
         if (class_92902 != null) {
             for (Text class_25612 : class_92902.lines()) {
                 String string = class_25612.getString();
                 String string2 = string.toLowerCase();
-                if (!string2.contains("\u0446\u0435\u043d\u0430 \u0437\u0430")) continue;
+                if (!string2.contains("\u0446\u0435\u043d\u0430 \u0437\u0430"))
+                    continue;
                 if (string2.contains("\u0432\u0441\u0451") || string2.contains("\u0432\u0441\u0435")) {
                     return Integer.MAX_VALUE;
                 }
                 Matcher matcher = RUSSIAN_QUANTITY_PATTERN.matcher(string);
-                if (!matcher.find()) continue;
+                if (!matcher.find())
+                    continue;
                 try {
                     return Integer.parseInt(matcher.group(1));
-                }
-                catch (NumberFormatException numberFormatException) {
+                } catch (NumberFormatException numberFormatException) {
                 }
             }
         }
@@ -1240,14 +1336,18 @@ extends FarmModeBase {
     }
 
     private boolean isSaleButtonItem(ItemStack class_17992) {
-        LoreComponent class_92902 = (LoreComponent)class_17992.get(DataComponentTypes.LORE);
+        LoreComponent class_92902 = (LoreComponent) class_17992.get(DataComponentTypes.LORE);
         if (class_92902 == null) {
             return false;
         }
         for (Text class_25612 : class_92902.lines()) {
             String string = class_25612.getString();
             String string2 = string.toLowerCase();
-            if (!string2.contains("\u043f\u0440\u043e\u0434\u0430") || !string2.contains("\u0432\u0441\u0451") && !string2.contains("\u0432\u0441\u0435") || !string.contains(">") && !string.contains("\u25b6") && !string.contains("\u27a4") && !string.contains("\u279c")) continue;
+            if (!string2.contains("\u043f\u0440\u043e\u0434\u0430")
+                    || !string2.contains("\u0432\u0441\u0451") && !string2.contains("\u0432\u0441\u0435")
+                    || !string.contains(">") && !string.contains("\u25b6") && !string.contains("\u27a4")
+                            && !string.contains("\u279c"))
+                continue;
             return true;
         }
         return false;
@@ -1259,8 +1359,9 @@ extends FarmModeBase {
         double d2 = VanillaChestLootTableGenerator.y - WallPlayerSkullBlock.y;
         double d3 = VanillaChestLootTableGenerator.z - WallPlayerSkullBlock.z;
         double d4 = Math.sqrt(d * d + d3 * d3);
-        float f = (float)(Math.toDegrees(Math.atan2(d3, d)) - 90.0);
-        float f2 = MathHelper.clamp((float)((float)(-Math.toDegrees(Math.atan2(d2, d4)))), (float)-90.0f, (float)90.0f);
+        float f = (float) (Math.toDegrees(Math.atan2(d3, d)) - 90.0);
+        float f2 = MathHelper.clamp((float) ((float) (-Math.toDegrees(Math.atan2(d2, d4)))), (float) -90.0f,
+                (float) 90.0f);
         MiningFarmMode.minecraftClient.player.setYaw(f);
         MiningFarmMode.minecraftClient.player.setPitch(f2);
         MiningFarmMode.minecraftClient.player.setHeadYaw(f);
@@ -1275,7 +1376,8 @@ extends FarmModeBase {
             this.lastRotationTargetBlock = adminsky;
             this.miningRotationConfirmationCount = 0;
         }
-        if ((rotation = RockstarClient.create().getRotationManager().getPacketRotation()).angleDistanceTo(rotation2) <= 1.5f) {
+        if ((rotation = RockstarClient.create().getRotationManager().getPacketRotation())
+                .angleDistanceTo(rotation2) <= 1.5f) {
             ++this.miningRotationConfirmationCount;
             return this.miningRotationConfirmationCount >= 2;
         }
@@ -1294,12 +1396,15 @@ extends FarmModeBase {
 
     private void equipBestMiningTool() {
         ItemStack class_17992 = MiningFarmMode.minecraftClient.player.getMainHandStack();
-        float f = class_17992.getItem() instanceof PickaxeItem ? class_17992.getMiningSpeedMultiplier(stoneState) : -1.0f;
+        float f = class_17992.getItem() instanceof PickaxeItem ? class_17992.getMiningSpeedMultiplier(stoneState)
+                : -1.0f;
         HotbarSlot hotbarSlot = null;
         for (HotbarSlot hotbarSlot2 : ItemRuleSets.getHotbarRules().getRules()) {
             float f2;
             ItemStack class_17993 = hotbarSlot2.getItemStack();
-            if (!(class_17993.getItem() instanceof PickaxeItem) || !((f2 = class_17993.getMiningSpeedMultiplier(stoneState)) > f)) continue;
+            if (!(class_17993.getItem() instanceof PickaxeItem)
+                    || !((f2 = class_17993.getMiningSpeedMultiplier(stoneState)) > f))
+                continue;
             f = f2;
             hotbarSlot = hotbarSlot2;
         }
@@ -1314,7 +1419,8 @@ extends FarmModeBase {
             for (int j = MINE_REGION_MIN_CORNER.getX(); j <= MINE_REGION_MAX_CORNER.getX(); ++j) {
                 for (int k = MINE_REGION_MIN_CORNER.getZ(); k <= MINE_REGION_MAX_CORNER.getZ(); ++k) {
                     BlockPos adminsky = new BlockPos(j, i, k);
-                    if (!this.isMineableTargetBlock(adminsky)) continue;
+                    if (!this.isMineableTargetBlock(adminsky))
+                        continue;
                     arrayList.add(adminsky);
                 }
             }
@@ -1342,19 +1448,24 @@ extends FarmModeBase {
     }
 
     private boolean isSelectedOreBlock(Block class_22482) {
-        if (this.diamondOreOption.isSelected() && (class_22482 == Blocks.DIAMOND_ORE || class_22482 == Blocks.DEEPSLATE_DIAMOND_ORE)) {
+        if (this.diamondOreOption.isSelected()
+                && (class_22482 == Blocks.DIAMOND_ORE || class_22482 == Blocks.DEEPSLATE_DIAMOND_ORE)) {
             return true;
         }
-        if (this.lapisOreOption.isSelected() && (class_22482 == Blocks.LAPIS_ORE || class_22482 == Blocks.DEEPSLATE_LAPIS_ORE)) {
+        if (this.lapisOreOption.isSelected()
+                && (class_22482 == Blocks.LAPIS_ORE || class_22482 == Blocks.DEEPSLATE_LAPIS_ORE)) {
             return true;
         }
-        if (this.redstoneOreOption.isSelected() && (class_22482 == Blocks.REDSTONE_ORE || class_22482 == Blocks.DEEPSLATE_REDSTONE_ORE)) {
+        if (this.redstoneOreOption.isSelected()
+                && (class_22482 == Blocks.REDSTONE_ORE || class_22482 == Blocks.DEEPSLATE_REDSTONE_ORE)) {
             return true;
         }
-        if (this.ironOreOption.isSelected() && (class_22482 == Blocks.IRON_ORE || class_22482 == Blocks.DEEPSLATE_IRON_ORE)) {
+        if (this.ironOreOption.isSelected()
+                && (class_22482 == Blocks.IRON_ORE || class_22482 == Blocks.DEEPSLATE_IRON_ORE)) {
             return true;
         }
-        if (this.goldOreOption.isSelected() && (class_22482 == Blocks.GOLD_ORE || class_22482 == Blocks.DEEPSLATE_GOLD_ORE)) {
+        if (this.goldOreOption.isSelected()
+                && (class_22482 == Blocks.GOLD_ORE || class_22482 == Blocks.DEEPSLATE_GOLD_ORE)) {
             return true;
         }
         return this.debrisOreOption.isSelected() && class_22482 == Blocks.ANCIENT_DEBRIS;
@@ -1366,7 +1477,9 @@ extends FarmModeBase {
                 for (int k = MINE_REGION_MIN_CORNER.getZ(); k <= MINE_REGION_MAX_CORNER.getZ(); ++k) {
                     Block class_22482;
                     BlockState class_26802 = MiningFarmMode.minecraftClient.world.getBlockState(new BlockPos(j, i, k));
-                    if (class_26802.isAir() || (class_22482 = class_26802.getBlock()) == Blocks.BEDROCK || class_22482 == Blocks.BARRIER || !class_26802.getFluidState().isEmpty()) continue;
+                    if (class_26802.isAir() || (class_22482 = class_26802.getBlock()) == Blocks.BEDROCK
+                            || class_22482 == Blocks.BARRIER || !class_26802.getFluidState().isEmpty())
+                        continue;
                     return true;
                 }
             }
@@ -1375,7 +1488,7 @@ extends FarmModeBase {
     }
 
     private double getBlockDistanceSquared(BlockPos adminsky) {
-        return MiningFarmMode.minecraftClient.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter((Vec3i)adminsky));
+        return MiningFarmMode.minecraftClient.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter((Vec3i) adminsky));
     }
 
     private Direction findMiningFace(BlockPos adminsky, double d) {
@@ -1387,7 +1500,18 @@ extends FarmModeBase {
             BlockHitResult class_39652;
             Vec3d WallPlayerSkullBlock;
             double d4;
-            if (!this.isSafePathBlock(adminsky.offset(class_23503)) || (d4 = VanillaChestLootTableGenerator.squaredDistanceTo(WallPlayerSkullBlock = Vec3d.ofCenter((Vec3i)adminsky).add((double)class_23503.getOffsetX() * 0.49, (double)class_23503.getOffsetY() * 0.49, (double)class_23503.getOffsetZ() * 0.49))) > d2 || d4 >= d3 || (class_39652 = MiningFarmMode.minecraftClient.world.raycast(new RaycastContext(VanillaChestLootTableGenerator, WallPlayerSkullBlock, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, (Entity)MiningFarmMode.minecraftClient.player))).getType() != HitResult.Type.BLOCK || !class_39652.getBlockPos().equals(adminsky)) continue;
+            if (!this.isSafePathBlock(adminsky.offset(class_23503))
+                    || (d4 = VanillaChestLootTableGenerator
+                            .squaredDistanceTo(WallPlayerSkullBlock = Vec3d.ofCenter((Vec3i) adminsky).add(
+                                    (double) class_23503.getOffsetX() * 0.49, (double) class_23503.getOffsetY() * 0.49,
+                                    (double) class_23503.getOffsetZ() * 0.49))) > d2
+                    || d4 >= d3
+                    || (class_39652 = MiningFarmMode.minecraftClient.world.raycast(new RaycastContext(
+                            VanillaChestLootTableGenerator, WallPlayerSkullBlock, RaycastContext.ShapeType.OUTLINE,
+                            RaycastContext.FluidHandling.NONE, (Entity) MiningFarmMode.minecraftClient.player)))
+                            .getType() != HitResult.Type.BLOCK
+                    || !class_39652.getBlockPos().equals(adminsky))
+                continue;
             class_23502 = class_23503;
             d3 = d4;
         }
@@ -1399,18 +1523,21 @@ extends FarmModeBase {
         if (class_26802.isAir() || class_26802.isReplaceable()) {
             return true;
         }
-        return class_26802.getCollisionShape((BlockView)MiningFarmMode.minecraftClient.world, adminsky).isEmpty();
+        return class_26802.getCollisionShape((BlockView) MiningFarmMode.minecraftClient.world, adminsky).isEmpty();
     }
 
     private Vec3d getBlockFaceCenter(BlockPos adminsky, Direction class_23502) {
-        return Vec3d.ofCenter((Vec3i)adminsky).add((double)class_23502.getOffsetX() * 0.5, (double)class_23502.getOffsetY() * 0.5, (double)class_23502.getOffsetZ() * 0.5);
+        return Vec3d.ofCenter((Vec3i) adminsky).add((double) class_23502.getOffsetX() * 0.5,
+                (double) class_23502.getOffsetY() * 0.5, (double) class_23502.getOffsetZ() * 0.5);
     }
 
     private double getMineRegionDistance() {
         double d = MiningFarmMode.minecraftClient.player.getX();
         double d2 = MiningFarmMode.minecraftClient.player.getZ();
-        double d3 = MathHelper.clamp((double)d, (double)MINE_REGION_MIN_CORNER.getX(), (double)MINE_REGION_MAX_CORNER.getX());
-        double d4 = MathHelper.clamp((double)d2, (double)MINE_REGION_MIN_CORNER.getZ(), (double)MINE_REGION_MAX_CORNER.getZ());
+        double d3 = MathHelper.clamp((double) d, (double) MINE_REGION_MIN_CORNER.getX(),
+                (double) MINE_REGION_MAX_CORNER.getX());
+        double d4 = MathHelper.clamp((double) d2, (double) MINE_REGION_MIN_CORNER.getZ(),
+                (double) MINE_REGION_MAX_CORNER.getZ());
         double d5 = d - d3;
         double d6 = d2 - d4;
         return Math.sqrt(d5 * d5 + d6 * d6);
@@ -1425,7 +1552,8 @@ extends FarmModeBase {
         if (MiningFarmMode.minecraftClient.player.currentScreenHandler == null) {
             return;
         }
-        double d = Math.hypot(MiningFarmMode.minecraftClient.player.getVelocity().x, MiningFarmMode.minecraftClient.player.getVelocity().z);
+        double d = Math.hypot(MiningFarmMode.minecraftClient.player.getVelocity().x,
+                MiningFarmMode.minecraftClient.player.getVelocity().z);
         boolean bl2 = d > 0.06;
         boolean bl3 = bl = this.countEmptyInventorySlots() <= 2;
         if (bl2 && !bl) {
@@ -1437,13 +1565,18 @@ extends FarmModeBase {
         }
         int n = bl2 ? 1 : 3;
         int n2 = 36 + MiningFarmMode.minecraftClient.player.getInventory().selectedSlot;
-        ItemRuleCollection<ItemRule> itemRuleCollection = ItemRuleSets.getInventoryRules().combineRules(ItemRuleSets.getHotbarRules());
+        ItemRuleCollection<ItemRule> itemRuleCollection = ItemRuleSets.getInventoryRules()
+                .combineRules(ItemRuleSets.getHotbarRules());
         int n3 = 0;
         for (ItemRule itemRule : itemRuleCollection.getRules()) {
-            if (n3 >= n) break;
+            if (n3 >= n)
+                break;
             ItemStack class_17992 = itemRule.getItemStack();
-            if (class_17992.isEmpty() || itemRule.getClickSlot() == n2 || this.isProtectedInventoryStack(class_17992)) continue;
-            MiningFarmMode.minecraftClient.interactionManager.clickSlot(MiningFarmMode.minecraftClient.player.currentScreenHandler.syncId, itemRule.getClickSlot(), 1, SlotActionType.THROW, (PlayerEntity)MiningFarmMode.minecraftClient.player);
+            if (class_17992.isEmpty() || itemRule.getClickSlot() == n2 || this.isProtectedInventoryStack(class_17992))
+                continue;
+            MiningFarmMode.minecraftClient.interactionManager.clickSlot(
+                    MiningFarmMode.minecraftClient.player.currentScreenHandler.syncId, itemRule.getClickSlot(), 1,
+                    SlotActionType.THROW, (PlayerEntity) MiningFarmMode.minecraftClient.player);
             ++n3;
         }
         if (n3 > 0) {
@@ -1453,13 +1586,17 @@ extends FarmModeBase {
 
     private boolean isProtectedInventoryStack(ItemStack class_17992) {
         Item class_17922 = class_17992.getItem();
-        if (class_17922 instanceof PickaxeItem || class_17922 instanceof SwordItem || class_17922 instanceof AxeItem || class_17922 instanceof ShovelItem || class_17922 instanceof HoeItem || class_17922 instanceof ArmorItem) {
+        if (class_17922 instanceof PickaxeItem || class_17922 instanceof SwordItem || class_17922 instanceof AxeItem
+                || class_17922 instanceof ShovelItem || class_17922 instanceof HoeItem
+                || class_17922 instanceof ArmorItem) {
             return true;
         }
         if (class_17992.contains(DataComponentTypes.FOOD)) {
             return true;
         }
-        if (class_17922 == Items.EXPERIENCE_BOTTLE || class_17922 == Items.TOTEM_OF_UNDYING || class_17922 == Items.ELYTRA || class_17922 == Items.ENDER_PEARL || class_17922 == Items.ENDER_CHEST) {
+        if (class_17922 == Items.EXPERIENCE_BOTTLE || class_17922 == Items.TOTEM_OF_UNDYING
+                || class_17922 == Items.ELYTRA || class_17922 == Items.ENDER_PEARL
+                || class_17922 == Items.ENDER_CHEST) {
             return true;
         }
         if (this.dropExceptSetting.isEnabled()) {
@@ -1469,16 +1606,21 @@ extends FarmModeBase {
     }
 
     private boolean isSelectedKeepItem(Item class_17922) {
-        if (this.diamondKeepOption.isSelected() && (class_17922 == Items.DIAMOND || class_17922 == Items.DIAMOND_BLOCK)) {
+        if (this.diamondKeepOption.isSelected()
+                && (class_17922 == Items.DIAMOND || class_17922 == Items.DIAMOND_BLOCK)) {
             return true;
         }
-        if (this.debrisKeepOption.isSelected() && (class_17922 == Items.ANCIENT_DEBRIS || class_17922 == Items.NETHERITE_SCRAP || class_17922 == Items.NETHERITE_INGOT || class_17922 == Items.NETHERITE_BLOCK)) {
+        if (this.debrisKeepOption.isSelected()
+                && (class_17922 == Items.ANCIENT_DEBRIS || class_17922 == Items.NETHERITE_SCRAP
+                        || class_17922 == Items.NETHERITE_INGOT || class_17922 == Items.NETHERITE_BLOCK)) {
             return true;
         }
-        if (this.ironKeepOption.isSelected() && (class_17922 == Items.RAW_IRON || class_17922 == Items.IRON_INGOT || class_17922 == Items.IRON_NUGGET || class_17922 == Items.IRON_BLOCK)) {
+        if (this.ironKeepOption.isSelected() && (class_17922 == Items.RAW_IRON || class_17922 == Items.IRON_INGOT
+                || class_17922 == Items.IRON_NUGGET || class_17922 == Items.IRON_BLOCK)) {
             return true;
         }
-        return this.goldKeepOption.isSelected() && (class_17922 == Items.RAW_GOLD || class_17922 == Items.GOLD_INGOT || class_17922 == Items.GOLD_NUGGET || class_17922 == Items.GOLD_BLOCK);
+        return this.goldKeepOption.isSelected() && (class_17922 == Items.RAW_GOLD || class_17922 == Items.GOLD_INGOT
+                || class_17922 == Items.GOLD_NUGGET || class_17922 == Items.GOLD_BLOCK);
     }
 
     private boolean isRepairNeeded() {
@@ -1494,7 +1636,7 @@ extends FarmModeBase {
         if (!(class_17992.getItem() instanceof PickaxeItem) || !class_17992.isDamageable()) {
             return false;
         }
-        return this.getItemDurabilityPercent(class_17992) < (double)this.repairThresholdSetting.getValue();
+        return this.getItemDurabilityPercent(class_17992) < (double) this.repairThresholdSetting.getValue();
     }
 
     private boolean isMiningResourcesReady() {
@@ -1507,7 +1649,8 @@ extends FarmModeBase {
         if (this.hasEmptyInventorySlot()) {
             return true;
         }
-        return this.autoSellSetting.isEnabled() && this.countSellableMineItems() > 0 && MiningFarmMode.parseMineIndex(this.sellServerSetting.getValue()) > 0;
+        return this.autoSellSetting.isEnabled() && this.countSellableMineItems() > 0
+                && MiningFarmMode.parseMineIndex(this.sellServerSetting.getValue()) > 0;
     }
 
     private void beginSellingWorkflow() {
@@ -1531,7 +1674,7 @@ extends FarmModeBase {
             this.resetMiningCycle();
             return;
         }
-        if (this.getItemDurabilityPercent(class_17993) >= (double)this.repairTargetPercentageSetting.getValue()) {
+        if (this.getItemDurabilityPercent(class_17993) >= (double) this.repairTargetPercentageSetting.getValue()) {
             this.resetMiningCycle();
             return;
         }
@@ -1540,7 +1683,8 @@ extends FarmModeBase {
             return;
         }
         if (MiningFarmMode.minecraftClient.player.getOffHandStack().getItem() != Items.EXPERIENCE_BOTTLE) {
-            ItemRule itemRule = ItemRuleSets.getInventoryRules().combineRules(ItemRuleSets.getHotbarRules()).findByStack(class_17992 -> class_17992.getItem() == Items.EXPERIENCE_BOTTLE);
+            ItemRule itemRule = ItemRuleSets.getInventoryRules().combineRules(ItemRuleSets.getHotbarRules())
+                    .findByStack(class_17992 -> class_17992.getItem() == Items.EXPERIENCE_BOTTLE);
             if (itemRule == null) {
                 this.openMarketplaceForRepairBottles();
                 return;
@@ -1567,14 +1711,18 @@ extends FarmModeBase {
         MiningFarmMode.minecraftClient.player.setPitch(90.0f);
         MiningFarmMode.minecraftClient.player.setHeadYaw(f);
         if (this.repairActionTimer.hasElapsed(120L)) {
-            ((moscow.rockstar.mixin.accessors.ClientPlayerInteractionManagerAccessor)(Object)MiningFarmMode.minecraftClient.interactionManager).rockstar$sendSequencedPacket(MiningFarmMode.minecraftClient.world, n -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, n, f, 90.0f));
+            ((moscow.rockstar.mixin.accessors.ClientPlayerInteractionManagerAccessor) (Object) MiningFarmMode.minecraftClient.interactionManager)
+                    .rockstar$sendSequencedPacket(MiningFarmMode.minecraftClient.world,
+                            n -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, n, f, 90.0f));
             this.repairActionTimer.reset();
         }
     }
 
     private void openMarketplaceForRepairBottles() {
         if (!this.hasEmptyInventorySlot()) {
-            if (this.autoSellSetting.isEnabled() && this.countSellableMineItems() > 0 && MiningFarmMode.parseMineIndex(this.sellServerSetting.getValue()) > 0 && this.beginInventoryProcessing(true)) {
+            if (this.autoSellSetting.isEnabled() && this.countSellableMineItems() > 0
+                    && MiningFarmMode.parseMineIndex(this.sellServerSetting.getValue()) > 0
+                    && this.beginInventoryProcessing(true)) {
                 return;
             }
             this.sendStatusMessageAndReset("modules.mine_farm.inventory_full");
@@ -1635,7 +1783,8 @@ extends FarmModeBase {
             return;
         }
         if (!this.marketSearchActive || this.marketActionTimer.hasElapsed(3500L)) {
-            MiningFarmMode.minecraftClient.player.networkHandler.sendChatCommand("ah search " + this.getExperienceBottleName());
+            MiningFarmMode.minecraftClient.player.networkHandler
+                    .sendChatCommand("ah search " + this.getExperienceBottleName());
             this.marketSearchActive = true;
             this.marketActionTimer.reset();
             ++this.marketSearchAttempts;
@@ -1667,7 +1816,8 @@ extends FarmModeBase {
 
     private void confirmBottlePurchase() {
         String string = this.getOpenScreenTitle();
-        if (string.contains("\u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435 \u043f\u043e\u043a\u0443\u043f\u043a\u0438")) {
+        if (string.contains(
+                "\u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435 \u043f\u043e\u043a\u0443\u043f\u043a\u0438")) {
             if (this.marketActionTimer.hasElapsed(300L)) {
                 this.clickInventorySlot(2, 0);
                 this.marketActionTimer.reset();
@@ -1702,7 +1852,8 @@ extends FarmModeBase {
         }
         this.inventoryFullNoticeActive = false;
         ++this.marketPurchaseCount;
-        if (this.countExperienceBottles() >= (int)this.repairBottleTargetSetting.getValue() || !this.hasEmptyInventorySlot() || this.marketPurchaseCount >= 20) {
+        if (this.countExperienceBottles() >= (int) this.repairBottleTargetSetting.getValue()
+                || !this.hasEmptyInventorySlot() || this.marketPurchaseCount >= 20) {
             this.repairActionTimer.reset();
             this.operationState = MiningOperationState.SELLING_RESOURCES;
             return;
@@ -1717,7 +1868,8 @@ extends FarmModeBase {
         if (!class_17992.isDamageable() || class_17992.getMaxDamage() <= 0) {
             return 100.0;
         }
-        return (double)(class_17992.getMaxDamage() - class_17992.getDamage()) / (double)class_17992.getMaxDamage() * 100.0;
+        return (double) (class_17992.getMaxDamage() - class_17992.getDamage()) / (double) class_17992.getMaxDamage()
+                * 100.0;
     }
 
     private int countExperienceBottles() {
@@ -1725,7 +1877,8 @@ extends FarmModeBase {
         PlayerInventory class_16612 = MiningFarmMode.minecraftClient.player.getInventory();
         for (int i = 0; i < class_16612.size(); ++i) {
             ItemStack class_17992 = class_16612.getStack(i);
-            if (class_17992.getItem() != Items.EXPERIENCE_BOTTLE) continue;
+            if (class_17992.getItem() != Items.EXPERIENCE_BOTTLE)
+                continue;
             n += class_17992.getCount();
         }
         return n;
@@ -1739,24 +1892,33 @@ extends FarmModeBase {
         PlayerInventory class_16612 = MiningFarmMode.minecraftClient.player.getInventory();
         int n = 0;
         for (int i = 0; i < 36; ++i) {
-            if (!class_16612.getStack(i).isEmpty()) continue;
+            if (!class_16612.getStack(i).isEmpty())
+                continue;
             ++n;
         }
         return n;
     }
 
     private long readAuctionPrice(ItemStack class_17992) {
-        for (Text class_25612 : class_17992.getTooltip(Item.TooltipContext.create((World)MiningFarmMode.minecraftClient.world), (PlayerEntity)MiningFarmMode.minecraftClient.player, (TooltipType)(MiningFarmMode.minecraftClient.options.advancedItemTooltips ? TooltipType.ADVANCED : TooltipType.BASIC))) {
+        for (Text class_25612 : class_17992
+                .getTooltip(Item.TooltipContext.create((World) MiningFarmMode.minecraftClient.world),
+                        (PlayerEntity) MiningFarmMode.minecraftClient.player,
+                        (TooltipType) (MiningFarmMode.minecraftClient.options.advancedItemTooltips
+                                ? TooltipType.ADVANCED
+                                : TooltipType.BASIC))) {
             String string;
             String string2 = class_25612.getString();
             String string3 = string2.toLowerCase();
-            if (!string2.contains("$") && !string3.contains("\u0446\u0435\u043d\u0430") && !string3.contains("\u0441\u0442\u043e\u0438\u043c") || string2.contains("%") || (string = string2.replaceAll("[^0-9]", "")).isEmpty()) continue;
+            if (!string2.contains("$") && !string3.contains("\u0446\u0435\u043d\u0430")
+                    && !string3.contains("\u0441\u0442\u043e\u0438\u043c") || string2.contains("%")
+                    || (string = string2.replaceAll("[^0-9]", "")).isEmpty())
+                continue;
             try {
                 long l = Long.parseLong(string);
-                if (l <= 0L) continue;
+                if (l <= 0L)
+                    continue;
                 return l;
-            }
-            catch (NumberFormatException numberFormatException) {
+            } catch (NumberFormatException numberFormatException) {
             }
         }
         return -1L;
@@ -1767,7 +1929,7 @@ extends FarmModeBase {
         if (!(class_17032 instanceof GenericContainerScreenHandler)) {
             return -1;
         }
-        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler)class_17032;
+        GenericContainerScreenHandler class_17072 = (GenericContainerScreenHandler) class_17032;
         int n = class_17072.slots.size() - 36;
         double d = Double.MAX_VALUE;
         int n2 = -1;
@@ -1777,7 +1939,11 @@ extends FarmModeBase {
             long l;
             ItemStack class_17992;
             Slot class_17352 = class_17072.getSlot(i);
-            if (class_17352 == null || !class_17352.hasStack() || (class_17992 = class_17352.getStack()).getItem() != Items.EXPERIENCE_BOTTLE || (l = this.readAuctionPrice(class_17992)) <= 0L || !((d2 = (double)l / (double)(n3 = Math.max(1, class_17992.getCount()))) < d)) continue;
+            if (class_17352 == null || !class_17352.hasStack()
+                    || (class_17992 = class_17352.getStack()).getItem() != Items.EXPERIENCE_BOTTLE
+                    || (l = this.readAuctionPrice(class_17992)) <= 0L
+                    || !((d2 = (double) l / (double) (n3 = Math.max(1, class_17992.getCount()))) < d))
+                continue;
             d = d2;
             n2 = class_17352.id;
         }
@@ -1794,20 +1960,30 @@ extends FarmModeBase {
                 }
                 yield "\u0412\u044b\u0431\u043e\u0440 \u0448\u0430\u0445\u0442\u044b...";
             }
-            case 1 -> "\u041f\u0435\u0440\u0435\u0445\u043e\u0434 \u043d\u0430 \u0430\u043d\u0430\u0440\u0445\u0438\u044e " + string;
-            case 2 -> "\u0422\u0435\u043b\u0435\u043f\u043e\u0440\u0442 \u043d\u0430 \u0448\u0430\u0445\u0442\u0443 (\u0430\u043d. " + string + ")";
+            case 1 ->
+                "\u041f\u0435\u0440\u0435\u0445\u043e\u0434 \u043d\u0430 \u0430\u043d\u0430\u0440\u0445\u0438\u044e "
+                        + string;
+            case 2 ->
+                "\u0422\u0435\u043b\u0435\u043f\u043e\u0440\u0442 \u043d\u0430 \u0448\u0430\u0445\u0442\u0443 (\u0430\u043d. "
+                        + string + ")";
             case 3 -> {
                 if (this.blockMiningActive) {
-                    yield "\u041a\u043e\u043f\u0430\u044e \u0448\u0430\u0445\u0442\u0443 (\u0430\u043d. " + string + ")";
+                    yield "\u041a\u043e\u043f\u0430\u044e \u0448\u0430\u0445\u0442\u0443 (\u0430\u043d. " + string
+                            + ")";
                 }
                 yield "\u0416\u0434\u0443 \u0441\u0431\u0440\u043e\u0441\u0430 (\u0430\u043d. " + string + ")";
             }
-            case 4 -> "\u0418\u0434\u0443 \u043f\u0440\u043e\u0434\u0430\u0432\u0430\u0442\u044c (\u0430\u043d. " + String.valueOf(this.sellServerIndex > 0 ? Integer.valueOf(this.sellServerIndex) : "?") + ")";
-            case 5 -> "\u041e\u0442\u043a\u0440\u044b\u0432\u0430\u044e \u0441\u043a\u0443\u043f\u0449\u0438\u043a\u0430";
+            case 4 -> "\u0418\u0434\u0443 \u043f\u0440\u043e\u0434\u0430\u0432\u0430\u0442\u044c (\u0430\u043d. "
+                    + String.valueOf(this.sellServerIndex > 0 ? Integer.valueOf(this.sellServerIndex) : "?") + ")";
+            case 5 ->
+                "\u041e\u0442\u043a\u0440\u044b\u0432\u0430\u044e \u0441\u043a\u0443\u043f\u0449\u0438\u043a\u0430";
             case 6 -> "\u0412\u044b\u0431\u043e\u0440 \u0441\u0435\u043a\u0446\u0438\u0438";
             case 7 -> "\u041f\u0440\u043e\u0434\u0430\u044e \u0440\u0443\u0434\u0443";
-            case 8 -> "\u0427\u0438\u043d\u044e \u043a\u0438\u0440\u043a\u0443 (" + this.countExperienceBottles() + " \u0431\u0443\u0442.)";
-            case 9, 10, 11, 12 -> "\u0417\u0430\u043a\u0443\u043f\u0430\u044e \u0431\u0443\u0442\u044b\u043b\u044c\u043a\u0438 (" + this.countExperienceBottles() + ")";
+            case 8 -> "\u0427\u0438\u043d\u044e \u043a\u0438\u0440\u043a\u0443 (" + this.countExperienceBottles()
+                    + " \u0431\u0443\u0442.)";
+            case 9, 10, 11, 12 ->
+                "\u0417\u0430\u043a\u0443\u043f\u0430\u044e \u0431\u0443\u0442\u044b\u043b\u044c\u043a\u0438 ("
+                        + this.countExperienceBottles() + ")";
         };
     }
 
@@ -1843,5 +2019,5 @@ extends FarmModeBase {
         PROCESSING_SELL_MENU,
         CONFIRMING_MARKET_ACTION,
         COMPLETING_MARKET_ACTION;
-}
+    }
 }
