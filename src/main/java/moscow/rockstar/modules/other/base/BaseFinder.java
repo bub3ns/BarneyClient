@@ -1,5 +1,7 @@
 package moscow.rockstar.modules.other.base;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +24,8 @@ import moscow.rockstar.events.EventListener;
 import moscow.rockstar.modules.Module;
 import moscow.rockstar.modules.ModuleCategory;
 import moscow.rockstar.modules.ModuleInfo;
+import moscow.rockstar.render.item.ItemRenderUtils;
+import moscow.rockstar.render.util.RenderUtils;
 import moscow.rockstar.settings.BooleanSetting;
 import moscow.rockstar.settings.NumberSetting;
 import moscow.rockstar.settings.StringSetting;
@@ -30,6 +34,10 @@ import moscow.rockstar.ui.notifications.Notification;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -45,6 +53,7 @@ import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Direction;
@@ -65,7 +74,6 @@ import pyrock.events.game.WorldChangeEvent;
 import pyrock.events.network.ReceivePacketEvent;
 import pyrock.events.render.Render3DEvent;
 import pyrock.utility.render.ColorRGBA;
-import pyrock.utility.render.PyRender3D;
 
 /**
  * One module containing the five base-finding behaviours from the reference
@@ -113,7 +121,6 @@ public class BaseFinder extends Module {
     private final StringSetting serverSeed;
     private final BooleanSetting lightFinder;
 
-    private final PyRender3D render3D = new PyRender3D();
     private final ConcurrentLinkedQueue<ChunkPos> pendingChunkPositions = new ConcurrentLinkedQueue<>();
     private final Set<ChunkPos> queuedSusChunkPositions = ConcurrentHashMap.newKeySet();
     private final Set<ChunkPos> queuedSuspiciousPositions = ConcurrentHashMap.newKeySet();
@@ -1141,17 +1148,19 @@ public class BaseFinder extends Module {
         if (world == null || BaseFinder.minecraftClient.player == null) {
             return;
         }
+        OverlayFrame frame = new OverlayFrame(event);
         int radius = this.getChunkScanRadius();
-        this.renderSuspiciousChunks(event, world, radius);
-        this.renderSuspiciousBlocks(event, world, radius);
-        this.renderKelpChunks(event, world, radius);
-        this.renderHoles(event, world, radius);
-        this.renderSeedChunks(event, world, radius);
-        this.renderLightSections(event, world);
-        this.renderEntities(event, world, radius);
+        this.renderSuspiciousChunks(frame, world, radius);
+        this.renderSuspiciousBlocks(frame, world, radius);
+        this.renderKelpChunks(frame, world, radius);
+        this.renderHoles(frame, world, radius);
+        this.renderSeedChunks(frame, world, radius);
+        this.renderLightSections(frame, world);
+        this.renderEntities(frame, world, radius);
+        frame.flush();
     }
 
-    private void renderSuspiciousChunks(Render3DEvent event, ClientWorld world, int radius) {
+    private void renderSuspiciousChunks(OverlayFrame frame, ClientWorld world, int radius) {
         int minimumScore = this.intValue(this.sensitivity);
         ColorRGBA color = new ColorRGBA(255.0f, 0.0f, 0.0f, this.intValue(this.chunkAlpha));
         for (Map.Entry<ChunkPos, Integer> entry : this.suspicionScores.entrySet()) {
@@ -1163,7 +1172,8 @@ public class BaseFinder extends Module {
                 || this.scannedNeighbourCount(chunkPos) < MIN_NEIGHBOUR_CHUNKS) {
                 continue;
             }
-            this.render3D.boxAt(event, chunkPos.getStartX(), 63.0, chunkPos.getStartZ(), 16.0, 0.1, 16.0, color);
+            frame.addBox(new Box(chunkPos.getStartX(), 63.0, chunkPos.getStartZ(),
+                chunkPos.getStartX() + 16.0, 63.1, chunkPos.getStartZ() + 16.0), color);
             this.recordBaseLocation(new BlockPos(chunkPos.getStartX() + 8, 63, chunkPos.getStartZ() + 8));
         }
 
@@ -1176,11 +1186,11 @@ public class BaseFinder extends Module {
             if (!this.isNearChunk(new ChunkPos(position), radius)) {
                 continue;
             }
-            this.render3D.boxAt(event, position.getX(), position.getY(), position.getZ(), 1.0, 1.0, 1.0, rotatedColor);
+            frame.addBox(new Box(position), rotatedColor);
         }
     }
 
-    private void renderSuspiciousBlocks(Render3DEvent event, ClientWorld world, int radius) {
+    private void renderSuspiciousBlocks(OverlayFrame frame, ClientWorld world, int radius) {
         int alpha = this.intValue(this.espAlpha);
         for (Map.Entry<ChunkPos, Map<BlockPos, SuspiciousType>> chunkEntry : this.suspiciousBlocksByChunk.entrySet()) {
             if (!this.isNearChunk(chunkEntry.getKey(), radius) || !world.isChunkLoaded(chunkEntry.getKey().x, chunkEntry.getKey().z)) {
@@ -1189,16 +1199,16 @@ public class BaseFinder extends Module {
             for (Map.Entry<BlockPos, SuspiciousType> blockEntry : chunkEntry.getValue().entrySet()) {
                 BlockPos position = blockEntry.getKey();
                 ColorRGBA color = this.suspiciousColor(blockEntry.getValue(), alpha);
-                this.render3D.boxAt(event, position.getX(), position.getY(), position.getZ(), 1.0, 1.0, 1.0, color);
+                frame.addBox(new Box(position), color);
                 if (this.tracers.isEnabled()) {
-                    this.drawTracer(event, position.toCenterPos(),
+                    frame.addTracer(position.toCenterPos(),
                         this.suspiciousColor(blockEntry.getValue(), 255));
                 }
             }
         }
     }
 
-    private void renderKelpChunks(Render3DEvent event, ClientWorld world, int radius) {
+    private void renderKelpChunks(OverlayFrame frame, ClientWorld world, int radius) {
         if (!this.espKelp.isEnabled()) {
             return;
         }
@@ -1207,23 +1217,24 @@ public class BaseFinder extends Module {
             if (!world.isChunkLoaded(chunkPos.x, chunkPos.z) || !this.isNearChunk(chunkPos, radius)) {
                 continue;
             }
-            this.render3D.boxAt(event, chunkPos.getStartX(), 63.0, chunkPos.getStartZ(), 16.0, 0.1, 16.0, color);
+            frame.addBox(new Box(chunkPos.getStartX(), 63.0, chunkPos.getStartZ(),
+                chunkPos.getStartX() + 16.0, 63.1, chunkPos.getStartZ() + 16.0), color);
         }
     }
 
-    private void renderHoles(Render3DEvent event, ClientWorld world, int radius) {
+    private void renderHoles(OverlayFrame frame, ClientWorld world, int radius) {
         int alpha = this.intValue(this.holeAlpha);
         if (this.oneByOneHoles.isEnabled()) {
             ColorRGBA color = new ColorRGBA(255.0f, 0.0f, 0.0f, alpha);
-            this.renderHoleSet(event, world, radius, this.holes1x1ByChunk, color);
+            this.renderHoleSet(frame, world, radius, this.holes1x1ByChunk, color);
         }
         if (this.threeByOneHoles.isEnabled()) {
             ColorRGBA color = new ColorRGBA(255.0f, 165.0f, 0.0f, alpha);
-            this.renderHoleSet(event, world, radius, this.holes3x1ByChunk, color);
+            this.renderHoleSet(frame, world, radius, this.holes3x1ByChunk, color);
         }
     }
 
-    private void renderHoleSet(Render3DEvent event, ClientWorld world, int radius,
+    private void renderHoleSet(OverlayFrame frame, ClientWorld world, int radius,
                                ConcurrentMap<ChunkPos, Set<Hole>> holesByChunk, ColorRGBA color) {
         for (Map.Entry<ChunkPos, Set<Hole>> chunkEntry : holesByChunk.entrySet()) {
             ChunkPos chunkPos = chunkEntry.getKey();
@@ -1231,13 +1242,13 @@ public class BaseFinder extends Module {
                 continue;
             }
             for (Hole hole : chunkEntry.getValue()) {
-                this.render3D.boxAt(event, hole.x, hole.startY, hole.z, hole.width,
-                    hole.endY - hole.startY, hole.length, color);
+                frame.addBox(new Box(hole.x, hole.startY, hole.z,
+                    hole.x + hole.width, hole.endY, hole.z + hole.length), color);
             }
         }
     }
 
-    private void renderSeedChunks(Render3DEvent event, ClientWorld world, int radius) {
+    private void renderSeedChunks(OverlayFrame frame, ClientWorld world, int radius) {
         if (!this.seedFinder.isEnabled() || !this.seedValid) {
             return;
         }
@@ -1250,12 +1261,13 @@ public class BaseFinder extends Module {
             if (!this.isNearChunk(chunkPos, radius)) {
                 continue;
             }
-            this.render3D.boxAt(event, chunkPos.getStartX(), 63.0, chunkPos.getStartZ(), 16.0, 0.1, 16.0, color);
+            frame.addBox(new Box(chunkPos.getStartX(), 63.0, chunkPos.getStartZ(),
+                chunkPos.getStartX() + 16.0, 63.1, chunkPos.getStartZ() + 16.0), color);
             this.recordBaseLocation(new BlockPos(chunkPos.getStartX() + 8, 63, chunkPos.getStartZ() + 8));
         }
     }
 
-    private void renderLightSections(Render3DEvent event, ClientWorld world) {
+    private void renderLightSections(OverlayFrame frame, ClientWorld world) {
         if (!this.lightFinder.isEnabled()) {
             return;
         }
@@ -1268,6 +1280,13 @@ public class BaseFinder extends Module {
             LightStorage lightStorage = blockLightProvider.lightStorage;
             ChunkToNibbleArrayMap storage = lightStorage.storage;
             Long2ObjectOpenHashMap<ChunkNibbleArray> arrays = storage.arrays;
+            ChunkPos playerChunk = BaseFinder.minecraftClient.player.getChunkPos();
+            int radius = this.getChunkScanRadius();
+            List<List<Box>> boxesByLight = new ArrayList<>(16);
+            for (int lightLevel = 0; lightLevel < 16; lightLevel++) {
+                boxesByLight.add(null);
+            }
+
             for (Long2ObjectMap.Entry<ChunkNibbleArray> entry : arrays.long2ObjectEntrySet()) {
                 ChunkNibbleArray lightArray = entry.getValue();
                 if (lightArray == null || lightArray.isArrayUninitialized()) {
@@ -1275,6 +1294,11 @@ public class BaseFinder extends Module {
                 }
 
                 ChunkSectionPos sectionPos = ChunkSectionPos.from(entry.getLongKey());
+                ChunkPos chunkPos = sectionPos.toChunkPos();
+                if (Math.abs(chunkPos.x - playerChunk.x) > radius
+                    || Math.abs(chunkPos.z - playerChunk.z) > radius) {
+                    continue;
+                }
                 int sectionX = sectionPos.getMinX();
                 int sectionY = sectionPos.getMinY();
                 int sectionZ = sectionPos.getMinZ();
@@ -1286,32 +1310,48 @@ public class BaseFinder extends Module {
                                 continue;
                             }
 
-                            BlockPos position = new BlockPos(sectionX + localX, sectionY + localY, sectionZ + localZ);
-                            if (position.getY() < 0) {
+                            int x = sectionX + localX;
+                            int y = sectionY + localY;
+                            int z = sectionZ + localZ;
+                            if (y < 0) {
                                 continue;
                             }
 
-                            float intensity = lightLevel / 15.0f;
-                            ColorRGBA color = new ColorRGBA(
-                                intensity * 255.0f,
-                                intensity * 255.0f,
-                                0.2f * 255.0f,
-                                0.3f * 255.0f
-                            );
-                            this.render3D.boxAt(event, position.getX(), position.getY(), position.getZ(),
-                                1.0, 1.0, 1.0, color);
+                            List<Box> lightBoxes = boxesByLight.get(lightLevel);
+                            if (lightBoxes == null) {
+                                lightBoxes = new ArrayList<>();
+                                boxesByLight.set(lightLevel, lightBoxes);
+                            }
+                            lightBoxes.add(new Box(
+                                x, y, z,
+                                x + 1.0, y + 1.0, z + 1.0
+                            ));
                         }
                     }
                 }
+            }
+
+            for (int lightLevel = 1; lightLevel < 16; lightLevel++) {
+                List<Box> lightBoxes = boxesByLight.get(lightLevel);
+                if (lightBoxes == null || lightBoxes.isEmpty()) {
+                    continue;
+                }
+                float intensity = lightLevel / 15.0f;
+                ColorRGBA color = new ColorRGBA(
+                    intensity * 255.0f,
+                    intensity * 255.0f,
+                    0.2f * 255.0f,
+                    0.3f * 255.0f
+                );
+                frame.addBoxes(lightBoxes, color);
             }
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
 
-    private void renderEntities(Render3DEvent event, ClientWorld world, int radius) {
+    private void renderEntities(OverlayFrame frame, ClientWorld world, int radius) {
         int alpha = this.intValue(this.espAlpha);
-        Vec3d cameraPosition = event.getCamera().getPos();
         for (Entity entity : world.getEntities()) {
             ChunkPos chunkPos = new ChunkPos(entity.getBlockPos());
             if (!this.isNearChunk(chunkPos, radius)) {
@@ -1338,19 +1378,14 @@ public class BaseFinder extends Module {
             if (color == null) {
                 continue;
             }
-            this.render3D.box(event, entity, color);
+            Vec3d interpolatedPosition = moscow.rockstar.render.util.ProjectionUtils.interpolateEntityPosition(
+                entity, frame.event.getTickDelta());
+            Vec3d entityOffset = interpolatedPosition.subtract(entity.getPos());
+            frame.addBox(entity.getBoundingBox().offset(entityOffset), color);
             if (this.tracers.isEnabled()) {
-                Vec3d target = entity.getBoundingBox().getCenter();
-                this.render3D.line(event, cameraPosition.x, cameraPosition.y, cameraPosition.z,
-                    target.x, target.y, target.z, tracerColor);
+                frame.addTracer(entity.getBoundingBox().getCenter().add(entityOffset), tracerColor);
             }
         }
-    }
-
-    private void drawTracer(Render3DEvent event, Vec3d target, ColorRGBA color) {
-        Vec3d cameraPosition = event.getCamera().getPos();
-        this.render3D.line(event, cameraPosition.x, cameraPosition.y, cameraPosition.z,
-            target.x, target.y, target.z, color);
     }
 
     private int scannedNeighbourCount(ChunkPos center) {
@@ -1487,6 +1522,80 @@ public class BaseFinder extends Module {
     public static String formatBaseCoordinates(String name, BlockPos position) {
         return name + " - " + Localization.translate("coords") + ": "
             + position.getX() + " " + position.getY() + " " + position.getZ();
+    }
+
+    /**
+     * Uses the same camera-relative outline/tracer path as the client's existing
+     * Storage ESP renderer. World-space positions are converted once using the
+     * camera from the current Render3DEvent, then everything is flushed together.
+     */
+    private static final class OverlayFrame {
+        private final Render3DEvent event;
+        private final Map<ColorRGBA, List<Box>> boxesByColor = new HashMap<>();
+        private final Map<ColorRGBA, List<Vec3d>> tracersByColor = new HashMap<>();
+
+        private OverlayFrame(Render3DEvent event) {
+            this.event = event;
+        }
+
+        private void addBox(Box box, ColorRGBA color) {
+            if (box == null || color == null || color.getAlpha() <= 0.0f) {
+                return;
+            }
+            this.boxesByColor.computeIfAbsent(color, ignored -> new ArrayList<>()).add(box);
+        }
+
+        private void addBoxes(Iterable<Box> boxes, ColorRGBA color) {
+            if (boxes == null) {
+                return;
+            }
+            for (Box box : boxes) {
+                this.addBox(box, color);
+            }
+        }
+
+        private void addTracer(Vec3d target, ColorRGBA color) {
+            if (target == null || color == null || color.getAlpha() <= 0.0f) {
+                return;
+            }
+            this.tracersByColor.computeIfAbsent(color, ignored -> new ArrayList<>()).add(target);
+        }
+
+        private void flush() {
+            if (this.boxesByColor.isEmpty() && this.tracersByColor.isEmpty()) {
+                return;
+            }
+
+            Vec3d cameraPosition = this.event.getCamera().getPos();
+            RenderSystem.enableBlend();
+            RenderSystem.disableCull();
+            RenderSystem.disableDepthTest();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+            RenderSystem.depthMask(false);
+            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+            BufferBuilder buffer = RenderSystem.renderThreadTesselator().begin(
+                VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
+            for (Map.Entry<ColorRGBA, List<Box>> entry : this.boxesByColor.entrySet()) {
+                ColorRGBA color = entry.getKey();
+                for (Box box : entry.getValue()) {
+                    Box cameraRelativeBox = box.offset(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+                    RenderUtils.drawBoxOutline(this.event.getMatrices(), buffer, cameraRelativeBox, color);
+                }
+            }
+            for (Map.Entry<ColorRGBA, List<Vec3d>> entry : this.tracersByColor.entrySet()) {
+                for (Vec3d target : entry.getValue()) {
+                    RenderUtils.drawWorldLineToPoint(this.event.getMatrices(), buffer, target, entry.getKey());
+                }
+            }
+
+            ItemRenderUtils.flushVertexConsumer(buffer);
+            RenderSystem.depthMask(true);
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.enableCull();
+            RenderSystem.enableDepthTest();
+            RenderSystem.disableBlend();
+        }
     }
 
     private enum SuspiciousType {
